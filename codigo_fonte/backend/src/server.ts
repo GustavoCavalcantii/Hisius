@@ -59,6 +59,7 @@ const startServer = async () => {
 
     logger.info("Conectando com o banco de dados...");
     await connectDB();
+    await User.findAll();
 
     const horizontalSize = getHorizontalSize(asciiArt) + 1;
 

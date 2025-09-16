@@ -13,14 +13,15 @@ export function ErrorMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  Logger.error(err);
+  Logger.error("Erro:", err);
 
-  const config = errorResponses[err.name];
-  
-  if (config) {
-    return res
-      .status(config.status)
-      .json(ErrorResponse(config.message, config.status));
+  if (err instanceof Error) {
+    const config = errorResponses[err.constructor.name];
+    if (config) {
+      return res
+        .status(config.status)
+        .json(ErrorResponse(config.message, config.status));
+    }
   }
 
   return res.status(500).json(ErrorResponse("Erro interno do servidor.", 500));

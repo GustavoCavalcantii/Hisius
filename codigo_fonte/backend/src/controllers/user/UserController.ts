@@ -4,19 +4,16 @@ import { createUser } from "../../service/UserService";
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../../utils/Responses/SuccessResponse";
 import { IUser } from "../../interfaces/user/IUser";
-import Logger from "../../config/Logger";
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
-    const dto = plainToInstance(UserDTO, req.body);
-
     try {
+      const dto = plainToInstance(UserDTO, req.body);
       const user: IUser = await createUser({
         name: dto.nome,
         email: dto.email,
         password: dto.senha,
       });
-
       const response = {
         id: user.id,
         username: user.nome,
@@ -27,8 +24,7 @@ export class UserController {
       return res
         .status(201)
         .json(SuccessResponse(response, "Usuário criado com sucesso!", 201));
-    } catch (err : any) {
-      Logger.error(err);
+    } catch (err: any) {
       next(err);
     }
   }

@@ -4,9 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts",
-    "db:migrate": "tsx ./node_modules/.bin/sequelize db:migrate --config ./config/config.ts",
-    "db:migrate:undo": "tsx ./node_modules/.bin/sequelize db:migrate:undo --config ./config/config.ts"
+    "start": "tsx src/server.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^6.0.0",

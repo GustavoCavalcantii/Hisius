@@ -37,7 +37,7 @@ Patient.init(
   },
   {
     sequelize,
-    tableName: "Paciente",
+    tableName: "paciente",
     timestamps: true,
     createdAt: "data_criacao",
     updatedAt: "data_atualizacao",

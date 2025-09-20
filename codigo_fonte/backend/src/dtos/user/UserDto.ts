@@ -14,7 +14,7 @@ export class UserDTO {
     message: "O nome deve ter entre 2 e 100 caracteres",
     groups: ["create", "update"],
   })
-  nome!: string;
+  name!: string;
 
   @IsEmail({}, { message: "O email deve ser válido", groups: ["create"] })
   email!: string;
@@ -27,12 +27,12 @@ export class UserDTO {
     message: "A senha deve ter pelo menos 6 caracteres",
     groups: ["create"],
   })
-  senha!: string;
+  password!: string;
 
   @IsString({
     message: "Confirmar senha deve ser uma string",
     groups: ["create"],
   })
-  @Match("senha", { message: "As senhas não conferem", groups: ["create"] })
-  confirmarSenha!: string;
+  @Match("password", { message: "As senhas não conferem", groups: ["create"] })
+  confirmPassword!: string;
 }

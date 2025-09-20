@@ -1,0 +1,18 @@
+SuccessStatusResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+      description: Indica se a operação foi bem-sucedida
+    message:
+      type: string
+      example: "Requisição bem-sucedida"
+      description: Mensagem descritiva
+    statusCode:
+      type: integer
+      example: 200
+      description: Código de status HTTP
+    data:
+      $ref: "#/components/schemas/ApiStatusResponse"
+      description: Dados da resposta (opcional)

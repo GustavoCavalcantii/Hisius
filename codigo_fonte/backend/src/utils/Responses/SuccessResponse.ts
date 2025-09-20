@@ -15,6 +15,6 @@ export const SuccessResponse = <T>(
   if (data !== null && data !== undefined) {
     response.data = data;
   }
- 
+
   return response;
 };

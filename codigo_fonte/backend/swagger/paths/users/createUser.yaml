@@ -1,0 +1,75 @@
+/users:
+  post:
+    summary: Registra um usuário
+    description: Registra um usuário na aplicação
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CreateUserDTO"
+    responses:
+      201:
+        description: Usuário criado com sucesso
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuccessResponse"
+            examples:
+              userCreated:
+                summary: Exemplo de usuário criado
+                value:
+                  success: true
+                  message: "Usuário criado com sucesso"
+                  statusCode: 201
+                  data:
+                    id: 1
+                    name: "Gustavo"
+                    email: "gustavo@email.com"
+                    role: "1"
+      400:
+        description: Requisição inválida — algum campo está errado ou ausente
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              InvalidFields:
+                summary: Exemplo de campos inválidos
+                value:
+                  success: false
+                  message: "Campos inválidos."
+                  statusCode: 400
+                  errors:
+                    - field: "email"
+                      message: "Email inválido"
+                    - field: "password"
+                      message: "Senha deve ter entre 6 e 20 caracteres"
+      409:
+        description: Já existe um usuário com esse email
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              DuplicateUser:
+                summary: Exemplo de usuário duplicado
+                value:
+                  success: false
+                  message: "Registro duplicado."
+                  statusCode: 409
+
+      500:
+        description: Erro interno do servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              InternalError:
+                summary: Exemplo de erro interno
+                value:
+                  success: false
+                  message: "Erro interno do servidor."
+                  statusCode: 500
+

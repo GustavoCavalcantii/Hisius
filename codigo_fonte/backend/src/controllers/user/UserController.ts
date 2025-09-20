@@ -10,13 +10,13 @@ export class UserController {
     try {
       const dto = plainToInstance(UserDTO, req.body);
       const user: IUser = await createUser({
-        name: dto.nome,
+        name: dto.name,
         email: dto.email,
-        password: dto.senha,
+        password: dto.password,
       });
       const response = {
         id: user.id,
-        username: user.nome,
+        name: user.nome,
         email: user.email,
         role: user.nivel_acesso,
       };

@@ -9,7 +9,7 @@ export const ErrorResponse = (
   return {
     success: false,
     message,
-    errors,
     statusCode,
+    errors,
   };
 };

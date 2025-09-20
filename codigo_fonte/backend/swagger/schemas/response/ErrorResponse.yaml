@@ -1,0 +1,22 @@
+ErrorResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: false
+    message:
+      type: string
+      example: "Ocorreu um erro"
+    statusCode:
+      type: integer
+      example: 400
+    errors:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          field:
+            type: string
+          message:
+            type: string

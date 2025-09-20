@@ -20,7 +20,7 @@ class StatusController {
     // Monta payload de status
     const response: ApiStatusResponse = {
       appName: API_NAME,
-      latestVersion: API_VERSION,
+      version: API_VERSION,
       environment: environment,
     };
 

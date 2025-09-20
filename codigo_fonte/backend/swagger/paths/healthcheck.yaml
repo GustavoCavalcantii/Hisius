@@ -1,0 +1,35 @@
+"/":
+  get:
+    summary: Healthcheck da API
+    description: Retorna informações sobre o status da aplicação
+    responses:
+      200:
+        description: API está online
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuccessStatusResponse"
+            examples:
+              userCreated:
+                summary: Exemplo API online
+                value:
+                  success: true
+                  message: "API está online"
+                  statusCode: 200
+                  data:
+                    appName: "hisius"
+                    version: "v1"
+                    environment: "development"
+      500:
+        description: Erro interno do servidor
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+            examples:
+              InternalError:
+                summary: Exemplo de erro interno
+                value:
+                  success: false
+                  message: "Erro interno do servidor."
+                  statusCode: 500

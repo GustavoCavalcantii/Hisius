@@ -6,7 +6,6 @@ import { generateASCII } from "./utils/NameGenerator";
 import { config } from "dotenv";
 import packageJson from "../package.json";
 import { connectDB, disconnectDB } from "./database/Connection";
-import User from "./database/models/User";
 
 config();
 
@@ -59,7 +58,6 @@ const startServer = async () => {
 
     logger.info("Conectando com o banco de dados...");
     await connectDB();
-    await User.findAll();
 
     const horizontalSize = getHorizontalSize(asciiArt) + 1;
 
@@ -76,6 +74,7 @@ const startServer = async () => {
         logger.info(`API rodando em: http://localhost:${PORT}/`);
       }
     });
+
     process.on("SIGINT", () => stopServer(false));
     process.on("SIGTERM", () => stopServer(false));
   } catch (err) {

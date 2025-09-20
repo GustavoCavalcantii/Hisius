@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middlewares/Error";
 import { NotFoundMiddleware } from "./middlewares/NotFound";
 import UserRoute from "./routes/UserRoute";
+import { setupSwagger } from "../swagger";
 
 const app = express();
 
@@ -16,6 +17,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:8088",
 ];
 
 /*
@@ -46,6 +48,7 @@ app.use(MaintenanceMiddleware);
 */
 
 app.use(UserRoute);
+setupSwagger(app);
 
 /*
   ERROS E 404

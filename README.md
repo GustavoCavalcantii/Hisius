@@ -32,24 +32,36 @@ O projeto consiste em uma plataforma que melhora a transparência na comunicaç�
 ```bash
 hisius/
 ├─ banco_de_dados/ 
-│   ├─ scripts.sql
+│   ├─ scripts.sql            # Scripts SQL para criação e populamento do banco
 ├─ codigo_fonte/
 │   ├─ backend/
 │   │   ├─ src/
-│   │   │  ├─ controllers/    # Lógica de controle da API (ex: User, Status)
+│   │   │  ├─ config/         # Configurações globais da aplicação (ex.: logger, env)
+│   │   │  ├─ controllers/    # Lógica de controle da API (ex.: UserController, StatusController)
 │   │   │  ├─ database/       # Conexão, models e configuração do Sequelize
-│   │   │  ├─ middlewares/    # Middlewares globais
-│   │   │  ├─ routes.ts       # Rotas principais
+│   │   │  ├─ decorators/     # Decorators customizados (ex.: validações)
+│   │   │  ├─ dtos/           # Data Transfer Objects (DTOs) para requests
+│   │   │  ├─ enums/          # Enumerações usadas na aplicação
+│   │   │  ├─ interfaces/     # Interfaces TypeScript
+│   │   │  ├─ middlewares/    # Middlewares globais da aplicação
+│   │   │  ├─ routes/         # Arquivos de rotas organizados por módulo
+│   │   │  ├─ service/        # Regras de negócio e serviços
+│   │   │  ├─ utils/          # Funções utilitárias e helpers
+│   │   │  ├─ routes.ts       # Rotas principais da aplicação
 │   │   │  └─ server.ts       # Inicialização do servidor
-│   │   ├─ .env.example       # Variáveis de ambiente de exemplo
-│   │   ├─ package.json       # Dependências do backend
+│   │   ├─ swagger/
+│   │   │  ├─ paths/          # Documentação Swagger dos endpoints
+│   │   │  ├─ schemas/        # Schemas reutilizáveis da documentação
+│   │   │  └─ index.ts        # Integração dos arquivos Swagger
+│   │   ├─ .env.example       # Exemplo de variáveis de ambiente
+│   │   ├─ package.json       # Dependências e scripts do backend
 │   │   └─ tsconfig.json      # Configuração do TypeScript
 │   └─ frontend/
-│       ├─ mobile/     
-│       └─ web/
-├─ demonstracao/ # Vídeo de demonstracao 
-├─ documentacao/
-└─ README.md
+│       ├─ mobile/            
+│       └─ web/               
+├─ demonstracao/              # Vídeo ou material de demonstração
+├─ documentacao/              # Documentação geral do projeto
+└─ README.md                  # README principal do projeto
 ```
 
 ## 🖥️ Instalação

@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middlewares/Error";
 import { NotFoundMiddleware } from "./middlewares/NotFound";
 import UserRoute from "./routes/UserRoute";
+import AuthRoute from "./routes/AuthRoute";
 import { setupSwagger } from "../swagger";
 
 const app = express();
@@ -47,6 +48,7 @@ app.use(MaintenanceMiddleware);
   ROTAS
 */
 
+app.use(AuthRoute);
 app.use(UserRoute);
 setupSwagger(app);
 

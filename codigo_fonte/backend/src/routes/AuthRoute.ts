@@ -1,18 +1,15 @@
 import { Router } from "express";
-import StatusController from "../controllers/StatusController";
 import JsonRequiredMiddleware from "../middlewares/JsonRequired";
 import { ValidateRequest } from "../middlewares/ValidateRequest";
 import { UserDTO } from "../dtos/user/UserDto";
-import { UserController } from "../controllers/UserController";
+import { AuthController } from "../controllers/AuthController";
 
 const router = Router();
 
-router.get("/", StatusController.getStatus);
-
 router.post(
-  "/users",
+  "/login",
   JsonRequiredMiddleware,
-  ValidateRequest(UserDTO, ["create"]),
-  UserController.register
+  ValidateRequest(UserDTO, ["login"]),
+  AuthController.login
 );
 export default router;

@@ -2,37 +2,50 @@ import { DataTypes, Model } from "sequelize";
 import { Gender } from "../../enums/User/Gender";
 import { sequelize } from "../Connection";
 import User from "./User";
-import { IPatient } from "../../interfaces/patient/IPatient";
 
-class Patient extends Model<IPatient> implements IPatient {
+export class Patient extends Model {
   declare id: number;
-  declare usuario_id: number;
+  declare userId: number;
   declare cpf: string;
-  declare sexo: Gender;
-  declare telefone: string;
-  declare data_nascimento: Date;
+  declare gender: Gender;
+  declare phone: string;
+  declare birthDate: Date;
+
+  declare data_criacao: Date;
+  declare data_atualizacao: Date;
 }
 
 Patient.init(
   {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    usuario_id: { type: DataTypes.INTEGER, allowNull: false },
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      field: "usuario_id",
+    },
     cpf: {
       type: DataTypes.STRING(14), // formato: 000.000.000-00
       allowNull: true,
       unique: true,
     },
-    telefone: {
+    phone: {
       type: DataTypes.STRING(20), // formato: (00) 00000-0000
       allowNull: true,
+      field: "telefone",
     },
-    sexo: {
+    gender: {
       type: DataTypes.ENUM(...Object.values(Gender)),
       allowNull: true,
+      field: "sexo",
     },
-    data_nascimento: {
+    birthDate: {
       type: DataTypes.DATEONLY,
       allowNull: true,
+      field: "data_nascimento",
     },
   },
   {
@@ -44,7 +57,7 @@ Patient.init(
   }
 );
 
-Patient.belongsTo(User, { foreignKey: "usuario_id" });
-User.hasOne(Patient, { foreignKey: "usuario_id" });
+Patient.belongsTo(User, { foreignKey: "usuario_id", as: "user" });
+User.hasOne(Patient, { foreignKey: "usuario_id", as: "patient" });
 
 export default Patient;

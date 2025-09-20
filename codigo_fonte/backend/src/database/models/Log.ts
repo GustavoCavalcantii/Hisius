@@ -1,25 +1,35 @@
-import { DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../Connection";
 import User from "./User";
 
-const Log = sequelize.define(
-  "Registro",
+export class Log extends Model {
+  declare id: number;
+  declare userId: number;
+  declare description: string;
+  
+  declare data_criacao: Date;
+}
+
+Log.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
     },
-    usuario_id: {
-      type: DataTypes.INTEGER,
+    userId: {
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
+      field: "usuario_id",
     },
-    descricao: {
+    description: {
       type: DataTypes.TEXT,
       allowNull: false,
+      field: "descricao",
     },
   },
   {
+    sequelize,
     tableName: "Atendimento",
     timestamps: true,
     createdAt: "data_criacao",
@@ -27,7 +37,8 @@ const Log = sequelize.define(
   }
 );
 
-User.hasMany(Log, { foreignKey: "usuario_id", as: "atendimento" });
-Log.belongsTo(User, { foreignKey: "usuario_id", as: "usuario" });
+// Associações
+User.hasMany(Log, { foreignKey: "usuario_id", as: "logs" });
+Log.belongsTo(User, { foreignKey: "usuario_id", as: "user" });
 
 export default Log;

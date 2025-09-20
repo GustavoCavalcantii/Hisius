@@ -2,15 +2,16 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../Connection";
 import User from "./User";
 
-export class Attendance extends Model {
+export class RefreshToken extends Model {
   declare id: number;
   declare userId: number;
-  declare description: string;
-  
+  declare token: string;
+
   declare data_criacao: Date;
+  declare data_atualizacao: Date;
 }
 
-Attendance.init(
+RefreshToken.init(
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -22,22 +23,20 @@ Attendance.init(
       allowNull: false,
       field: "usuario_id",
     },
-    description: {
-      type: DataTypes.TEXT,
+    token: {
+      type: DataTypes.STRING,
       allowNull: false,
-      field: "descricao",
     },
   },
   {
     sequelize,
-    tableName: "Atendimento",
+    tableName: "refresh_tokens",
     timestamps: true,
     createdAt: "data_criacao",
-    updatedAt: false,
+    updatedAt: "data_atualizacao",
   }
 );
 
-User.hasMany(Attendance, { foreignKey: "usuario_id", as: "attendances" });
-Attendance.belongsTo(User, { foreignKey: "usuario_id", as: "user" });
+User.hasMany(RefreshToken, { foreignKey: "userId", as: "refreshTokens" });
+RefreshToken.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-export default Attendance;

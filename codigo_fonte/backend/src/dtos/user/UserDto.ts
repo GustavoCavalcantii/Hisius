@@ -1,8 +1,4 @@
-import {
-  IsString,
-  IsEmail,
-  Length,
-} from "class-validator";
+import { IsString, IsEmail, Length } from "class-validator";
 import { Match } from "../../decorators/Match";
 
 export class UserDTO {
@@ -16,16 +12,19 @@ export class UserDTO {
   })
   name!: string;
 
-  @IsEmail({}, { message: "O email deve ser válido", groups: ["create"] })
+  @IsEmail(
+    {},
+    { message: "O email deve ser válido", groups: ["create", "login"] }
+  )
   email!: string;
 
   @IsString({
     message: "A senha deve ser uma string",
-    groups: ["create"],
+    groups: ["create", "login"],
   })
   @Length(6, 255, {
     message: "A senha deve ter pelo menos 6 caracteres",
-    groups: ["create"],
+    groups: ["create", "login"],
   })
   password!: string;
 

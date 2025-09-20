@@ -1,31 +1,31 @@
 import bcrypt from "bcrypt";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
-import User from "../database/models/User.js";
+import { UserRepository } from "../repositories/UserRepository";
 
 const SALT_ROUNDS = 10;
 
-export const createUser = async (userInput: ICreateUserInput) => {
-  const { name, email, password } = userInput;
+export class UserService {
+  private userRepo = new UserRepository();
 
-  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ nome: name, email, senha: hashedPassword });
-  return user;
-};
+  private sanitizeUser(user: any) {
+    if (!user) return null;
 
-export const updateUserPassword = async (
-  userId: number,
-  newPassword: string
-) => {
-  const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
-  const user = await User.findByPk(userId);
-  if (!user) throw new Error("User not found");
-  user.senha = hashedPassword;
-  await user.save();
-  return user;
-};
+    const { data_criacao, data_atualizacao, ...rest } = user.toJSON();
+    return rest;
+  }
 
-export const checkPassword = async (email: string, password: string) => {
-  const user = await User.findOne({ where: { email } });
-  if (!user) return false;
-  return await bcrypt.compare(password, user.senha);
-};
+  async createUser(userInput: ICreateUserInput) {
+    const hashedPassword = await bcrypt.hash(userInput.password, SALT_ROUNDS);
+    const user = await this.userRepo.create({
+      ...userInput,
+      password: hashedPassword,
+    });
+
+    return this.sanitizeUser(user);
+  }
+
+  async getUserByEmail(email: string) {
+    const user = await this.userRepo.findByEmail(email);
+    return this.sanitizeUser(user);
+  }
+}

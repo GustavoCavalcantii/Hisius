@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { UserService } from "../service/UserService";
 import { TokenRepository } from "../repositories/TokenRepository.js";
 import { BadRequestError } from "../utils/Errors/BadResquestError";
@@ -8,6 +8,7 @@ import { ITokenPayload } from "../interfaces/ITokenPayload";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+
 const ACCESS_TOKEN_EXP = "15m";
 const REFRESH_TOKEN_EXP = "7d";
 
@@ -15,16 +16,13 @@ export class AuthService {
   private userService = new UserService();
   private tokenRepo = new TokenRepository();
 
-  private generateAccessToken(userId: number, role: number) {
-    return jwt.sign({ id: userId, role }, ACCESS_TOKEN_SECRET, {
-      expiresIn: ACCESS_TOKEN_EXP,
-    });
-  }
-
-  private generateRefreshToken(userId: number, role: number) {
-    return jwt.sign({ id: userId, role }, REFRESH_TOKEN_SECRET, {
-      expiresIn: REFRESH_TOKEN_EXP,
-    });
+  private generateToken(
+    userId: number,
+    role: number,
+    secret: Secret,
+    options?: SignOptions
+  ): string {
+    return jwt.sign({ id: userId, role }, secret, options);
   }
 
   private async validateRefreshToken(token: string): Promise<ITokenPayload> {
@@ -55,8 +53,16 @@ export class AuthService {
   async refreshToken(oldToken: string) {
     const { id: userId, role } = await this.validateRefreshToken(oldToken);
 
-    const accessToken = this.generateAccessToken(userId, role);
-    const refreshToken = this.generateRefreshToken(userId, role);
+    const accessToken = this.generateToken(userId, role, ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_TOKEN_EXP,
+    });
+
+    const refreshToken = this.generateToken(
+      userId,
+      role,
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXP }
+    );
 
     await this.tokenRepo.saveOrUpdateRefreshToken(userId, refreshToken);
 
@@ -70,8 +76,19 @@ export class AuthService {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) throw new BadRequestError("Email ou senha inválido");
 
-    const accessToken = this.generateAccessToken(user.id, user.role);
-    const refreshToken = this.generateRefreshToken(user.id, user.role);
+    const accessToken = this.generateToken(
+      user.id,
+      user.role,
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXP }
+    );
+
+    const refreshToken = this.generateToken(
+      user.id,
+      user.role,
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXP }
+    );
 
     await this.tokenRepo.saveOrUpdateRefreshToken(user.id, refreshToken);
 

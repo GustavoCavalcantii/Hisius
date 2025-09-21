@@ -15,23 +15,16 @@ export class AuthController {
       const { password, ...safeUser } = response.user;
 
       const payload = { ...safeUser, accessToken: response.accessToken };
-
-      res.cookie("refreshToken", response.refreshToken, {
-        httpOnly: true,
-        secure: process.env.ENVIRONMENT === "production",
-        sameSite: "strict",
-        path: "/auth",
-        maxAge: 7 * 24 * 60 * 60 * 1000, //7 dias
-      });
+      AuthController.createRefreshCookie(res, response.refreshToken);
 
       return res
         .status(200)
         .json(SuccessResponse(payload, "Logado com sucesso", 200));
-    } catch (err: any) {
+    } catch (err) {
       next(err);
     }
   }
-  
+
   static async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.cookies?.refreshToken;
@@ -49,8 +42,8 @@ export class AuthController {
       return res
         .status(200)
         .json(SuccessResponse(null, "Desconectado com sucesso", 200));
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -63,13 +56,7 @@ export class AuthController {
         token
       );
 
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.ENVIRONMENT === "production",
-        sameSite: "strict",
-        path: "/auth",
-        maxAge: 7 * 24 * 60 * 60 * 1000, //7 dias
-      });
+      AuthController.createRefreshCookie(res, refreshToken);
 
       return res
         .status(200)
@@ -77,5 +64,15 @@ export class AuthController {
     } catch (err) {
       next(err);
     }
+  }
+
+  static createRefreshCookie(res: Response, refresh: string) {
+    res.cookie("refreshToken", refresh, {
+      httpOnly: true,
+      secure: process.env.ENVIRONMENT === "production",
+      sameSite: "strict",
+      path: "/auth",
+      maxAge: 7 * 24 * 60 * 60 * 1000, //7 dias
+    });
   }
 }

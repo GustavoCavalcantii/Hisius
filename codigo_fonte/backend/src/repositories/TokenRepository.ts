@@ -20,7 +20,7 @@ export class TokenRepository {
       await existing.save();
       return;
     }
-    
+
     await this.saveRefreshToken(userId, newToken);
   }
 

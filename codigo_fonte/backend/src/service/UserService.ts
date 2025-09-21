@@ -1,13 +1,14 @@
 import bcrypt from "bcrypt";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
 import { UserRepository } from "../repositories/UserRepository";
+import User from "../database/models/User.js";
 
 const SALT_ROUNDS = 10;
 
 export class UserService {
   private userRepo = new UserRepository();
 
-  private sanitizeUser(user: any) {
+  private sanitizeUser(user: User | null) {
     if (!user) return null;
 
     const { data_criacao, data_atualizacao, ...rest } = user.toJSON();

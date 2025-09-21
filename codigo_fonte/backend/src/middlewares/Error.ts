@@ -1,13 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ErrorResponse } from "../utils/Responses/ErrorResponse";
 import Logger from "../config/Logger";
-import { BadRequestError } from "../utils/Errors/BadResquestError";
 
-const errorResponses: Record<string, { status: number; message: string }> = {
-  UniqueConstraintError: { status: 409, message: "Registro duplicado." },
-  ValidationError: { status: 422, message: "Dados inválidos." },
-  BadRequestError: { status: 400, message: "Dados inválidos." },
-};
 
 export function ErrorMiddleware(
   err: any,

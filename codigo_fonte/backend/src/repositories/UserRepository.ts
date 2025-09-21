@@ -1,5 +1,6 @@
 import User from "../database/models/User.js";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
+import { BadRequestError } from "../utils/Errors/BadResquestError.js";
 
 export class UserRepository {
   async create(data: ICreateUserInput) {
@@ -20,7 +21,7 @@ export class UserRepository {
 
   async updatePassword(id: number, hashedPassword: string) {
     const user = await this.findById(id);
-    if (!user) throw new Error("User not found");
+    if (!user) throw new BadRequestError("Usuário não encontrado.");
     user.password = hashedPassword;
     await user.save();
     return user;

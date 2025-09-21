@@ -12,4 +12,9 @@ router.post(
   ValidateRequest(UserDTO, ["login"]),
   AuthController.login
 );
+
+router.post("/refresh", AuthController.refresh);
+
+router.delete("/refresh-token", AuthController.logout);
+
 export default router;

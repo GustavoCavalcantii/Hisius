@@ -9,15 +9,22 @@ export class TokenRepository {
     return RefreshToken.findOne({ where: { userId, token } });
   }
 
-  async updateRefreshToken(userId: number, oldToken: string, newToken: string) {
-    const tokenEntry = await this.findRefreshToken(userId, oldToken);
-    if (!tokenEntry) throw new Error("Token not found");
-    tokenEntry.token = newToken;
-    await tokenEntry.save();
-    return tokenEntry;
+  async findRefreshTokenByUser(userId: number) {
+    return RefreshToken.findOne({ where: { userId } });
+  }
+
+  async saveOrUpdateRefreshToken(userId: number, newToken: string) {
+    const existing = await this.findRefreshTokenByUser(userId);
+    if (existing) {
+      existing.token = newToken;
+      await existing.save();
+      return;
+    }
+    
+    await this.saveRefreshToken(userId, newToken);
   }
 
   async deleteRefreshToken(userId: number, token: string) {
-    return RefreshToken.destroy({ where: { userId, token } });
+    return RefreshToken.destroy({ where: { usuario_id: userId, token } });
   }
 }

@@ -48,7 +48,7 @@ app.use(MaintenanceMiddleware);
   ROTAS
 */
 
-app.use(AuthRoute);
+app.use("/auth", AuthRoute);
 app.use(UserRoute);
 setupSwagger(app);
 

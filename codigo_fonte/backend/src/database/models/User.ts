@@ -40,7 +40,7 @@ User.init(
     role: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: 1,
       field: "nivel_acesso",
     },
   },

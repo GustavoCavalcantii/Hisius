@@ -1,5 +1,7 @@
 /users:
   post:
+    tags:
+      - User
     summary: Registra um usuário
     description: Registra um usuário na aplicação
     requestBody:
@@ -7,14 +9,14 @@
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/CreateUserDTO"
+            $ref: "#/components/schemas/CreateUser"
     responses:
       201:
         description: Usuário criado com sucesso
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SuccessResponse"
+              $ref: "#/components/responses/SuccessResponse"
             examples:
               userCreated:
                 summary: Exemplo de usuário criado
@@ -32,7 +34,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ErrorResponse"
+              $ref: "#/components/responses/ErrorResponse"
             examples:
               InvalidFields:
                 summary: Exemplo de campos inválidos
@@ -50,7 +52,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ErrorResponse"
+              $ref: "#/components/responses/ErrorResponse"
             examples:
               DuplicateUser:
                 summary: Exemplo de usuário duplicado
@@ -64,7 +66,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ErrorResponse"
+              $ref: "#/components/responses/ErrorResponse"
             examples:
               InternalError:
                 summary: Exemplo de erro interno

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ErrorResponse } from "../utils/Responses/ErrorResponse";
+import { ErrorResponse } from "../utils/responses/ErrorResponse";
 
 export function NotFoundMiddleware(
   req: Request,

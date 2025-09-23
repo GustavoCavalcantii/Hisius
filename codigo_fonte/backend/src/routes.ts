@@ -49,7 +49,7 @@ app.use(MaintenanceMiddleware);
 */
 
 app.use("/auth", AuthRoute);
-app.use(UserRoute);
+app.use("/users", UserRoute);
 setupSwagger(app);
 
 /*

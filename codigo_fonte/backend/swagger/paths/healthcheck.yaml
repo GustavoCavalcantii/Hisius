@@ -8,7 +8,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SuccessStatusResponse"
+              $ref: "#/components/responses/SuccessStatusResponse"
             examples:
               userCreated:
                 summary: Exemplo API online
@@ -25,7 +25,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ErrorResponse"
+              $ref: "#/components/responses/ErrorResponse"
             examples:
               InternalError:
                 summary: Exemplo de erro interno

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { BadRequestError } from "../utils/Errors/BadResquestError";
-import { ForbiddenError } from "../utils/Errors/ForbiddenError";
+import { BadRequestError } from "../utils/errors/BadResquestError";
+import { ForbiddenError } from "../utils/errors/ForbiddenError";
 
 export async function AuthMiddleware(
   req: Request,

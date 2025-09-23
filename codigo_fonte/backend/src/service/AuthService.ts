@@ -2,9 +2,10 @@ import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { UserService } from "../service/UserService";
 import { TokenRepository } from "../repositories/TokenRepository.js";
-import { BadRequestError } from "../utils/Errors/BadResquestError";
-import { ForbiddenError } from "../utils/Errors/ForbiddenError";
+import { BadRequestError } from "../utils/errors/BadResquestError";
+import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { ITokenPayload } from "../interfaces/ITokenPayload";
+import { mapValueFieldNames } from "sequelize/types/utils";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
@@ -71,10 +72,18 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.userService.getUserByEmail(email);
-    if (!user) throw new BadRequestError("Email ou senha inválido");
+    if (!user)
+      throw new BadRequestError("Email ou senha inválido", [
+        { field: "email", message: "Email inválido" },
+        { field: "password", message: "Senha inválido" },
+      ]);
 
     const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) throw new BadRequestError("Email ou senha inválido");
+    if (!isValid)
+      throw new BadRequestError("Email ou senha inválido", [
+        { field: "email", message: "Email inválido" },
+        { field: "password", message: "Senha inválido" },
+      ]);
 
     const accessToken = this.generateToken(
       user.id,

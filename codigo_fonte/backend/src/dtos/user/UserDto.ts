@@ -24,7 +24,7 @@ export class UserDTO {
   })
   @Length(6, 255, {
     message: "A senha deve ter pelo menos 6 caracteres",
-    groups: ["create", "login"],
+    groups: ["create"],
   })
   password!: string;
 

@@ -8,10 +8,14 @@ const SALT_ROUNDS = 10;
 export class UserService {
   private userRepo = new UserRepository();
 
+  async deleteUser(user: User) {
+    return await this.userRepo.deleteUser(user.id);
+  }
+
   private sanitizeUser(user: User | null) {
     if (!user) return null;
 
-    const { data_criacao, data_atualizacao, ...rest } = user.toJSON();
+    const { data_criacao, data_atualizacao, deleted, ...rest } = user.toJSON();
     return rest;
   }
 
@@ -22,7 +26,9 @@ export class UserService {
       password: hashedPassword,
     });
 
-    return this.sanitizeUser(user);
+    const { password, ...rest } = this.sanitizeUser(user);
+
+    return rest;
   }
 
   async getUserByEmail(email: string) {

@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { ApiEnviroment } from "../enums/Api/ApiEnviroment";
 import { config } from "dotenv";
 import packageJson from "../../package.json";
-import { ApiStatusResponse } from "../utils/Responses/ApiStatusResponse";
-import { SuccessResponse } from "../utils/Responses/SuccessResponse";
+import { ApiStatusResponse } from "../utils/responses/ApiStatusResponse";
+import { SuccessResponse } from "../utils/responses/SuccessResponse";
 
 config();
 

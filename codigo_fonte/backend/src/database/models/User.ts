@@ -7,6 +7,7 @@ export class User extends Model {
   declare email: string;
   declare password: string;
   declare role: number;
+  declare deleted: boolean;
 
   declare data_criacao: Date;
   declare data_atualizacao: Date;
@@ -31,6 +32,11 @@ User.init(
       validate: {
         isEmail: true,
       },
+    },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: "deletado",
     },
     password: {
       type: DataTypes.STRING(255),

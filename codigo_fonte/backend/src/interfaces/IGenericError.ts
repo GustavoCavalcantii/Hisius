@@ -1,4 +1,4 @@
-interface IGenericError {
+export interface IGenericError {
   status?: number;
   message: string;
 }

@@ -1,9 +1,9 @@
 import { plainToInstance } from "class-transformer";
 import { UserDTO } from "../dtos/user/UserDto";
-import { NextFunction, Request, Response } from "express";
-import { SuccessResponse } from "../utils/Responses/SuccessResponse";
+import { NextFunction, Request, Response, Router } from "express";
+import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import { AuthService } from "../service/AuthService";
-import { BadRequestError } from "../utils/Errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadResquestError";
 
 const authService = new AuthService();
 
@@ -60,7 +60,7 @@ export class AuthController {
 
       return res
         .status(200)
-        .json(SuccessResponse({ accessToken }, "Logado com sucesso", 200));
+        .json(SuccessResponse({ accessToken }, "Token atualizado", 200));
     } catch (err) {
       next(err);
     }

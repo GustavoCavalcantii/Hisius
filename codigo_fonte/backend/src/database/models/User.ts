@@ -1,25 +1,29 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../Connection";
-import { IUser } from "../../interfaces/user/IUser";
 
-class User extends Model<IUser> implements IUser {
+export class User extends Model {
   declare id: number;
-  declare nome: string;
+  declare name: string;
   declare email: string;
-  declare senha: string;
-  declare nivel_acesso: number;
+  declare password: string;
+  declare role: number;
+  declare deleted: boolean;
+
+  declare data_criacao: Date;
+  declare data_atualizacao: Date;
 }
 
 User.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
     },
-    nome: {
+    name: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      field: "nome",
     },
     email: {
       type: DataTypes.STRING(150),
@@ -29,22 +33,30 @@ User.init(
         isEmail: true,
       },
     },
-    senha: {
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: "deletado",
+    },
+    password: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      field: "senha",
     },
-    nivel_acesso: {
+    role: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
       allowNull: false,
+      defaultValue: 1,
+      field: "nivel_acesso",
     },
   },
   {
     sequelize,
-    tableName: "Usuario",
+    tableName: "usuario",
     timestamps: true,
     createdAt: "data_criacao",
     updatedAt: "data_atualizacao",
   }
 );
+
 export default User;

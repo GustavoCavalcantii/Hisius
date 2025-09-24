@@ -1,13 +1,14 @@
 {
   "name": "hisius",
   "description": "",
-  "version": "0.2.0",
+  "version": "0.6.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -17,6 +18,7 @@
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
     "figlet": "^1.8.0",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.15.0",
     "sequelize": "^6.37.7",

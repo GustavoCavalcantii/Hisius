@@ -1,7 +1,7 @@
 import { validate } from "class-validator";
 import { Request, Response, NextFunction } from "express";
 import { plainToInstance } from "class-transformer";
-import { ErrorResponse } from "../utils/Responses/ErrorResponse";
+import { ErrorResponse } from "../utils/responses/ErrorResponse";
 import { IErrorDetail } from "../interfaces/IErrorDetail";
 
 export function ValidateRequest<T extends object>(

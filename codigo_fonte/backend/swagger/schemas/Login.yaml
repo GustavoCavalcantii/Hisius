@@ -1,4 +1,4 @@
-CreateUserDTO:
+Login:
   type: object
   properties:
     name:
@@ -10,11 +10,7 @@ CreateUserDTO:
     password:
       type: string
       example: "123456"
-    confirmPassword:
-      type: string
-      example: "123456"
   required:
     - name
     - email
     - password
-    - confirmPassword

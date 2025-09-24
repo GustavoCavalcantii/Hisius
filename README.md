@@ -44,6 +44,7 @@ hisius/
 │   │   │  ├─ enums/          # Enumerações usadas na aplicação
 │   │   │  ├─ interfaces/     # Interfaces TypeScript
 │   │   │  ├─ middlewares/    # Middlewares globais da aplicação
+│   │   │  ├─ repositories/   # Camada de repositórios (acesso a dados)      
 │   │   │  ├─ routes/         # Arquivos de rotas organizados por módulo
 │   │   │  ├─ service/        # Regras de negócio e serviços
 │   │   │  ├─ utils/          # Funções utilitárias e helpers

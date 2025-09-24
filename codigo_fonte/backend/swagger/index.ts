@@ -24,7 +24,9 @@ function readYAMLDir(dir: string): Record<string, any> {
 }
 
 const schemasDir = path.join(__dirname, "./schemas");
+const responsesDir = path.join(__dirname, "./responses");
 const schemas = readYAMLDir(schemasDir);
+const responses = readYAMLDir(responsesDir);
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -35,8 +37,19 @@ const options: swaggerJsdoc.Options = {
       version: packageJson.version,
       description: "Documentação da API",
     },
+    tags: [
+      {
+        name: "Auth",
+        description: "Operações relacionadas a autenticação",
+      },
+      {
+        name: "User",
+        description: "Operações relacionadas ao usuário",
+      },
+    ],
     components: {
       schemas,
+      responses,
     },
   },
   apis: [path.join(__dirname, "./paths/**/*.yaml")],

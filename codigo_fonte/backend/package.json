@@ -1,7 +1,7 @@
 {
   "name": "hisius",
   "description": "",
-  "version": "0.2.0",
+  "version": "0.6.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts"

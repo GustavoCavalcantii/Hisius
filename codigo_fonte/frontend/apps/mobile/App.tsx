@@ -4,7 +4,7 @@ import { Button } from "@hisius/ui";
 export default function App() {
   return (
     <View style={styles.container}>
-      <Button title="Clique aqui (Web)" onPress={() => alert("Hello Web!")} />
+      <Button title="Clique aqui (Mobile)" onPress={() => alert("Hello Mobile!")} />
     </View>
   );
 }

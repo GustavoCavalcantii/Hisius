@@ -9,7 +9,9 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:mobile": "turbo run dev --filter=mobile"
   },
   "devDependencies": {
     "eslint": "^9.36.0",

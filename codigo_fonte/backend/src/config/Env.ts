@@ -1,5 +1,4 @@
 import * as dotenv from "dotenv";
-import Logger from "./Logger";
 dotenv.config();
 
 const requiredVars = [

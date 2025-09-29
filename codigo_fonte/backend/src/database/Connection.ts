@@ -13,6 +13,7 @@ export const initDB = async (CONFIG: any): Promise<Sequelize> => {
     host,
     port,
     dialect: "mysql",
+    logging: msg => Logger.debug(msg)
   };
   sequelize = new Sequelize(config);
 

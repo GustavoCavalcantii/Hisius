@@ -5,7 +5,7 @@ import app from "./routes";
 import { generateASCII } from "./utils/NameGenerator";
 import packageJson from "../package.json";
 import { initDB, disconnectDB } from "./database/Connection";
-import { initializeModels } from "./database/models/Index";
+import { initializeModels } from "./database/models/index";
 
 const API_NAME = packageJson.name;
 const APP_VERSION = packageJson.version;
@@ -84,6 +84,7 @@ const startServer = async () => {
   } catch (err: any) {
     logger.error("Não foi possível iniciar a aplicação:");
     logger.error(err instanceof Error ? err.message : err);
+    logger.error(err instanceof Error ? err.stack : "");
     await stopServer(true);
   }
 };

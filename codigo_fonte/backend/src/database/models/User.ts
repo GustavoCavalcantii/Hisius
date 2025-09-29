@@ -1,7 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { IModel } from "../../interfaces/IModel";
 
-export class User extends Model implements IModel {
+export class User extends Model {
   declare id: number;
   declare name: string;
   declare email: string;
@@ -12,7 +11,7 @@ export class User extends Model implements IModel {
   declare data_criacao: Date;
   declare data_atualizacao: Date;
 
-  initialize(sequelize: Sequelize): void {
+  static initialize(sequelize: Sequelize): void {
     User.init(
       {
         id: {

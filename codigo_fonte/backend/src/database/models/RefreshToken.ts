@@ -1,8 +1,7 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
 import User from "./User";
-import { IModel } from "../../interfaces/IModel";
 
-export class RefreshToken extends Model implements IModel {
+export class RefreshToken extends Model {
   declare id: number;
   declare userId: number;
   declare token: string;
@@ -10,7 +9,7 @@ export class RefreshToken extends Model implements IModel {
   declare data_criacao: Date;
   declare data_atualizacao: Date;
 
-  initialize(sequelize: Sequelize): void {
+  static initialize(sequelize: Sequelize): void {
     RefreshToken.init(
       {
         id: {
@@ -37,7 +36,7 @@ export class RefreshToken extends Model implements IModel {
       }
     );
   }
-  associate(): void {
+  static associate(): void {
     User.hasMany(RefreshToken, { foreignKey: "userId", as: "refreshTokens" });
     RefreshToken.belongsTo(User, { foreignKey: "userId", as: "user" });
   }

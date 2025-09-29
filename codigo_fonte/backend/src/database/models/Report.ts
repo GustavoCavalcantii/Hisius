@@ -2,14 +2,14 @@ import { Model, DataTypes, Sequelize } from "sequelize";
 import Attendance from "./Attendance";
 import { IModel } from "../../interfaces/IModel";
 
-export class Report extends Model implements IModel {
+export class Report extends Model {
   declare id: number;
   declare attendanceId: number;
   declare averageTime: string;
 
   declare data_criacao: Date;
 
-  initialize(sequelize: Sequelize): void {
+  static initialize(sequelize: Sequelize): void {
     Report.init(
       {
         id: {
@@ -37,7 +37,7 @@ export class Report extends Model implements IModel {
       }
     );
   }
-  associate(): void {
+  static associate(): void {
     Attendance.hasMany(Report, { foreignKey: "atendimento_id", as: "reports" });
     Report.belongsTo(Attendance, {
       foreignKey: "atendimento_id",

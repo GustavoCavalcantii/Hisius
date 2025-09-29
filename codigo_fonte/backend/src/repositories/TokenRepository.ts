@@ -1,4 +1,4 @@
-import { RefreshToken } from "../database/models/Token";
+import { RefreshToken } from "../database/models/RefreshToken";
 
 export class TokenRepository {
   async saveRefreshToken(userId: number, token: string) {

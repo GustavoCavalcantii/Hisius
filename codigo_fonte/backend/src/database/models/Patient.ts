@@ -3,7 +3,7 @@ import { Gender } from "../../enums/User/Gender";
 import User from "./User";
 import { IModel } from "../../interfaces/IModel";
 
-export class Patient extends Model implements IModel {
+export class Patient extends Model {
   declare id: number;
   declare userId: number;
   declare cpf: string;
@@ -14,7 +14,7 @@ export class Patient extends Model implements IModel {
   declare data_criacao: Date;
   declare data_atualizacao: Date;
 
-  initialize(sequelize: Sequelize): void {
+  static initialize(sequelize: Sequelize): void {
     Patient.init(
       {
         id: {
@@ -57,7 +57,7 @@ export class Patient extends Model implements IModel {
       }
     );
   }
-  associate(): void {
+  static associate(): void {
     Patient.belongsTo(User, { foreignKey: "usuario_id", as: "user" });
     User.hasOne(Patient, { foreignKey: "usuario_id", as: "patient" });
   }

@@ -1,5 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import { Button } from "@hisius/ui";
+import { color } from "@hisius/ui/theme/colors";
 
 export default function App() {
   return (
@@ -12,7 +13,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: color.background,
     alignItems: "center",
     justifyContent: "center",
   },

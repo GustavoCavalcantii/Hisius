@@ -1,5 +1,7 @@
 import React from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
+import { color } from "../../theme/colors";
+import { styles } from "./styles";
 
 type ButtonProps = {
   title: string;
@@ -13,19 +15,3 @@ export const Button: React.FC<ButtonProps> = ({ title, onPress }) => {
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#4f46e5",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});

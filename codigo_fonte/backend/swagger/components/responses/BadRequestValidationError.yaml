@@ -1,0 +1,16 @@
+BadRequestValidationError:
+  description: "Erro de validação de campos"
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/responses/ErrorResponse"
+      examples:
+        InvalidPassword:
+          summary: Credenciais inválidas
+          value:
+            success: false
+            message: "Credenciais inválidas"
+            statusCode: 400
+            errors:
+              - field: "password"
+                message: "A senha deve ser uma string"

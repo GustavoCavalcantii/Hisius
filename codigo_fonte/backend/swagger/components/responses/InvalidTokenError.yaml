@@ -1,0 +1,13 @@
+InvalidTokenError:
+  description: Refresh token inválido ou expirado
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/responses/ErrorResponse"
+      examples:
+        InvalidToken:
+          summary: Token inválido ou expirado
+          value:
+            success: false
+            message: "Refresh token inválido ou expirado"
+            statusCode: 403

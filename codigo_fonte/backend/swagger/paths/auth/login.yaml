@@ -1,0 +1,67 @@
+/auth/login:
+  post:
+    tags:
+      - Auth
+    summary: Acessa a conta
+    description: "Acessa a conta do usuário na aplicação"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Login"
+    responses:
+      200:
+        description: Login bem-sucedido
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/responses/SuccessResponse"
+            examples:
+              successLogin:
+                summary: Logado com sucesso
+                value:
+                  success: true
+                  message: "Logado com sucesso"
+                  statusCode: 200
+                  data:
+                    id: 5
+                    name: "Gustavo"
+                    email: "gustavo@email.com"
+                    role: "1"
+                    accessToken: "<TOKEN>"
+
+      400:
+        description: Erro de requisição
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/responses/ErrorResponse"
+            examples:
+              InvalidFields:
+                summary: Email ou senha inválida
+                value:
+                  success: false
+                  message: "Email ou senha inválido"
+                  statusCode: 400
+              InvalidJSON:
+                summary: JSON inválido no corpo da requisição
+                value:
+                  success: false
+                  message: "JSON inválido no corpo da requisição."
+                  statusCode: 400
+              InvalidEmail:
+                summary: Email inválido
+                value:
+                  success: false
+                  message: "Campos inválidos."
+                  statusCode: 400
+                  errors:
+                    - field: "email"
+                      message: "O email deve ser válido"
+
+      409:
+        $ref: "#/components/responses/ConflictError"
+
+      500:
+        $ref: "#/components/responses/InternalServerError"

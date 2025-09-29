@@ -1,0 +1,27 @@
+/auth/refresh-token:
+  delete:
+    tags:
+      - Auth
+    summary: Desconecta da conta
+    description: "Desconecta da conta invalidando o refresh token"
+    responses:
+      200:
+        description: Desconectado com sucesso
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/responses/SuccessResponse"
+            examples:
+              successLogin:
+                summary: Desconectado com sucesso
+                value:
+                  success: true
+                  message: "Desconectado com sucesso"
+                  statusCode: 200
+
+      403:
+        $ref: "#/components/responses/InvalidTokenError"
+      400:
+        $ref: "#/components/responses/MissingTokenError"
+      500:
+        $ref: "#/components/responses/InternalServerError"

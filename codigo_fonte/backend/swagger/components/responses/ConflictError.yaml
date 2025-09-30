@@ -1,0 +1,13 @@
+ConflictError:
+  description: "Registro duplicado (ex: existe um usuário com esse email)"
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/responses/ErrorResponse"
+      examples:
+        DuplicateUser:
+          summary: Exemplo de usuário duplicado
+          value:
+            success: false
+            message: "Registro duplicado."
+            statusCode: 409

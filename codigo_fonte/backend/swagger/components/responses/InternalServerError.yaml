@@ -1,0 +1,13 @@
+InternalServerError:
+  description: "Erro interno do servidor"
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/responses/ErrorResponse"
+      examples:
+        InternalError:
+          summary: Exemplo de erro interno
+          value:
+            success: false
+            message: "Erro interno do servidor."
+            statusCode: 500

@@ -1,10 +1,22 @@
-import { Sequelize } from "sequelize";
+import { Options, Sequelize } from "sequelize";
 import Logger from "../config/Logger";
-import config from "./config/database";
 
-const sequelize = new Sequelize(config);
+let sequelize: Sequelize;
 
-const connectDB = async () => {
+export const initDB = async (CONFIG: any): Promise<Sequelize> => {
+  const { host, port, user, password, database } = CONFIG.mysql;
+
+  const config: Options = {
+    username: user,
+    password,
+    database,
+    host,
+    port,
+    dialect: "mysql",
+    logging: msg => Logger.debug(msg)
+  };
+  sequelize = new Sequelize(config);
+
   try {
     await sequelize.authenticate();
     Logger.info("Conexão com MySQL via Sequelize realizada com sucesso!");
@@ -12,9 +24,12 @@ const connectDB = async () => {
     Logger.error("Erro ao conectar ao MySQL:", error);
     throw error;
   }
+
+  return sequelize;
 };
 
-const disconnectDB = async () => {
+export const disconnectDB = async () => {
+  if (!sequelize) return;
   try {
     await sequelize.close();
     Logger.warn("Conexão com MySQL encerrada!");
@@ -22,5 +37,3 @@ const disconnectDB = async () => {
     Logger.error("Erro ao fechar a conexão:", error);
   }
 };
-
-export { connectDB, disconnectDB, sequelize };

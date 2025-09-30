@@ -19,7 +19,7 @@ export class UserRepository {
     return User.findOne({ where: { id, deletado: false } });
   }
 
-  async deleteUser(id: number) {
+  async delete(id: number) {
     const user = await this.findById(id);
     if (!user) throw new BadRequestError("Usuário não encontrado.");
     user.deleted = true;

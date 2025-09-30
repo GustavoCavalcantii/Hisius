@@ -1,0 +1,13 @@
+BadRequestInvalidJSON:
+  description: "JSON inválido no corpo da requisição"
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/responses/ErrorResponse"
+      examples:
+        InvalidJSON:
+          summary: JSON inválido
+          value:
+            success: false
+            message: "JSON inválido no corpo da requisição."
+            statusCode: 400

@@ -3,18 +3,12 @@ import logger from "./config/Logger";
 import { ApiEnviroment } from "./enums/Api/ApiEnviroment";
 import app from "./routes";
 import { generateASCII } from "./utils/NameGenerator";
-import { config } from "dotenv";
 import packageJson from "../package.json";
-import { connectDB, disconnectDB } from "./database/Connection";
+import { initDB, disconnectDB } from "./database/Connection";
+import { initializeModels } from "./database/models/index";
 
-config();
-
-const API_NAME: string = packageJson.name;
-const APP_VERSION: string = packageJson.version;
-const API_VERSION: string = "v" + (process.env.API_VERSION || "1");
-const ENVIRONMENT: string =
-  process.env.ENVIRONMENT === "dev" ? ApiEnviroment.DEV : ApiEnviroment.PROD;
-const PORT: number = Number(process.env.API_PORT) || 8088;
+const API_NAME = packageJson.name;
+const APP_VERSION = packageJson.version;
 
 let server: http.Server | null = null;
 
@@ -54,10 +48,20 @@ function getHorizontalSize(asciiArt: string): number {
  */
 const startServer = async () => {
   try {
-    const asciiArt = await generateASCII(API_NAME);
+    logger.info("Capturando variáveis de ambiente...");
+    const { CONFIG } = await import("./config/Env");
+
+    const API_VERSION = "v" + CONFIG.apiVersion;
+    const ENVIRONMENT =
+      CONFIG.environment === "dev" ? ApiEnviroment.DEV : ApiEnviroment.PROD;
+    const PORT = CONFIG.apiPort;
 
     logger.info("Conectando com o banco de dados...");
-    await connectDB();
+    const sequelize = await initDB(CONFIG);
+    logger.info("Inicializando modelos...");
+    await initializeModels(sequelize);
+
+    const asciiArt = await generateASCII(API_NAME);
 
     const horizontalSize = getHorizontalSize(asciiArt) + 1;
 
@@ -77,8 +81,10 @@ const startServer = async () => {
 
     process.on("SIGINT", () => stopServer(false));
     process.on("SIGTERM", () => stopServer(false));
-  } catch (err) {
-    logger.error(`Erro ao iniciar aplicação: ${err}`);
+  } catch (err: any) {
+    logger.error("Não foi possível iniciar a aplicação:");
+    logger.error(err instanceof Error ? err.message : err);
+    logger.error(err instanceof Error ? err.stack : "");
     await stopServer(true);
   }
 };

@@ -1,0 +1,13 @@
+MissingTokenError:
+  description: Erro de requisição
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/responses/ErrorResponse"
+      examples:
+        OutToken:
+          summary: Token ausente
+          value:
+            success: false
+            message: "Token ausente"
+            statusCode: 400

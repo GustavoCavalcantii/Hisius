@@ -1,0 +1,16 @@
+ApiStatusResponse:
+  type: object
+  properties:
+    appName:
+      type: string
+      example: "MeuApp"
+      description: Nome da aplicação
+    latestVersion:
+      type: string
+      example: "v1"
+      description: Última versão da API
+    environment:
+      type: string
+      enum: [dev, prod]
+      example: "dev"
+      description: Ambiente em que a API está rodando

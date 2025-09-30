@@ -9,7 +9,7 @@ export class UserService {
   private userRepo = new UserRepository();
 
   async deleteUser(user: User) {
-    return await this.userRepo.deleteUser(user.id);
+    return await this.userRepo.delete(user.id);
   }
 
   private sanitizeUser(user: User | null) {

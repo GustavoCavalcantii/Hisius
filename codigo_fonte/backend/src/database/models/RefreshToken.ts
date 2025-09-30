@@ -1,16 +1,16 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
 import User from "./User";
-import { IModel } from "../../interfaces/IModel";
 
-export class Log extends Model {
+export class RefreshToken extends Model {
   declare id: number;
   declare userId: number;
-  declare description: string;
+  declare token: string;
 
   declare data_criacao: Date;
+  declare data_atualizacao: Date;
 
   static initialize(sequelize: Sequelize): void {
-    Log.init(
+    RefreshToken.init(
       {
         id: {
           type: DataTypes.INTEGER.UNSIGNED,
@@ -22,26 +22,22 @@ export class Log extends Model {
           allowNull: false,
           field: "usuario_id",
         },
-        description: {
-          type: DataTypes.TEXT,
+        token: {
+          type: DataTypes.STRING,
           allowNull: false,
-          field: "descricao",
         },
       },
       {
         sequelize,
-        tableName: "Atendimento",
+        tableName: "refresh_tokens",
         timestamps: true,
         createdAt: "data_criacao",
-        updatedAt: false,
+        updatedAt: "data_atualizacao",
       }
     );
   }
-
   static associate(): void {
-    User.hasMany(Log, { foreignKey: "usuario_id", as: "logs" });
-    Log.belongsTo(User, { foreignKey: "usuario_id", as: "user" });
+    User.hasMany(RefreshToken, { foreignKey: "userId", as: "refreshTokens" });
+    RefreshToken.belongsTo(User, { foreignKey: "userId", as: "user" });
   }
 }
-
-export default Log;

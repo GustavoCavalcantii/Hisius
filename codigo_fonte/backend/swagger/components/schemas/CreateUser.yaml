@@ -1,0 +1,20 @@
+CreateUser:
+  type: object
+  properties:
+    name:
+      type: string
+      example: "Gustavo"
+    email:
+      type: string
+      example: "gustavo@email.com"
+    password:
+      type: string
+      example: "123456"
+    confirmPassword:
+      type: string
+      example: "123456"
+  required:
+    - name
+    - email
+    - password
+    - confirmPassword

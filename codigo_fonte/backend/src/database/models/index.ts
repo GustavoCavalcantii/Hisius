@@ -24,8 +24,6 @@ export const initializeModels = async (sequelize: Sequelize) => {
     }
   }
 
-  models.forEach((model) => console.log(model));
-
   models.forEach((model) => model.initialize(sequelize));
   models.forEach((model) => model.associate?.());
 };

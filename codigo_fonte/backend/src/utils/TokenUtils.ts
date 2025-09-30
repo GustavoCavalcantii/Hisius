@@ -66,6 +66,10 @@ export class TokenUtils {
     return jwt.verify(token, REFRESH_SECRET) as ITokenPayload;
   }
 
+  public validateResetPassToken(token: string) {
+    return jwt.verify(token, RESET_PASS_SECRET) as ITokenPayload;
+  }
+
   public validateAcessToken(token: string) {
     return jwt.verify(token, ACCESS_SECRET) as ITokenPayload;
   }

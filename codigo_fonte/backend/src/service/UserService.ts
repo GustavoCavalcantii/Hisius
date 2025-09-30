@@ -3,11 +3,15 @@ import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
 import { UserRepository } from "../repositories/UserRepository";
 import User from "../database/models/User.js";
 import { BadRequestError } from "../utils/errors/BadResquestError.js";
+import { TokenUtils } from "../utils/TokenUtils.js";
+import { EmailUtils } from "../utils/EmailUtils.js";
 
 const SALT_ROUNDS = 10;
 
 export class UserService {
   private userRepo = new UserRepository();
+  private tokenUtils = new TokenUtils();
+  private emailUtils = new EmailUtils();
 
   async deleteUser(user: User) {
     return await this.userRepo.delete(user.id);
@@ -20,6 +24,18 @@ export class UserService {
     const { password, ...rest } = this.sanitizeUser(user);
 
     return rest;
+  }
+
+  async requestResetToken(email: string) {
+    const user = await this.getUserByEmail(email);
+
+    const resetPassToken = this.tokenUtils.generateResetPassToken(user.id);
+
+    this.emailUtils.sendResetEmail(user.email, user.name, resetPassToken);
+  }
+
+  async recoverPassword(password: string, token: string) {
+    const resetToken = this.tokenUtils.validateResetPassToken(token);
   }
 
   private sanitizeUser(user: User | null) {

@@ -47,32 +47,6 @@ export class AuthController {
     }
   }
 
-  static async requestReset(req: Request, res: Response, next: NextFunction) {
-    try {
-      const dto = plainToInstance(UserDTO, req.body);
-      await authService.requestResetToken(dto.email);
-
-      return res
-        .status(200)
-        .json(SuccessResponse(null, "Email enviado", 200));
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  static async recoverPassword(req: Request, res: Response, next: NextFunction) {
-    try {
-      
-
-
-      return res
-        .status(200)
-        .json(SuccessResponse(null, "Email enviado", 200));
-    } catch (err) {
-      next(err);
-    }
-  }
-
   static async refresh(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.cookies?.refreshToken;

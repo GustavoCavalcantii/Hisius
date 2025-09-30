@@ -9,6 +9,32 @@ import { BadRequestError } from "../utils/errors/BadResquestError";
 const userService = new UserService();
 
 export class UserController {
+  static async requestReset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = plainToInstance(UserDTO, req.body);
+      await userService.requestResetToken(dto.email);
+
+      return res.status(200).json(SuccessResponse(null, "Email enviado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async recoverPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const dto = plainToInstance(UserDTO, req.body);
+      const response = await userService.recoverPassword(dto.password, dto.token);
+
+      return res.status(200).json(SuccessResponse(null, "Email enviado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = plainToInstance(UserDTO, req.body);

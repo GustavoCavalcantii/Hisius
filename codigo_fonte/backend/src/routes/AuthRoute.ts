@@ -16,20 +16,6 @@ router.post(
 
 router.post("/refresh", AuthController.refresh);
 
-router.post(
-  "/reset-password",
-  JsonRequiredMiddleware,
-  ValidateRequest(UserDTO, ["reset"]),
-  AuthController.requestReset
-);
-
-router.get(
-  "/recover-password",
-  ValidateRequest(UserDTO, ["reset"]),
-  AuthMiddleware,
-  AuthController.requestReset
-);
-
 router.delete("/refresh-token", AuthController.logout);
 
 export default router;

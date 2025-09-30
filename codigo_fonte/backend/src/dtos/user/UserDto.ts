@@ -24,7 +24,7 @@ export class UserDTO {
   })
   @Length(6, 255, {
     message: "A senha deve ter pelo menos 6 caracteres",
-    groups: ["create"],
+    groups: ["create", "reset"],
   })
   password!: string;
 
@@ -32,7 +32,7 @@ export class UserDTO {
     message: "Confirmar senha deve ser uma string",
     groups: ["create"],
   })
-  @Match("password", { message: "As senhas não conferem", groups: ["create"] })
+  @Match("password", { message: "As senhas não conferem", groups: ["create", "reset"] })
   confirmPassword!: string;
 
   @IsString({

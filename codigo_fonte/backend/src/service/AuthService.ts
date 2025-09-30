@@ -5,21 +5,11 @@ import { BadRequestError } from "../utils/errors/BadResquestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { ITokenPayload } from "../interfaces/ITokenPayload";
 import { TokenUtils } from "../utils/TokenUtils";
-import { EmailUtils } from "../utils/EmailUtils";
 
 export class AuthService {
   private userService = new UserService();
   private tokenRepo = new TokenRepository();
   private tokenUtils = new TokenUtils();
-  private emailUtils = new EmailUtils();
-
-  async requestResetToken(email: string) {
-    const user = await this.userService.getUserByEmail(email);
-
-    const resetPassToken = this.tokenUtils.generateResetPassToken(user.id);
-
-    this.emailUtils.sendResetEmail(user.email, user.name, resetPassToken);
-  }
 
   private async validateRefreshToken(token: string): Promise<ITokenPayload> {
     try {

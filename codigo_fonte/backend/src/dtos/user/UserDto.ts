@@ -14,7 +14,7 @@ export class UserDTO {
 
   @IsEmail(
     {},
-    { message: "O email deve ser válido", groups: ["create", "login"] }
+    { message: "O email deve ser válido", groups: ["create", "login", "reset"] }
   )
   email!: string;
 
@@ -34,4 +34,10 @@ export class UserDTO {
   })
   @Match("password", { message: "As senhas não conferem", groups: ["create"] })
   confirmPassword!: string;
+
+  @IsString({
+    message: "Token deve existir",
+    groups: ["reset"],
+  })
+  token!: string;
 }

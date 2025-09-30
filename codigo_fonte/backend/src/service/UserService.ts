@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
 import { UserRepository } from "../repositories/UserRepository";
 import User from "../database/models/User.js";
+import { BadRequestError } from "../utils/errors/BadResquestError.js";
 
 const SALT_ROUNDS = 10;
 
@@ -10,6 +11,15 @@ export class UserService {
 
   async deleteUser(user: User) {
     return await this.userRepo.delete(user.id);
+  }
+  async getUserById(id: number) {
+    const user = await this.userRepo.findById(id);
+
+    if (!user) throw new BadRequestError("Usuário não encontrado");
+
+    const { password, ...rest } = this.sanitizeUser(user);
+
+    return rest;
   }
 
   private sanitizeUser(user: User | null) {

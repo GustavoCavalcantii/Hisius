@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
 import { BadRequestError } from "../utils/errors/BadResquestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
+import { TokenUtils } from "../utils/TokenUtils";
+
+var tokenUtils = new TokenUtils();
 
 export async function AuthMiddleware(
   req: Request,
@@ -12,7 +14,7 @@ export async function AuthMiddleware(
   if (!token) return next(new BadRequestError("Token ausente"));
 
   try {
-    const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
+    const payload = tokenUtils.validateAcessToken(token);
 
     if (typeof payload === "string") {
       throw new BadRequestError("Token inválido");

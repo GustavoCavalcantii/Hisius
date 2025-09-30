@@ -1,35 +1,29 @@
 import bcrypt from "bcrypt";
-import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { UserService } from "../service/UserService";
 import { TokenRepository } from "../repositories/TokenRepository.js";
 import { BadRequestError } from "../utils/errors/BadResquestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { ITokenPayload } from "../interfaces/ITokenPayload";
-import { mapValueFieldNames } from "sequelize/types/utils";
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
-
-const ACCESS_TOKEN_EXP = "15m";
-const REFRESH_TOKEN_EXP = "7d";
+import { TokenUtils } from "../utils/TokenUtils";
+import { EmailUtils } from "../utils/EmailUtils";
 
 export class AuthService {
   private userService = new UserService();
   private tokenRepo = new TokenRepository();
+  private tokenUtils = new TokenUtils();
+  private emailUtils = new EmailUtils();
 
-  private generateToken(
-    userId: number,
-    role: number,
-    secret: Secret,
-    options?: SignOptions
-  ): string {
-    return jwt.sign({ id: userId, role }, secret, options);
+  async requestResetToken(email: string) {
+    const user = await this.userService.getUserByEmail(email);
+
+    const resetPassToken = this.tokenUtils.generateResetPassToken(user.id);
+
+    this.emailUtils.sendResetEmail(user.email, user.name, resetPassToken);
   }
 
   private async validateRefreshToken(token: string): Promise<ITokenPayload> {
     try {
-      const payload = jwt.verify(token, REFRESH_TOKEN_SECRET) as ITokenPayload;
-
+      const payload = this.tokenUtils.validateRefreshToken(token);
       if (typeof payload.id !== "number") {
         throw new ForbiddenError("Token inválido");
       }
@@ -54,16 +48,9 @@ export class AuthService {
   async refreshToken(oldToken: string) {
     const { id: userId, role } = await this.validateRefreshToken(oldToken);
 
-    const accessToken = this.generateToken(userId, role, ACCESS_TOKEN_SECRET, {
-      expiresIn: ACCESS_TOKEN_EXP,
-    });
+    const accessToken = this.tokenUtils.generateAccessToken(userId, role);
 
-    const refreshToken = this.generateToken(
-      userId,
-      role,
-      REFRESH_TOKEN_SECRET,
-      { expiresIn: REFRESH_TOKEN_EXP }
-    );
+    const refreshToken = this.tokenUtils.generateRefreshToken(userId, role);
 
     await this.tokenRepo.saveOrUpdateRefreshToken(userId, refreshToken);
 
@@ -85,18 +72,11 @@ export class AuthService {
         { field: "password", message: "Senha inválido" },
       ]);
 
-    const accessToken = this.generateToken(
-      user.id,
-      user.role,
-      ACCESS_TOKEN_SECRET,
-      { expiresIn: ACCESS_TOKEN_EXP }
-    );
+    const accessToken = this.tokenUtils.generateAccessToken(user.id, user.role);
 
-    const refreshToken = this.generateToken(
+    const refreshToken = this.tokenUtils.generateRefreshToken(
       user.id,
-      user.role,
-      REFRESH_TOKEN_SECRET,
-      { expiresIn: REFRESH_TOKEN_EXP }
+      user.role
     );
 
     await this.tokenRepo.saveOrUpdateRefreshToken(user.id, refreshToken);

@@ -1,0 +1,10 @@
+{
+  "name": "@hisius/ui",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.d.ts",
+  "dependencies": {
+    "react-native": "0.81.4",
+    "react-native-web": "~0.21.0"
+  }
+}

@@ -22,20 +22,6 @@ export class TokenUtils {
     return jwt.sign({ ...payload, type }, secret, options);
   }
 
-  private generateAuthToken(
-    userId: number,
-    role: number,
-    secret: Secret,
-    options?: SignOptions
-  ): string {
-    return this.generateToken(
-      { id: userId, role },
-      TokenType.AUTH,
-      secret,
-      options
-    );
-  }
-
   public generateResetEmailToken(userId: number, email: string): string {
     return this.generateToken(
       { id: userId, email },

@@ -24,7 +24,10 @@ export async function ResetPassMiddleware(
     req.user = { id: payload.id };
 
     next();
-  } catch {
+  } catch (err: any) {
+    if (err.name === "TokenExpiredError") {
+      return next(new ForbiddenError("Token expirado"));
+    }
     next(new ForbiddenError("Token inválido"));
   }
 }

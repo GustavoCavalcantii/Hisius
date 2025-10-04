@@ -6,6 +6,7 @@ import { ITokenPayload } from "../interfaces/ITokenPayload";
 const ACCESS_SECRET = CONFIG.tokens.accessSecret;
 const REFRESH_SECRET = CONFIG.tokens.refreshSecret;
 const RESET_PASS_SECRET = CONFIG.tokens.resetPassSecret;
+const RESET_EMAIL_SECRET = CONFIG.tokens.resetEmailSecret;
 
 const ACCESS_EXP = "15m";
 const REFRESH_EXP = "7d";
@@ -32,6 +33,15 @@ export class TokenUtils {
       TokenType.AUTH,
       secret,
       options
+    );
+  }
+
+  public generateResetEmailToken(userId: number, email: string): string {
+    return this.generateToken(
+      { id: userId, email },
+      TokenType.RESET_EMAIL,
+      RESET_EMAIL_SECRET,
+      { expiresIn: RESET_EXP }
     );
   }
 
@@ -66,11 +76,15 @@ export class TokenUtils {
     return jwt.verify(token, REFRESH_SECRET) as ITokenPayload;
   }
 
+  public validateEmailToken(token: string) {
+    return jwt.verify(token, RESET_EMAIL_SECRET) as ITokenPayload;
+  }
+
   public validateResetPassToken(token: string) {
     return jwt.verify(token, RESET_PASS_SECRET) as ITokenPayload;
   }
 
-  public validateAcessToken(token: string) {
+  public validateAccessToken(token: string) {
     return jwt.verify(token, ACCESS_SECRET) as ITokenPayload;
   }
 }

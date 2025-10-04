@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { TokenUtils } from "../utils/TokenUtils";
-import { TokenType } from "../enums/Token/TokenTypes";
 import { BadRequestError } from "../utils/errors/BadResquestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
+import { TokenUtils } from "../utils/TokenUtils";
+import { TokenType } from "../enums/Token/TokenTypes";
 
 var tokenUtils = new TokenUtils();
 
-export async function AuthMiddleware(
+export async function ResetEmailMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -15,16 +15,14 @@ export async function AuthMiddleware(
   if (!token) return next(new BadRequestError("Token ausente"));
 
   try {
-    const payload = tokenUtils.validateAccessToken(token);
+    const payload = tokenUtils.validateEmailToken(token);
 
-    if (payload.type !== TokenType.AUTH) {
+    if (payload.type !== TokenType.RESET_EMAIL) {
       throw new BadRequestError("Token inválido");
     }
 
-    req.user = {
-      id: payload.id,
-      role: payload.role,
-    };
+    req.user = { id: payload.id, email: payload.email };
+
     next();
   } catch {
     next(new ForbiddenError("Token inválido"));

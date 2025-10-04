@@ -13,16 +13,21 @@
           cellpadding="0"
           cellspacing="0"
           border="0"
-          style="margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden;"
+          style="
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+          "
         >
           <!-- Logo -->
           <tr>
             <td align="center" style="padding: 24px">
               <img
-                src="https://media.marka-img.com/a9f42121/9tv7uU5kaYuk1GSe9IrX7B21BYfJX8.png"
-                width="48"
-                height="48"
-                style="border-radius: 50%; display: block"
+                src="https://cdn-icons-png.flaticon.com/512/561/561127.png"
+                width="28"
+                height="28"
+                style="display: block"
                 alt="Logo"
               />
             </td>
@@ -38,8 +43,9 @@
                   color: #0d1329;
                   font-weight: 600;
                 "
-                >Redefinição de senha</span
               >
+                Confirmação de e-mail
+              </span>
             </td>
           </tr>
 
@@ -57,8 +63,8 @@
                   display: block;
                 "
               >
-                Olá {{userName}}! Você solicitou a redefinição da sua senha.<br />
-                Clique no botão abaixo para criar uma nova senha:
+                Olá {{userName}}! Você solicitou a atualização do seu e-mail.<br />
+                Clique no botão abaixo para confirmar a alteração:
               </span>
             </td>
           </tr>
@@ -69,7 +75,7 @@
               <!--[if mso]>
                 <v:roundrect
                   xmlns:v="urn:schemas-microsoft-com:vml"
-                  href="{{resetLink}}"
+                  href="{{confirmLink}}"
                   style="height: 50px; v-text-anchor: middle; width: 180px"
                   arcsize="16%"
                   stroke="f"
@@ -84,7 +90,7 @@
                       font-weight: 600;
                     "
                   >
-                    Redefinir senha
+                    Confirmar e-mail
                   </center>
                 </v:roundrect>
               <![endif]-->
@@ -104,7 +110,7 @@
                   border-radius: 8px;
                 "
               >
-                Redefinir senha
+                Confirmar e-mail
               </a>
             </td>
           </tr>

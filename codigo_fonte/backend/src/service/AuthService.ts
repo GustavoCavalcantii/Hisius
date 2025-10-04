@@ -5,11 +5,13 @@ import { BadRequestError } from "../utils/errors/BadResquestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { ITokenPayload } from "../interfaces/ITokenPayload";
 import { TokenUtils } from "../utils/TokenUtils";
+import { EmailUtils } from "../utils/EmailUtils";
 
 export class AuthService {
   private userService = new UserService();
   private tokenRepo = new TokenRepository();
   private tokenUtils = new TokenUtils();
+  private emailUtils = new EmailUtils();
 
   private async validateRefreshToken(token: string): Promise<ITokenPayload> {
     try {
@@ -73,5 +75,39 @@ export class AuthService {
 
     const { password: _, ...safeUser } = user;
     return { user: safeUser, accessToken, refreshToken };
+  }
+
+  async requestResetEmailToken(userId: number, newEmail: string) {
+    const user = await this.userService.getUserById(userId);
+
+    if (user.email === newEmail) {
+      throw new BadRequestError("Email inválido", [
+        {
+          field: "email",
+          message: "O novo email não pode ser igual ao atual.",
+        },
+      ]);
+    }
+
+    const resetEmailToken = this.tokenUtils.generateResetEmailToken(
+      userId,
+      newEmail
+    );
+    
+    this.emailUtils.sendResetEmail(newEmail, user.name, resetEmailToken);
+  }
+
+  async changeEmail(id: number, email: string) {
+    return await this.userService.changeEmail(id, email);
+  }
+
+  async requestResetPassToken(email: string) {
+    const user = await this.userService.getUserByEmail(email);
+    const resetPassToken = this.tokenUtils.generateResetPassToken(user.id);
+    this.emailUtils.sendResetPass(user.email, user.name, resetPassToken);
+  }
+
+  async recoverPassword(id: number, password: string) {
+    return await this.userService.changePassword(id, password);
   }
 }

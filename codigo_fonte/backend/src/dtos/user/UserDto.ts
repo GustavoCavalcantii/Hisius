@@ -14,13 +14,13 @@ export class UserDTO {
 
   @IsEmail(
     {},
-    { message: "O email deve ser válido", groups: ["create", "login", "reset"] }
+    { message: "O email deve ser válido", groups: ["create", "login", "forgot", "changeEmail"] }
   )
   email!: string;
 
   @IsString({
     message: "A senha deve ser uma string",
-    groups: ["create", "login"],
+    groups: ["create", "login", "reset"],
   })
   @Length(6, 255, {
     message: "A senha deve ter pelo menos 6 caracteres",
@@ -30,14 +30,8 @@ export class UserDTO {
 
   @IsString({
     message: "Confirmar senha deve ser uma string",
-    groups: ["create"],
+    groups: ["create", "reset"],
   })
   @Match("password", { message: "As senhas não conferem", groups: ["create", "reset"] })
   confirmPassword!: string;
-
-  @IsString({
-    message: "Token deve existir",
-    groups: ["reset"],
-  })
-  token!: string;
 }

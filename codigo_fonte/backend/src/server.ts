@@ -2,10 +2,12 @@ import http from "http";
 import logger from "./config/Logger";
 import { ApiEnviroment } from "./enums/Api/ApiEnviroment";
 import app from "./routes";
-import { generateASCII } from "./utils/NameGenerator";
+import { generateASCII } from "./utils/nameGenerator";
 import packageJson from "../package.json";
 import { initDB, disconnectDB } from "./database/Connection";
 import { initializeModels } from "./database/models/index";
+import { getTransporter, initSMTP } from "./config/Smtp";
+import { EmailUtils } from "./utils/EmailUtils";
 
 const API_NAME = packageJson.name;
 const APP_VERSION = packageJson.version;
@@ -60,9 +62,10 @@ const startServer = async () => {
     const sequelize = await initDB(CONFIG);
     logger.info("Inicializando modelos...");
     await initializeModels(sequelize);
+    logger.info("Conectando com serviço SMTP...");
+    await initSMTP(CONFIG);
 
     const asciiArt = await generateASCII(API_NAME);
-
     const horizontalSize = getHorizontalSize(asciiArt) + 1;
 
     console.log(asciiArt);

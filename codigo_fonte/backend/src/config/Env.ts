@@ -13,6 +13,17 @@ const requiredVars = [
   "MYSQL_DATABASE",
   "ACCESS_TOKEN_SECRET",
   "REFRESH_TOKEN_SECRET",
+  "RESET_PASS_TOKEN_SECRET",
+  "RESET_EMAIL_TOKEN_SECRET",
+  "SMTP_HOST",
+  "SMTP_USER",
+  "SMTP_PASS",
+  "SMTP_SECURE",
+  "SMTP_PORT",
+  "SMTP_CHARSET",
+  "EMAIL_FROM",
+  "FRONTEND_URL",
+  "RESET_TOKEN_EXPIRES_MIN",
 ] as const;
 
 type RequiredEnv = {
@@ -33,7 +44,7 @@ function loadEnv(): RequiredEnv {
   }
 
   if (missing.length > 0) {
-    throw new Error("Variáveis de ambiente ausentes");
+    throw new Error("Variáveis de ambiente ausentes: " + missing.join(", "));
   }
 
   return env as RequiredEnv;
@@ -56,5 +67,18 @@ export const CONFIG = {
   tokens: {
     accessSecret: ENV.ACCESS_TOKEN_SECRET,
     refreshSecret: ENV.REFRESH_TOKEN_SECRET,
+    resetPassSecret: ENV.RESET_PASS_TOKEN_SECRET,
+    resetEmailSecret: ENV.RESET_EMAIL_TOKEN_SECRET,
   },
+  smtp: {
+    host: ENV.SMTP_HOST,
+    user: ENV.SMTP_USER,
+    pass: ENV.SMTP_PASS,
+    secure: ENV.SMTP_SECURE === "true",
+    port: Number(ENV.SMTP_PORT),
+    charset: ENV.SMTP_CHARSET,
+    from: ENV.EMAIL_FROM,
+  },
+  frontendUrl: ENV.FRONTEND_URL,
+  resetTokenExpiresMin: Number(ENV.RESET_TOKEN_EXPIRES_MIN),
 };

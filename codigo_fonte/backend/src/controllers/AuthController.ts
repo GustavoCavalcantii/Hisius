@@ -1,6 +1,6 @@
 import { plainToInstance } from "class-transformer";
 import { UserDTO } from "../dtos/user/UserDto";
-import { NextFunction, Request, Response, Router } from "express";
+import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import { AuthService } from "../service/AuthService";
 import { BadRequestError } from "../utils/errors/BadResquestError";
@@ -61,6 +61,78 @@ export class AuthController {
       return res
         .status(200)
         .json(SuccessResponse({ accessToken }, "Token atualizado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async requestEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const dto = plainToInstance(UserDTO, req.body);
+      await authService.requestResetEmailToken(loggedInUser.id, dto.email);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Email enviado com sucesso.", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async changeEmail (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      await authService.changeEmail(loggedInUser.id, loggedInUser.email!);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Email alterado com sucesso", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async requestResetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const dto = plainToInstance(UserDTO, req.body);
+      await authService.requestResetPassToken(dto.email);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Email enviado com sucesso.", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async recoverPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const dto = plainToInstance(UserDTO, req.body);
+      await authService.recoverPassword(loggedInUser.id, dto.password);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Senha alterada com sucesso", 200));
     } catch (err) {
       next(err);
     }

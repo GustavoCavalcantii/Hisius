@@ -34,4 +34,12 @@ export class UserRepository {
     await user.save();
     return user;
   }
+
+  async updateEmail(id: number, email: string) {
+    const user = await this.findById(id);
+    if (!user) throw new BadRequestError("Usuário não encontrado.");
+    user.email = email;
+    await user.save();
+    return user;
+  }
 }

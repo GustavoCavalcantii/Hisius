@@ -6,8 +6,8 @@ import { generateASCII } from "./utils/nameGenerator";
 import packageJson from "../package.json";
 import { initDB, disconnectDB } from "./database/Connection";
 import { initializeModels } from "./database/models/index";
-import { getTransporter, initSMTP } from "./config/Smtp";
-import { EmailUtils } from "./utils/EmailUtils";
+import { initSMTP } from "./config/Smtp";
+import { connectRedis } from "./config/Redis";
 
 const API_NAME = packageJson.name;
 const APP_VERSION = packageJson.version;
@@ -64,6 +64,8 @@ const startServer = async () => {
     await initializeModels(sequelize);
     logger.info("Conectando com serviço SMTP...");
     await initSMTP(CONFIG);
+    logger.info("Conectando com Redis...");
+    await connectRedis();
 
     const asciiArt = await generateASCII(API_NAME);
     const horizontalSize = getHorizontalSize(asciiArt) + 1;

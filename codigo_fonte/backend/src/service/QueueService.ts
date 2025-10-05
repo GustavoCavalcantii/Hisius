@@ -68,4 +68,26 @@ export class QueueService {
 
     await redis.sAdd(this.getPatientSetKey(), patient.id.toString());
   }
+
+  async getPatientsByQueue(
+    type: QueueType,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<IQueuedPatient[]> {
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
+
+    const redis = this.getRedisClient();
+    const queuedPatientsRaw = await redis.lRange(`queue:${type}`, start, end);
+
+    const queuedPatients: IQueuedPatient[] = queuedPatientsRaw.map((p) => {
+      const parsed = JSON.parse(p);
+      return {
+        ...parsed,
+        joinedAt: new Date(parsed.joinedAt),
+      };
+    });
+
+    return queuedPatients;
+  }
 }

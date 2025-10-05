@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import http from "http";
 import logger from "./config/Logger";
 import { ApiEnviroment } from "./enums/Api/ApiEnviroment";

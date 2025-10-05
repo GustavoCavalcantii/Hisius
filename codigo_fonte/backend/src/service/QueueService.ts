@@ -6,6 +6,7 @@ import { IQueuedPatient } from "../interfaces/queue/IQueuedPatient";
 import { BadRequestError } from "../utils/errors/BadResquestError";
 import { PatientService } from "./PatientService";
 import { UserService } from "./UserService";
+import { QueueTypePT } from "../enums/Queue/QueueTypePT";
 
 export class QueueService {
   private redis?: RedisClientType;
@@ -19,8 +20,8 @@ export class QueueService {
     return this.redis;
   }
 
-  private getPatientSetKey() {
-    return "patientsInQueue";
+  private getPatientQueueMapKey() {
+    return "patientQueueMap";
   }
 
   async enqueuedPatient(
@@ -33,12 +34,15 @@ export class QueueService {
 
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
-    const isInQueue = await redis.sIsMember(
-      this.getPatientSetKey(),
-      patient.id.toString()
-    );
+    const patientIdStr = patient.id.toString();
+    const patientQueueMapKey = this.getPatientQueueMapKey();
 
-    if (isInQueue) throw new BadRequestError("Paciente já está em uma fila");
+    const existingQueue = await redis.hGet(patientQueueMapKey, patientIdStr);
+
+    if (existingQueue) {
+      const queuePT = QueueTypePT[existingQueue as QueueType] ?? existingQueue;
+      throw new BadRequestError(`Paciente já está na fila ${queuePT}`);
+    }
 
     const birthDate = patient.birthDate;
     const today = new Date();
@@ -66,7 +70,7 @@ export class QueueService {
       })
     );
 
-    await redis.sAdd(this.getPatientSetKey(), patient.id.toString());
+    await redis.hSet(patientQueueMapKey, patientIdStr, type);
   }
 
   async getPatientsByQueue(

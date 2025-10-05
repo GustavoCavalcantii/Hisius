@@ -94,4 +94,39 @@ export class QueueService {
 
     return queuedPatients;
   }
+
+  async dequeuePatient(userId: number) {
+    const redis = this.getRedisClient();
+    const patientQueueMapKey = this.getPatientQueueMapKey();
+
+    const patient = await this.patientService.getByUserId(userId);
+    if (!patient) throw new BadRequestError("Paciente não encontrado");
+
+    const patientIdStr = patient.id.toString();
+
+    const queueType = await redis.hGet(patientQueueMapKey, patientIdStr);
+
+    if (!queueType) {
+      throw new BadRequestError("Paciente não está em nenhuma fila");
+    }
+
+    const queueKey = `queue:${queueType}`;
+
+    const list = await redis.lRange(queueKey, 0, -1);
+    const index = list.findIndex(
+      (p) => JSON.parse(p).id.toString() === patientIdStr
+    );
+
+    if (index === -1) {
+      await redis.hDel(patientQueueMapKey, patientIdStr);
+      throw new BadRequestError("Paciente não encontrado na fila");
+    }
+
+    await redis.lSet(queueKey, index, "__TO_REMOVE__");
+    await redis.lRem(queueKey, 0, "__TO_REMOVE__");
+
+    await redis.hDel(patientQueueMapKey, patientIdStr);
+
+    return queueType;
+  }
 }

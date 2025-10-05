@@ -25,6 +25,21 @@ export class QueueController {
     }
   }
 
+  static async queueLeave(req: Request, res: Response, next: NextFunction) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      await queueService.dequeuePatient(loggedInUser.id);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Saiu da fila com sucesso", 200));
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async getPatientsByQueue(
     req: Request,
     res: Response,

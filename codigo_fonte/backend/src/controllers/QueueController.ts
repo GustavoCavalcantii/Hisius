@@ -6,6 +6,7 @@ import { QueueType } from "../enums/Queue/QueueType";
 import { plainToInstance } from "class-transformer";
 import { QueueDto } from "../dtos/queue/QueueDto";
 import { QueueParamsDto } from "../dtos/queue/QueueParamsDto";
+import { NotFoundError } from "../utils/errors/NotFoundError";
 
 const queueService = new QueueService();
 
@@ -15,11 +16,48 @@ export class QueueController {
       const loggedInUser = req.user;
       if (!loggedInUser) throw new BadRequestError("Acesso negado");
 
-      await queueService.enqueuedPatient(loggedInUser.id, QueueType.TRIAGE);
+      await queueService.enqueuePatient(loggedInUser.id, QueueType.TRIAGE);
 
       return res
         .status(200)
         .json(SuccessResponse(null, "Entrou na fila com sucesso", 200));
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
+  static async getNextPatient(req: Request, res: Response, next: NextFunction) {
+    try {
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+
+      const patient = await queueService.getNextPatient(paramDto.type);
+    
+      if(!patient) throw new NotFoundError("Não há nenhum paciente na fila");
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(patient, "Próximo paciente chamado com sucesso", 200)
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
+  static async moveToNextQueue(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+      const dto = plainToInstance(QueueDto, req.body);
+
+      await queueService.moveToNextQueue(paramDto.patientId, dto.classification);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Paciente movido com sucesso", 200));
     } catch (err: any) {
       next(err);
     }

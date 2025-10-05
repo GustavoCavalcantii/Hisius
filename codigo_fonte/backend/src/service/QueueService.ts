@@ -7,11 +7,20 @@ import { BadRequestError } from "../utils/errors/BadResquestError";
 import { PatientService } from "./PatientService";
 import { UserService } from "./UserService";
 import { QueueTypePT } from "../enums/Queue/QueueTypePT";
+import { calculateAge, calculateScore } from "../utils/CalculateUtils";
+import Patient from "../database/models/Patient";
+import User from "../database/models/User";
+import { parseClassification } from "../utils/Helper";
+import { NotFoundError } from "../utils/errors/NotFoundError";
 
 export class QueueService {
   private redis?: RedisClientType;
   private patientService = new PatientService();
   private userService = new UserService();
+
+  private getPatientQueueMapKey() {
+    return "patientQueueMap";
+  }
 
   private getRedisClient(): RedisClientType {
     if (!this.redis) {
@@ -20,11 +29,25 @@ export class QueueService {
     return this.redis;
   }
 
-  private getPatientQueueMapKey() {
-    return "patientQueueMap";
+  private async genEnqueuedPatient(user: User, patient: Patient) {
+    const redis = this.getRedisClient();
+
+    const meta = await redis.hGetAll(`patient:${patient.id}:queueData`);
+
+    const age = calculateAge(patient.birthDate);
+
+    const patientOb: IQueuedPatient = {
+      id: patient.id,
+      name: user.name,
+      age,
+      gender: patient.gender,
+      classification: parseClassification(meta.classification),
+    };
+
+    return patientOb;
   }
 
-  async enqueuedPatient(
+  async enqueuePatient(
     userId: number,
     type: QueueType,
     classification?: ManchesterClassification
@@ -44,55 +67,107 @@ export class QueueService {
       throw new BadRequestError(`Paciente já está na fila ${queuePT}`);
     }
 
-    const birthDate = patient.birthDate;
+    if (type === QueueType.TREATMENT && !classification) {
+      throw new BadRequestError(
+        "Classificação de risco é obrigatória para atendimento"
+      );
+    }
+
+    const age = calculateAge(patient.birthDate);
     const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    const dayDiff = today.getDate() - birthDate.getDate();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
 
     const user = await this.userService.getUserById(patient.userId);
     if (!user) throw new BadRequestError("Usuário não encontrado");
 
-    const enqueuedPatient: IQueuedPatient = {
-      id: patient.id,
-      name: user.name,
-      age: age,
-      joinedAt: today,
-      classification,
-    };
+    const queueKey = `queue:${type}`;
 
-    await redis.rPush(
-      `queue:${type}`,
-      JSON.stringify({
-        ...enqueuedPatient,
-        joinedAt: enqueuedPatient.joinedAt.toISOString(),
-      })
-    );
+    await redis.zAdd(queueKey, {
+      score: calculateScore(today, age, classification),
+      value: patientIdStr,
+    });
 
     await redis.hSet(patientQueueMapKey, patientIdStr, type);
+    await redis.hSet(`patient:${patientIdStr}:queueData`, {
+      joinedAt: today.toISOString(),
+      classification: classification ?? "",
+    });
   }
 
   async getPatientsByQueue(
     type: QueueType,
     page: number = 1,
     limit: number = 10
-  ): Promise<IQueuedPatient[]> {
-    const start = (page - 1) * limit;
-    const end = start + limit - 1;
-
+  ): Promise<(IQueuedPatient & { position: number })[]> {
     const redis = this.getRedisClient();
-    const queuedPatientsRaw = await redis.lRange(`queue:${type}`, start, end);
+    const queueKey = `queue:${type}`;
 
-    const queuedPatients: IQueuedPatient[] = queuedPatientsRaw.map((p) => {
-      const parsed = JSON.parse(p);
-      return {
-        ...parsed,
-        joinedAt: new Date(parsed.joinedAt),
-      };
-    });
+    const total = await redis.zCard(queueKey);
+    const currentPage = Math.max(page, 1);
+    const start = (currentPage - 1) * limit;
+    const end = Math.min(start + limit - 1, total - 1);
 
-    return queuedPatients;
+    if (start > total - 1) return [];
+
+    const patientsRaw = await redis.zRange(queueKey, start, end);
+
+    const patients = await Promise.all(
+      patientsRaw.map(async (p, idx) => {
+        const patient = await this.patientService.getById(Number(p));
+        const user = await this.userService.getUserById(patient.userId);
+
+        const base = await this.genEnqueuedPatient(user, patient);
+
+        return {
+          ...base,
+          position: start + idx + 1,
+        };
+      })
+    );
+
+    return patients;
+  }
+
+  async moveToNextQueue(
+    patientId: number,
+    classification: ManchesterClassification
+  ) {
+    const patient = await this.patientService.getById(patientId);
+    if (!patient) throw new BadRequestError("Paciente não encontrado");
+
+    await this.dequeuePatient(patient.userId);
+    await this.enqueuePatient(
+      patient.userId,
+      QueueType.TREATMENT,
+      classification
+    );
+  }
+
+  async getNextPatient(type: QueueType): Promise<IQueuedPatient | null> {
+    const redis = this.getRedisClient();
+    const queueKey = `queue:${type}`;
+
+    const next = await redis.zPopMin(queueKey);
+    if (!next) return null;
+
+    const patientIdStr = next.value;
+    const patient = await this.patientService.getById(Number(patientIdStr));
+    if (!patient) {
+      await redis.hDel(this.getPatientQueueMapKey(), patientIdStr);
+      await redis.del(`patient:${patientIdStr}:queueData`);
+      throw new NotFoundError("Paciente não encontrado");
+    }
+
+    const user = await this.userService.getUserById(patient.userId);
+    if (!user) {
+      await redis.hDel(this.getPatientQueueMapKey(), patientIdStr);
+      await redis.del(`patient:${patientIdStr}:queueData`);
+      throw new NotFoundError("Usuário não encontrado");
+    }
+
+    await redis.hDel(this.getPatientQueueMapKey(), patientIdStr);
+    await redis.del(`patient:${patientIdStr}:queueData`);
+
+    return this.genEnqueuedPatient(user, patient);
   }
 
   async dequeuePatient(userId: number) {
@@ -105,27 +180,15 @@ export class QueueService {
     const patientIdStr = patient.id.toString();
 
     const queueType = await redis.hGet(patientQueueMapKey, patientIdStr);
-
-    if (!queueType) {
+    if (!queueType)
       throw new BadRequestError("Paciente não está em nenhuma fila");
-    }
 
     const queueKey = `queue:${queueType}`;
+    const metaDataKey = `patient:${patientIdStr}:queueData`;
 
-    const list = await redis.lRange(queueKey, 0, -1);
-    const index = list.findIndex(
-      (p) => JSON.parse(p).id.toString() === patientIdStr
-    );
-
-    if (index === -1) {
-      await redis.hDel(patientQueueMapKey, patientIdStr);
-      throw new BadRequestError("Paciente não encontrado na fila");
-    }
-
-    await redis.lSet(queueKey, index, "__TO_REMOVE__");
-    await redis.lRem(queueKey, 0, "__TO_REMOVE__");
-
+    await redis.zRem(queueKey, patientIdStr);
     await redis.hDel(patientQueueMapKey, patientIdStr);
+    await redis.del(metaDataKey);
 
     return queueType;
   }

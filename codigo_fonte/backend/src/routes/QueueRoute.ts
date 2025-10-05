@@ -4,6 +4,7 @@ import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { QueueController } from "../controllers/QueueController";
 import { QueueDto } from "../dtos/queue/QueueDto";
 import { QueueParamsDto } from "../dtos/queue/QueueParamsDto";
+import JsonRequiredMiddleware from "../middlewares/JsonRequired";
 
 const router = Router();
 
@@ -11,12 +12,26 @@ router.post("/join", AuthMiddleware, QueueController.queueJoin);
 
 router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 
-router.get(
-  "/:type",
-  ValidateRequest(QueueParamsDto, undefined, "params"),
-  ValidateRequest(QueueDto, undefined, "query"),
-  QueueController.getPatientsByQueue
+router.delete(
+  "/:type/next",
+  JsonRequiredMiddleware,
+  ValidateRequest(QueueParamsDto, ["search"], "params"),
+  QueueController.getNextPatient
 );
 
+router.put(
+  "/:patientId",
+  JsonRequiredMiddleware,
+  ValidateRequest(QueueParamsDto, ["next"], "params"),
+  ValidateRequest(QueueDto, ["next"], "body"),
+  QueueController.moveToNextQueue
+);
+
+router.get(
+  "/:type",
+  ValidateRequest(QueueParamsDto, ["search"], "params"),
+  ValidateRequest(QueueDto, ["search"], "query"),
+  QueueController.getPatientsByQueue
+);
 
 export default router;

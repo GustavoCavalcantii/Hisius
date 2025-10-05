@@ -1,9 +1,10 @@
 import { ManchesterClassification } from "../../enums/Queue/ManchesterClassification";
+import { Gender } from "../../enums/User/Gender";
 
 export interface IQueuedPatient {
   id: number;
   name: string;
   age: number;
-  joinedAt: Date;
+  gender: Gender;
   classification?: ManchesterClassification;
 }

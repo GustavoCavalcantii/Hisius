@@ -5,6 +5,8 @@ import { QueueController } from "../controllers/QueueController";
 import { QueueDto } from "../dtos/queue/QueueDto";
 import { QueueParamsDto } from "../dtos/queue/QueueParamsDto";
 import JsonRequiredMiddleware from "../middlewares/JsonRequired";
+import { ValidateRoles } from "../middlewares/ValidateRoles";
+import { UserRole } from "../enums/User/UserRole";
 
 const router = Router();
 
@@ -14,6 +16,8 @@ router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 
 router.post(
   "/:type/call-next",
+  AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
   JsonRequiredMiddleware,
   ValidateRequest(QueueDto, ["next-patient"]),
   ValidateRequest(QueueParamsDto, ["search"], "params"),
@@ -22,6 +26,8 @@ router.post(
 
 router.put(
   "/:patientId",
+  AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
   JsonRequiredMiddleware,
   ValidateRequest(QueueParamsDto, ["next"], "params"),
   ValidateRequest(QueueDto, ["next"], "body"),
@@ -30,6 +36,8 @@ router.put(
 
 router.put(
   "/:patientId/next",
+  AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
   JsonRequiredMiddleware,
   ValidateRequest(QueueParamsDto, ["next"], "params"),
   ValidateRequest(QueueDto, ["next"], "body"),
@@ -40,6 +48,8 @@ router.get("/me", AuthMiddleware, QueueController.getSelfInfo);
 
 router.get(
   "/:type/patients",
+  AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
   ValidateRequest(QueueParamsDto, ["search"], "params"),
   ValidateRequest(QueueDto, ["search"], "query"),
   QueueController.getPatientsByQueue

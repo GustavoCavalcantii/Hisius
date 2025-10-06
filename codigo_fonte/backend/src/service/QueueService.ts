@@ -18,10 +18,6 @@ export class QueueService {
   private patientService = new PatientService();
   private userService = new UserService();
 
-  private getPatientQueueMapKey() {
-    return "patientQueueMap";
-  }
-
   private getRedisClient(): RedisClientType {
     if (!this.redis) {
       this.redis = getRedis();
@@ -58,12 +54,11 @@ export class QueueService {
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
     const patientIdStr = patient.id.toString();
-    const patientQueueMapKey = this.getPatientQueueMapKey();
 
-    const existingQueue = await redis.hGet(patientQueueMapKey, patientIdStr);
+    const meta = await redis.hGetAll(`patient:${patientIdStr}:queueData`);
 
-    if (existingQueue) {
-      const queuePT = QueueTypePT[existingQueue as QueueType] ?? existingQueue;
+    if (meta && meta.type) {
+      const queuePT = QueueTypePT[meta.type as QueueType] ?? meta.type;
       throw new BadRequestError(`Paciente já está na fila ${queuePT}`);
     }
 
@@ -86,10 +81,10 @@ export class QueueService {
       value: patientIdStr,
     });
 
-    await redis.hSet(patientQueueMapKey, patientIdStr, type);
     await redis.hSet(`patient:${patientIdStr}:queueData`, {
       joinedAt: today.toISOString(),
       classification: classification ?? "",
+      type,
     });
   }
 
@@ -131,8 +126,14 @@ export class QueueService {
     patientId: number,
     classification: ManchesterClassification
   ) {
+    const redis = this.getRedisClient();
     const patient = await this.patientService.getById(patientId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
+
+    const meta = await redis.hGetAll(`patient:${patient.id}:queueData`);
+
+    if(meta.type === QueueType.TREATMENT)
+      throw new BadRequestError("Paciente já está na fila de atendimento");
 
     await this.dequeuePatient(patient.userId);
     await this.enqueuePatient(
@@ -152,19 +153,16 @@ export class QueueService {
     const patientIdStr = next.value;
     const patient = await this.patientService.getById(Number(patientIdStr));
     if (!patient) {
-      await redis.hDel(this.getPatientQueueMapKey(), patientIdStr);
       await redis.del(`patient:${patientIdStr}:queueData`);
       throw new NotFoundError("Paciente não encontrado");
     }
 
     const user = await this.userService.getUserById(patient.userId);
     if (!user) {
-      await redis.hDel(this.getPatientQueueMapKey(), patientIdStr);
       await redis.del(`patient:${patientIdStr}:queueData`);
       throw new NotFoundError("Usuário não encontrado");
     }
 
-    await redis.hDel(this.getPatientQueueMapKey(), patientIdStr);
     await redis.del(`patient:${patientIdStr}:queueData`);
 
     return this.genEnqueuedPatient(user, patient);
@@ -172,24 +170,21 @@ export class QueueService {
 
   async dequeuePatient(userId: number) {
     const redis = this.getRedisClient();
-    const patientQueueMapKey = this.getPatientQueueMapKey();
 
     const patient = await this.patientService.getByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
     const patientIdStr = patient.id.toString();
-
-    const queueType = await redis.hGet(patientQueueMapKey, patientIdStr);
-    if (!queueType)
-      throw new BadRequestError("Paciente não está em nenhuma fila");
-
-    const queueKey = `queue:${queueType}`;
     const metaDataKey = `patient:${patientIdStr}:queueData`;
 
+    const queue = await redis.hGetAll(metaDataKey);
+    if (!queue) throw new BadRequestError("Paciente não está em nenhuma fila");
+
+    const queueKey = `queue:${queue.type}`;
+
     await redis.zRem(queueKey, patientIdStr);
-    await redis.hDel(patientQueueMapKey, patientIdStr);
     await redis.del(metaDataKey);
 
-    return queueType;
+    return queue;
   }
 }

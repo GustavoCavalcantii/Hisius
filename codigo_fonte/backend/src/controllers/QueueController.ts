@@ -26,13 +26,30 @@ export class QueueController {
     }
   }
 
+  static async getSelfInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const patient = await queueService.getPatientInfo(loggedInUser.id);
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(patient, "Informações capturadas com sucesso", 200)
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async getNextPatient(req: Request, res: Response, next: NextFunction) {
     try {
       const paramDto = plainToInstance(QueueParamsDto, req.params);
 
       const patient = await queueService.getNextPatient(paramDto.type);
-    
-      if(!patient) throw new NotFoundError("Não há nenhum paciente na fila");
+
+      if (!patient) throw new NotFoundError("Não há nenhum paciente na fila");
 
       return res
         .status(200)
@@ -53,7 +70,10 @@ export class QueueController {
       const paramDto = plainToInstance(QueueParamsDto, req.params);
       const dto = plainToInstance(QueueDto, req.body);
 
-      await queueService.moveToNextQueue(paramDto.patientId, dto.classification);
+      await queueService.moveToTreatment(
+        paramDto.patientId,
+        dto.classification
+      );
 
       return res
         .status(200)
@@ -78,6 +98,34 @@ export class QueueController {
     }
   }
 
+  static async updateQueueClassification(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+      const dto = plainToInstance(QueueDto, req.body);
+
+      await queueService.updateClassification(
+        paramDto.patientId,
+        dto.classification
+      );
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(
+            null,
+            "Classificação de risco alterada com sucesso",
+            200
+          )
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async getPatientsByQueue(
     req: Request,
     res: Response,
@@ -90,7 +138,9 @@ export class QueueController {
       const enquedPatients = await queueService.getPatientsByQueue(
         paramDto.type,
         queryDto.page,
-        queryDto.limit
+        queryDto.limit,
+        queryDto.classification,
+        queryDto.nameFilter
       );
 
       return res

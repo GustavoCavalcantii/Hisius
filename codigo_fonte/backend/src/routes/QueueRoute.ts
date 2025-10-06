@@ -13,7 +13,7 @@ router.post("/join", AuthMiddleware, QueueController.queueJoin);
 router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 
 router.delete(
-  "/:type/next",
+  "/:type/call-next",
   JsonRequiredMiddleware,
   ValidateRequest(QueueParamsDto, ["search"], "params"),
   QueueController.getNextPatient
@@ -24,11 +24,21 @@ router.put(
   JsonRequiredMiddleware,
   ValidateRequest(QueueParamsDto, ["next"], "params"),
   ValidateRequest(QueueDto, ["next"], "body"),
+  QueueController.updateQueueClassification
+);
+
+router.put(
+  "/:patientId/next",
+  JsonRequiredMiddleware,
+  ValidateRequest(QueueParamsDto, ["next"], "params"),
+  ValidateRequest(QueueDto, ["next"], "body"),
   QueueController.moveToNextQueue
 );
 
+router.get("/me", AuthMiddleware, QueueController.getSelfInfo);
+
 router.get(
-  "/:type",
+  "/:type/patients",
   ValidateRequest(QueueParamsDto, ["search"], "params"),
   ValidateRequest(QueueDto, ["search"], "query"),
   QueueController.getPatientsByQueue

@@ -9,6 +9,7 @@ import { initDB, disconnectDB } from "./database/Connection";
 import { initializeModels } from "./database/models/index";
 import { initSMTP } from "./config/Smtp";
 import { connectRedis } from "./config/Redis";
+import { QueueService } from "./service/QueueService";
 
 const API_NAME = packageJson.name;
 const APP_VERSION = packageJson.version;

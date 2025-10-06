@@ -5,7 +5,7 @@ export class PatientService {
   async getByUserId(userId: number) {
     const patientMock = {
       id: 1,
-      userId: userId,
+      userId: 7,
       cpf: "123.456.789-00",
       gender: Gender.MALE,
       phone: "(11) 91234-5678",
@@ -17,7 +17,7 @@ export class PatientService {
   async getById(id: number) {
     const patientMock = {
       id: id,
-      userId: 6,
+      userId: 7,
       cpf: "123.456.789-00",
       gender: Gender.MALE,
       phone: "(11) 91234-5678",

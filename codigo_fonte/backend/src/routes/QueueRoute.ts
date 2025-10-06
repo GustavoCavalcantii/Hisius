@@ -12,9 +12,10 @@ router.post("/join", AuthMiddleware, QueueController.queueJoin);
 
 router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 
-router.delete(
+router.post(
   "/:type/call-next",
   JsonRequiredMiddleware,
+  ValidateRequest(QueueDto, ["next-patient"]),
   ValidateRequest(QueueParamsDto, ["search"], "params"),
   QueueController.getNextPatient
 );

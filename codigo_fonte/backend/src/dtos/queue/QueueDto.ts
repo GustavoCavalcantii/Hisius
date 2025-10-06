@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
 import { ManchesterClassification } from "../../enums/Queue/ManchesterClassification";
 
 export class QueueDto {
@@ -52,4 +52,17 @@ export class QueueDto {
     groups: ["search"],
   })
   nameFilter: string;
+
+  /**
+   * Nome da sala para o paciente ir
+   */
+  @IsString({
+    message: "A sala deve ser um texto",
+    groups: ["next-patient"],
+  })
+  @IsNotEmpty({
+    message: "A sala não pode ser vazia",
+    groups: ["next-patient"],
+  })
+  room: string;
 }

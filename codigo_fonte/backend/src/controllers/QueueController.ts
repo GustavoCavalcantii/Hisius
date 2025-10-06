@@ -46,8 +46,12 @@ export class QueueController {
   static async getNextPatient(req: Request, res: Response, next: NextFunction) {
     try {
       const paramDto = plainToInstance(QueueParamsDto, req.params);
+      const dto = plainToInstance(QueueDto, req.body);
 
-      const patient = await queueService.getNextPatient(paramDto.type);
+      const patient = await queueService.getNextPatient(
+        paramDto.type,
+        dto.room
+      );
 
       if (!patient) throw new NotFoundError("Não há nenhum paciente na fila");
 

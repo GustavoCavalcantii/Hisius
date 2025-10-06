@@ -12,6 +12,7 @@ import { QueueRepository } from "../repositories/QueueRepository";
 import { QueueStatus } from "../interfaces/queue/QueueStatus";
 import Patient from "../database/models/Patient";
 import User from "../database/models/User";
+import { NotificationService } from "./NotificationService";
 
 export class QueueService {
   private patientService = new PatientService();
@@ -264,7 +265,10 @@ export class QueueService {
     );
   }
 
-  async getNextPatient(type: QueueType): Promise<IQueuedPatient | null> {
+  async getNextPatient(
+    type: QueueType,
+    room: string
+  ): Promise<IQueuedPatient | null> {
     const queueKey = `queue:${type}`;
     const patientIdStr = await this.queueRepo.getNextPatientId(queueKey);
 
@@ -277,11 +281,15 @@ export class QueueService {
     const { patient, user } = await this.getPatientWithUser(patientId);
     await this.queueRepo.registerPatientCalled(type, patient.id);
 
-    return this.formatQueuedPatient(
+    const queuedPatient = await this.formatQueuedPatient(
       user,
       patient,
       await this.queueRepo.getPatientMeta(patientId)
     );
+
+    await NotificationService.notifyPatientCalled(user.id, room);
+
+    return queuedPatient;
   }
 
   async dequeuePatient(userId: number) {

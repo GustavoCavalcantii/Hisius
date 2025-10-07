@@ -4,16 +4,16 @@ import { ICreateManagerInput } from "../interfaces/manager/ICreateManagerInput";
 export class ManagerRepository {
   async create(data: ICreateManagerInput) {
     return Manager.create({
-      userId: data.userId, 
-      hospitalCode: data.hospitalCode
+      userId: data.userId,
+      hospitalCode: data.hospitalCode,
     });
   }
 
   async findById(id: number) {
-    return Manager.findOne({ where: { id, deletado: false } });
+    return Manager.findByPk(id);
   }
 
   async findByUserId(userId: number) {
-    return Manager.findOne({ where: { userId, deletado: false } });
+    return Manager.findOne({ where: { userId } });
   }
 }

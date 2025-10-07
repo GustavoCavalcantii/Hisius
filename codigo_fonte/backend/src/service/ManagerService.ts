@@ -3,6 +3,7 @@ import { TokenUtils } from "../utils/TokenUtils";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { ManagerRepository } from "../repositories/ManagerRepository";
 import Manager from "../database/models/Manager";
+import { BadRequestError } from "../utils/errors/BadResquestError";
 
 export class ManagerService {
   private userService = new UserService();
@@ -33,5 +34,12 @@ export class ManagerService {
     const sanatizedManager = this.sanatizeManager(manager);
 
     return { ...sanatizedManager, ...user };
+  }
+
+  async getHospitalCode(userId: number): Promise<string> {
+    const manager = await this.managerRepo.findByUserId(userId);
+    if (!manager) throw new BadRequestError("Administrador não encontrado");
+
+    return manager.hospitalCode;
   }
 }

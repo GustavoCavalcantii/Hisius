@@ -36,6 +36,13 @@ export class ManagerService {
     return { ...sanatizedManager, ...user };
   }
 
+  async generateAddEmployeToken(userId: number) {
+    const hospitalCode = await this.getHospitalCode(userId);
+    const token = await this.tokenUtils.generateEmployeeToken(hospitalCode);
+
+    return token;
+  }
+
   async getHospitalCode(userId: number): Promise<string> {
     const manager = await this.managerRepo.findByUserId(userId);
     if (!manager) throw new BadRequestError("Administrador não encontrado");

@@ -14,6 +14,12 @@ router.post(
   ManagerController.register
 );
 
+router.post(
+  "/staff-code",
+  AuthMiddleware,
+  ManagerController.generateAddEmployeToken
+);
+
 router.get("/hospital-info", AuthMiddleware, ManagerController.getHospitalCode);
 
 export default router;

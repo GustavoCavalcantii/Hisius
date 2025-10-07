@@ -21,6 +21,33 @@ export class ManagerController {
     }
   }
 
+  static async generateAddEmployeToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const token: string = await managerService.generateAddEmployeToken(
+        loggedInUser.id
+      );
+
+      return res
+        .status(201)
+        .json(
+          SuccessResponse(
+            { token: token },
+            "Informações capturadas com sucesso!",
+            201
+          )
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+  
   static async getHospitalCode(
     req: Request,
     res: Response,

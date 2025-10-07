@@ -15,6 +15,7 @@ const requiredVars = [
   "REFRESH_TOKEN_SECRET",
   "RESET_PASS_TOKEN_SECRET",
   "RESET_EMAIL_TOKEN_SECRET",
+  "GENERATE_TOKEN_SECRET",
   "SMTP_HOST",
   "SMTP_USER",
   "SMTP_PASS",
@@ -69,6 +70,7 @@ export const CONFIG = {
     refreshSecret: ENV.REFRESH_TOKEN_SECRET,
     resetPassSecret: ENV.RESET_PASS_TOKEN_SECRET,
     resetEmailSecret: ENV.RESET_EMAIL_TOKEN_SECRET,
+    generateSecret: ENV.GENERATE_TOKEN_SECRET,
   },
   smtp: {
     host: ENV.SMTP_HOST,

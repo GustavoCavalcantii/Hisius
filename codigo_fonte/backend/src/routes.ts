@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middlewares/Error";
 import { NotFoundMiddleware } from "./middlewares/NotFound";
 import UserRoute from "./routes/UserRoute";
+import ManagerRoute from "./routes/ManangerRoute";
 import EnvRoute from "./routes/EnviromentRoute";
 import AuthRoute from "./routes/AuthRoute";
 import { setupSwagger } from "../swagger";
@@ -51,6 +52,7 @@ app.use(MaintenanceMiddleware);
 app.use(EnvRoute);
 app.use("/auth", AuthRoute);
 app.use("/users", UserRoute);
+app.use("/admins", ManagerRoute);
 setupSwagger(app);
 
 /*

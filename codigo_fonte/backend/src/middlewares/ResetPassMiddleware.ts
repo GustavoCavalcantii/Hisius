@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { BadRequestError } from "../utils/errors/BadRequestError";
+import { BadRequestError } from "../utils/errors/BadResquestError";
+import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { TokenType } from "../enums/Token/TokenTypes";
-import { ForbiddenError } from "../utils/errors/ForbiddenError";
 
 var tokenUtils = new TokenUtils();
 
-export async function AuthMiddleware(
+export async function ResetPassMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -15,20 +15,18 @@ export async function AuthMiddleware(
   if (!token) return next(new BadRequestError("Token ausente"));
 
   try {
-    const payload = tokenUtils.validateAccessToken(token);
+    const payload = tokenUtils.validateResetPassToken(token);
 
-    if (payload.type !== TokenType.AUTH) {
+    if (payload.type !== TokenType.RESET_PASS) {
       throw new BadRequestError("Token inválido");
     }
 
-    req.user = {
-      id: payload.id,
-      role: payload.role,
-    };
+    req.user = { id: payload.id };
+
     next();
   } catch (err: any) {
     if (err.name === "TokenExpiredError") {
-     return next(new ForbiddenError("Token expirado"));
+      return next(new ForbiddenError("Token expirado"));
     }
     next(new ForbiddenError("Token inválido"));
   }

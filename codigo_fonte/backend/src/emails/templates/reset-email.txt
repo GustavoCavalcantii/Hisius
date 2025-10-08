@@ -1,0 +1,6 @@
+Olá {{userName}}! Você solicitou a atualização do seu e-mail.
+Clique no link abaixo para confirmar a alteração:
+
+{{confirmLink}}
+
+Se você não solicitou esta ação, ignore este e-mail.

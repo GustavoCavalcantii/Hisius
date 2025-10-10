@@ -25,5 +25,18 @@ export class PatientRepository {
     }
     await patient.destroy();
   }
+
+   async findByUserId(userId: number) {
+    return Patient.findOne({ where: { userId } });
+  }
+
+  async updateByUserId(userId: number, data: Partial<PatientDto>): Promise<Patient> {
+    const patient = await this.findByUserId(userId);
+    if (!patient) {
+      throw new BadRequestError("Perfil de paciente não encontrado para este usuário.");
+    }
+    await patient.update(data);
+    return patient;
+  }
 }
 

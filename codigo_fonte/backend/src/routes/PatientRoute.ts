@@ -1,40 +1,22 @@
 import { Router } from "express";
 import { PatientController } from "../controllers/PatientController";
-import JsonRequiredMiddleware from "../middlewares/JsonRequired";
+import { AuthMiddleware } from "../middlewares/AuthMiddleware";
+import { RoleMiddleware } from "../middlewares/RoleMiddleware";
 import { ValidateRequest } from "../middlewares/ValidateRequest";
 import { PatientDto } from "../dtos/patient/PatientDto";
-import { AuthMiddleware } from "../middlewares/AuthMiddleware";
+import JsonRequiredMiddleware from "../middlewares/JsonRequired";
 
 const router = Router();
 
+// Rota de criação (qualquer usuário logado)
+router.post("/", AuthMiddleware, JsonRequiredMiddleware, ValidateRequest(PatientDto, ["create"]), PatientController.createPatient);
 
-router.get("/:id", AuthMiddleware, PatientController.getPatient);
+// Rotas do próprio paciente
+router.get("/me", AuthMiddleware, PatientController.getMyProfile);
+router.put("/me", AuthMiddleware, JsonRequiredMiddleware, ValidateRequest(PatientDto, ["update"]), PatientController.updateMyProfile);
 
-router.post(
-  "/",
-  AuthMiddleware,
-  JsonRequiredMiddleware,
-  ValidateRequest(PatientDto, ["create"]),
-  PatientController.createPatient
-);
-
-
-router.put(
-  "/:id",
-  AuthMiddleware,
-  JsonRequiredMiddleware,
-  ValidateRequest(PatientDto, ["update"]),
-  PatientController.updatePatient
-);
-
-// Dentro do arquivo PatientRoute.ts
-
-// ... (depois da rota PUT)
-
-router.delete(
-  "/:id",
-  AuthMiddleware,
-  PatientController.deletePatient
-);
+// Rotas do administrador
+router.get("/:id", AuthMiddleware, RoleMiddleware([0]), PatientController.getPatient);
+router.put("/:id", AuthMiddleware, RoleMiddleware([0]), JsonRequiredMiddleware, ValidateRequest(PatientDto, ["update"]), PatientController.updatePatient);
 
 export default router;

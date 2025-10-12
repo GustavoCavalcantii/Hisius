@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { TokenType } from "../enums/Token/TokenTypes";

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { UserService } from "../service/UserService";
-import { TokenRepository } from "../repositories/TokenRepository.js";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { TokenRepository } from "../repositories/TokenRepository";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { ITokenPayload } from "../interfaces/ITokenPayload";
 import { TokenUtils } from "../utils/TokenUtils";

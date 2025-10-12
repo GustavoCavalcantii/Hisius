@@ -11,6 +11,7 @@ import { NotFoundMiddleware } from "./middlewares/NotFound";
 import UserRoute from "./routes/UserRoute";
 import EnvRoute from "./routes/EnviromentRoute";
 import AuthRoute from "./routes/AuthRoute";
+import PatientRoute from "./routes/PatientRoute"
 import { setupSwagger } from "../swagger";
 
 const app = express();
@@ -51,6 +52,7 @@ app.use(MaintenanceMiddleware);
 app.use(EnvRoute);
 app.use("/auth", AuthRoute);
 app.use("/users", UserRoute);
+app.use("/patients", PatientRoute);
 setupSwagger(app);
 
 /*

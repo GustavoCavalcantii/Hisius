@@ -6,8 +6,7 @@ import { generateASCII } from "./utils/nameGenerator";
 import packageJson from "../package.json";
 import { initDB, disconnectDB } from "./database/Connection";
 import { initializeModels } from "./database/models/index";
-import { getTransporter, initSMTP } from "./config/Smtp";
-import { EmailUtils } from "./utils/EmailUtils";
+import { initSMTP } from "./config/Smtp";
 
 const API_NAME = packageJson.name;
 const APP_VERSION = packageJson.version;

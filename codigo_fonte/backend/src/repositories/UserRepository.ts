@@ -1,6 +1,6 @@
-import User from "../database/models/User.js";
-import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
-import { BadRequestError } from "../utils/errors/BadResquestError.js";
+import User from "../database/models/User";
+import { ICreateUserInput } from "../interfaces/user/ICreateUser";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 export class UserRepository {
   async create(data: ICreateUserInput) {

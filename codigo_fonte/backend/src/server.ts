@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import http from "http";
 import logger from "./config/Logger";
 import { ApiEnviroment } from "./enums/Api/ApiEnviroment";
@@ -7,6 +8,8 @@ import packageJson from "../package.json";
 import { initDB, disconnectDB } from "./database/Connection";
 import { initializeModels } from "./database/models/index";
 import { initSMTP } from "./config/Smtp";
+import { connectRedis } from "./config/Redis";
+import { SocketServer } from "./config/SocketServer";
 
 const API_NAME = packageJson.name;
 const APP_VERSION = packageJson.version;
@@ -63,6 +66,8 @@ const startServer = async () => {
     await initializeModels(sequelize);
     logger.info("Conectando com serviço SMTP...");
     await initSMTP(CONFIG);
+    logger.info("Conectando com Redis...");
+    await connectRedis();
 
     const asciiArt = await generateASCII(API_NAME);
     const horizontalSize = getHorizontalSize(asciiArt) + 1;
@@ -74,11 +79,14 @@ const startServer = async () => {
     console.log(`Ambiente: ${ENVIRONMENT}`);
     console.log("=".repeat(horizontalSize));
 
-    server = app.listen(PORT, () => {
+    server = app.listen(PORT, async () => {
       logger.info(`Aplicação iniciada na porta ${PORT}`);
       if (ENVIRONMENT === ApiEnviroment.DEV) {
         logger.info(`API rodando em: http://localhost:${PORT}/`);
       }
+
+      logger.info("Conectando o Websocket...");
+      await SocketServer.init(server);
     });
 
     process.on("SIGINT", () => stopServer(false));

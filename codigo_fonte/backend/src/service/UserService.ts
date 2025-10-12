@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
-import { ICreateUserInput } from "../interfaces/user/ICreateUser.js";
+import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { UserRepository } from "../repositories/UserRepository";
 import User from "../database/models/User.js";
-import { BadRequestError } from "../utils/errors/BadResquestError.js";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 const SALT_ROUNDS = 10;
 

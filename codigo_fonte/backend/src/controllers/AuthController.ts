@@ -3,7 +3,7 @@ import { UserDTO } from "../dtos/user/UserDto";
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import { AuthService } from "../service/AuthService";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 const authService = new AuthService();
 

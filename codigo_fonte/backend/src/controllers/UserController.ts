@@ -4,7 +4,7 @@ import { UserService } from "../service/UserService";
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import User from "../database/models/User";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 const userService = new UserService();
 

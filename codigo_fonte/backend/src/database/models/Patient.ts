@@ -6,6 +6,7 @@ import { IModel } from "../../interfaces/IModel";
 export class Patient extends Model {
   declare id: number;
   declare userId: number;
+   declare name: string;
   declare cpf: string;
   declare gender: Gender;
   declare phone: string;
@@ -27,6 +28,12 @@ export class Patient extends Model {
           allowNull: false,
           field: "usuario_id",
         },
+
+         name: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        field: "nome"},
+        
         cpf: {
           type: DataTypes.STRING(14), // formato: 000.000.000-00
           allowNull: true,

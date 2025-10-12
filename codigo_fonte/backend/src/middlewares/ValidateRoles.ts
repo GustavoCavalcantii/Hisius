@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserRole } from "../enums/User/UserRole";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 export function ValidateRoles(neededRole: UserRole) {
   return async (req: Request, _res: Response, next: NextFunction) => {

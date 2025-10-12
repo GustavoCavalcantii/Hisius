@@ -1,6 +1,7 @@
 import { ManchesterClassification } from "../enums/Queue/ManchesterClassification";
 
-export function calculateAge(birthDate: Date): number {
+export function calculateAge(date: Date): number {
+  const birthDate = date instanceof Date ? date : new Date(date);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();

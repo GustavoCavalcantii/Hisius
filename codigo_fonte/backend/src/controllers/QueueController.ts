@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 import { QueueService } from "../service/QueueService";
 import { QueueType } from "../enums/Queue/QueueType";
 import { plainToInstance } from "class-transformer";

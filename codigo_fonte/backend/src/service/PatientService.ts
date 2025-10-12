@@ -9,7 +9,7 @@ export class PatientService {
   private _sanitizePatient(patient: Patient | null) {
     if (!patient) return null;
     const patientJSON = patient.toJSON();
-    const { data_criacao, data_atualizacao, ...rest } = patientJSON;
+    const { data_criacao, data_atualizacao, usuario_id, ...rest } = patientJSON;
     return rest;
   }
 

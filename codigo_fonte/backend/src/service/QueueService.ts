@@ -1,7 +1,7 @@
 import { ManchesterClassification } from "../enums/Queue/ManchesterClassification";
 import { QueueType } from "../enums/Queue/QueueType";
 import { IQueuedPatient } from "../interfaces/queue/IQueuedPatient";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 import { NotFoundError } from "../utils/errors/NotFoundError";
 import { PatientService } from "./PatientService";
 import { UserService } from "./UserService";
@@ -22,7 +22,7 @@ export class QueueService {
   private async getPatientWithUser(
     patientId: number
   ): Promise<{ patient: Patient; user: User }> {
-    const patient = await this.patientService.getById(patientId);
+    const patient = await this.patientService.getPatientById(patientId);
     if (!patient) throw new NotFoundError("Paciente não encontrado");
 
     const user = await this.userService.getUserById(patient.userId);
@@ -59,7 +59,7 @@ export class QueueService {
     type: QueueType,
     classification?: ManchesterClassification
   ) {
-    const patient = await this.patientService.getByUserId(userId);
+    const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
     await this.ensurePatientNotInQueue(patient.id);
@@ -198,7 +198,7 @@ export class QueueService {
   }
 
   async getPatientInfo(userId: number) {
-    const patient = await this.patientService.getByUserId(userId);
+    const patient = await this.patientService.getPatientById(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
     const meta = await this.queueRepo.getPatientMeta(patient.id);
@@ -293,7 +293,7 @@ export class QueueService {
   }
 
   async dequeuePatient(userId: number) {
-    const patient = await this.patientService.getByUserId(userId);
+    const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
     const meta = await this.queueRepo.getPatientMeta(patient.id);

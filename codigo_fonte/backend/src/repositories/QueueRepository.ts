@@ -36,6 +36,14 @@ export class QueueRepository {
     });
   }
 
+  async removePatientFromHistory(
+    historyKey: string,
+    patientId: number
+  ) {
+    const redis = this.getRedisClient();
+    await redis.zRem(historyKey, patientId.toString());
+  }
+
   async removePatientFromQueue(queueKey: string, patientId: number) {
     const redis = this.getRedisClient();
     await redis.zRem(queueKey, patientId.toString());

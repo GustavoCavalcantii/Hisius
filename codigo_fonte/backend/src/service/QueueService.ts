@@ -198,7 +198,7 @@ export class QueueService {
   }
 
   async getPatientInfo(userId: number) {
-    const patient = await this.patientService.getPatientById(userId);
+    const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
     const meta = await this.queueRepo.getPatientMeta(patient.id);
@@ -290,6 +290,29 @@ export class QueueService {
     await NotificationService.notifyPatientCalled(user.id, room);
 
     return queuedPatient;
+  }
+
+  async finishTreatment(patientId: number) {
+    const { patient } = await this.getPatientWithUser(patientId);
+
+    const meta = await this.queueRepo.getPatientMeta(patient.id);
+    const wasInQueue = meta && Object.keys(meta).length > 0;
+
+    if (!wasInQueue)
+      throw new BadRequestError("Paciente não está em nenhuma fila.");
+
+    const queueTypes = Object.values(QueueType);
+
+    for (const queueType of queueTypes) {
+      const queueKey = `queue:${queueType}`;
+      await this.queueRepo.removePatientFromQueue(queueKey, patient.id);
+    }
+    await this.queueRepo.deletePatientMeta(patient.id);
+
+    for (const queueType of queueTypes) {
+      const historyKey = `queue:history:${queueType}`;
+      await this.queueRepo.removePatientFromHistory(historyKey, patient.id);
+    }
   }
 
   async dequeuePatient(userId: number) {

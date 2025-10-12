@@ -87,6 +87,23 @@ export class QueueController {
     }
   }
 
+  static async finishTreatment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+      await queueService.finishTreatment(paramDto.patientId);
+
+      return res
+        .status(200)
+        .json(SuccessResponse(null, "Atendimento finalizado com sucesso", 200));
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async queueLeave(req: Request, res: Response, next: NextFunction) {
     try {
       const loggedInUser = req.user;

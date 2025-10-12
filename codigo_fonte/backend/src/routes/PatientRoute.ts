@@ -4,17 +4,43 @@ import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { ValidateRequest } from "../middlewares/ValidateRequest";
 import { PatientDto } from "../dtos/patient/PatientDto";
 import JsonRequiredMiddleware from "../middlewares/JsonRequired";
+import { ValidateRoles } from "../middlewares/ValidateRoles";
+import { UserRole } from "../enums/User/UserRole";
 
 const router = Router();
 
-router.post("/", AuthMiddleware, JsonRequiredMiddleware, ValidateRequest(PatientDto, ["create"]), PatientController.createPatient);
+router.post(
+  "/",
+  AuthMiddleware,
+  JsonRequiredMiddleware,
+  ValidateRequest(PatientDto, ["create"]),
+  PatientController.createPatient
+);
 
 // Rotas do próprio paciente
 router.get("/me", AuthMiddleware, PatientController.getMyProfile);
-router.put("/me", AuthMiddleware, JsonRequiredMiddleware, ValidateRequest(PatientDto, ["update"]), PatientController.updateMyProfile);
+router.put(
+  "/me",
+  AuthMiddleware,
+  JsonRequiredMiddleware,
+  ValidateRequest(PatientDto, ["update"]),
+  PatientController.updateMyProfile
+);
 
 // Rotas do administrador
-router.get("/:id", AuthMiddleware, PatientController.getPatient);
-router.put("/:id", AuthMiddleware, JsonRequiredMiddleware, ValidateRequest(PatientDto, ["update"]), PatientController.updatePatient);
+router.get(
+  "/:id",
+  ValidateRoles(UserRole.EMPLOYEE),
+  AuthMiddleware,
+  PatientController.getPatient
+);
+router.put(
+  "/:id",
+  ValidateRoles(UserRole.EMPLOYEE),
+  AuthMiddleware,
+  JsonRequiredMiddleware,
+  ValidateRequest(PatientDto, ["update"]),
+  PatientController.updatePatient
+);
 
 export default router;

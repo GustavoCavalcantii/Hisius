@@ -13,7 +13,8 @@ export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = plainToInstance(UserDTO, req.body);
-      const user = await userService.createUser(dto);
+      const {role, ...rest} = dto;
+      const user = await userService.createUser(rest);
 
       return res
         .status(201)

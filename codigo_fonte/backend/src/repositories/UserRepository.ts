@@ -1,4 +1,5 @@
 import User from "../database/models/User";
+import { UserRole } from "../enums/User/UserRole";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { BadRequestError } from "../utils/errors/BadRequestError";
 
@@ -24,6 +25,14 @@ export class UserRepository {
     const user = await this.findById(id);
     if (!user) throw new BadRequestError("Usuário não encontrado.");
     user.deleted = true;
+    await user.save();
+    return user;
+  }
+
+  async updateRole(newRole: UserRole, userId: number) {
+    const user = await this.findById(userId);
+    if (!user) throw new BadRequestError("Usuário não encontrado.");
+    user.role = newRole;
     await user.save();
     return user;
   }

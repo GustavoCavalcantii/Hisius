@@ -3,7 +3,7 @@ import { TokenUtils } from "../utils/TokenUtils";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { ManagerRepository } from "../repositories/ManagerRepository";
 import Manager from "../database/models/Manager";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 export class ManagerService {
   private userService = new UserService();

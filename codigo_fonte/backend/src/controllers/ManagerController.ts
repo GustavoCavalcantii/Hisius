@@ -3,7 +3,7 @@ import { ManagerService } from "../service/ManagerService";
 import { UserDTO } from "../dtos/user/UserDto";
 import { plainToInstance } from "class-transformer";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 
 const managerService = new ManagerService();
 
@@ -11,7 +11,8 @@ export class ManagerController {
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = plainToInstance(UserDTO, req.body);
-      const user = await managerService.create(dto);
+      const { role, ...rest } = dto;
+      const user = await managerService.create(rest);
 
       return res
         .status(201)
@@ -47,7 +48,7 @@ export class ManagerController {
       next(err);
     }
   }
-  
+
   static async getHospitalCode(
     req: Request,
     res: Response,

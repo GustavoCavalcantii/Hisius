@@ -3,6 +3,7 @@ import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { UserRepository } from "../repositories/UserRepository";
 import User from "../database/models/User.js";
 import { BadRequestError } from "../utils/errors/BadRequestError";
+import { UserRole } from "../enums/User/UserRole";
 
 const SALT_ROUNDS = 10;
 
@@ -39,6 +40,18 @@ export class UserService {
     const { password, ...rest } = this.sanitizeUser(user);
 
     return rest;
+  }
+
+  async updateRole(newRole: UserRole, userId: number) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new BadRequestError("Usuário não encontrado.");
+
+    if (user?.role === newRole)
+      throw new BadRequestError("Nível de acesso não pode ser o mesmo");
+
+    const updateUser = await this.userRepo.updateRole(newRole, userId);
+
+    return this.sanitizeUser(updateUser);
   }
 
   async changeEmail(userId: number, email: string) {

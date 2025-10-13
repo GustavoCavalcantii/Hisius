@@ -1,5 +1,6 @@
 export enum TokenType {
   AUTH = "AUTH",
+  GENERATE_ACCOUNT = "GEN_ACCOUNT",
   RESET_PASS = "RESET_PASS",
   RESET_EMAIL = "RESET_EMAIL"
 }

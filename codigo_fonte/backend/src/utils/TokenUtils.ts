@@ -5,12 +5,14 @@ import { ITokenPayload } from "../interfaces/ITokenPayload";
 
 const ACCESS_SECRET = CONFIG.tokens.accessSecret;
 const REFRESH_SECRET = CONFIG.tokens.refreshSecret;
+const GEN_SECRET = CONFIG.tokens.generateSecret;
 const RESET_PASS_SECRET = CONFIG.tokens.resetPassSecret;
 const RESET_EMAIL_SECRET = CONFIG.tokens.resetEmailSecret;
 
 const ACCESS_EXP = "15m";
 const REFRESH_EXP = "7d";
 const RESET_EXP = "15m";
+const GEN_EXP = "15m";
 
 export class TokenUtils {
   private generateToken(
@@ -56,6 +58,19 @@ export class TokenUtils {
       REFRESH_SECRET,
       { expiresIn: REFRESH_EXP }
     );
+  }
+
+  public generateEmployeeToken(hospitalCode: string): string {
+    return this.generateToken(
+      { hospitalCode: hospitalCode },
+      TokenType.GENERATE_ACCOUNT,
+      GEN_SECRET,
+      { expiresIn: GEN_EXP }
+    );
+  }
+
+  public validateEmployeeToken(token: string) {
+    return jwt.verify(token, GEN_SECRET) as ITokenPayload;
   }
 
   public validateRefreshToken(token: string) {

@@ -1,5 +1,7 @@
-import { IsString, IsEmail, Length } from "class-validator";
+import { IsString, IsEmail, Length, IsIn } from "class-validator";
 import { Match } from "../../decorators/Match";
+import { UserRole } from "../../enums/User/UserRole";
+import { Type } from "class-transformer";
 
 export class UserDTO {
   /**
@@ -55,4 +57,11 @@ export class UserDTO {
     groups: ["create", "reset"],
   })
   confirmPassword!: string;
+
+  @Type(() => Number)
+  @IsIn([UserRole.ADMIN, UserRole.EMPLOYEE], {
+    message: `Role inválida. Use ${UserRole.ADMIN} (ADMIN) ou ${UserRole.EMPLOYEE} (EMPLOYEE).`,
+    groups: ["role"],
+  })
+  role!: UserRole;
 }

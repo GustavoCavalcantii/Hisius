@@ -12,6 +12,9 @@ import UserRoute from "./routes/UserRoute";
 import ManagerRoute from "./routes/ManangerRoute";
 import EnvRoute from "./routes/EnviromentRoute";
 import AuthRoute from "./routes/AuthRoute";
+import QueueRoute from "./routes/QueueRoute";
+import PatientRoute from "./routes/PatientRoute"
+
 import { setupSwagger } from "../swagger";
 
 const app = express();
@@ -50,9 +53,11 @@ app.use(MaintenanceMiddleware);
   ROTAS
 */
 app.use(EnvRoute);
+app.use("/queue", QueueRoute);
 app.use("/auth", AuthRoute);
 app.use("/users", UserRoute);
 app.use("/admins", ManagerRoute);
+app.use("/patients", PatientRoute);
 setupSwagger(app);
 
 /*

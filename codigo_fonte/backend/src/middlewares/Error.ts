@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ErrorResponse } from "../utils/responses/ErrorResponse";
 import Logger from "../config/Logger";
 import { UniqueConstraintError, ValidationError } from "sequelize";
-import { BadRequestError } from "../utils/errors/BadResquestError";
+import { BadRequestError } from "../utils/errors/BadRequestError";
 const errorHandlers = [
   {
     type: SyntaxError,

@@ -1,7 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import { Gender } from "../../enums/User/Gender";
 import User from "./User";
-import { IModel } from "../../interfaces/IModel";
 
 export class Patient extends Model {
   declare id: number;

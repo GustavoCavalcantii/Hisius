@@ -1,26 +1,21 @@
-import { IsString, IsOptional, IsEnum, IsDateString } from "class-validator";
+
+import { IsString, IsOptional, IsEnum, IsDateString, Length, IsNotEmpty } from "class-validator";
 import { Gender } from "../../enums/User/Gender";
 
 export class PatientDto {
-  @IsOptional({ groups: ["update"] })
-  @IsString({ message: "O CPF deve ser uma string", groups: ["update"] })
+  @IsString({ message: "O CPF deve ser uma string", groups: ["create", "update"] })
+  @IsOptional({ groups: ["create", "update"] })
   cpf?: string;
 
-  @IsOptional({ groups: ["update"] })
-  @IsString({ message: "O telefone deve ser uma string", groups: ["update"] })
-  telefone?: string;
+  @IsString({ message: "O telefone deve ser uma string", groups: ["create", "update"] })
+  @IsOptional({ groups: ["create", "update"] })
+  phone?: string;
 
-  @IsOptional({ groups: ["update"] })
-  @IsEnum(Gender, { message: "Sexo inválido", groups: ["update"] })
-  sexo?: Gender;
+  @IsEnum(Gender, { message: "Sexo inválido", groups: ["create", "update"] })
+  @IsOptional({ groups: ["create", "update"] })
+  gender?: Gender;
 
-  @IsOptional({ groups: ["update"] })
-  @IsDateString(
-    {},
-    {
-      message: "A data de nascimento deve ser uma data válida",
-      groups: ["update"],
-    }
-  )
-  data_nascimento?: string;
+  @IsDateString({}, { message: "A data de nascimento deve ser uma data válida", groups: ["create", "update"] })
+  @IsOptional({ groups: ["create", "update"] })
+  birthDate?: string;
 }

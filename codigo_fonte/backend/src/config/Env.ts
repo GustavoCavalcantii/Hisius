@@ -23,6 +23,7 @@ const requiredVars = [
   "SMTP_PORT",
   "SMTP_CHARSET",
   "EMAIL_FROM",
+  "REDIS_URL",
   "FRONTEND_URL",
   "RESET_TOKEN_EXPIRES_MIN",
 ] as const;
@@ -71,6 +72,9 @@ export const CONFIG = {
     resetPassSecret: ENV.RESET_PASS_TOKEN_SECRET,
     resetEmailSecret: ENV.RESET_EMAIL_TOKEN_SECRET,
     generateSecret: ENV.GENERATE_TOKEN_SECRET,
+  },
+  redis: {
+    url: ENV.REDIS_URL,
   },
   smtp: {
     host: ENV.SMTP_HOST,

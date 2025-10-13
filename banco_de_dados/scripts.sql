@@ -18,7 +18,6 @@ CREATE TABLE Usuario (
 CREATE TABLE Paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
-    nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(14) UNIQUE,
     telefone VARCHAR(20),
     sexo ENUM('MASCULINO', 'FEMININO') NULL,

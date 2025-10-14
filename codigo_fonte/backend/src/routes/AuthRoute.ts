@@ -6,6 +6,7 @@ import { AuthController } from "../controllers/AuthController";
 import { ResetPassMiddleware } from "../middlewares/ResetPassMiddleware";
 import { ResetEmailMiddleware } from "../middlewares/ResetEmailMiddleware";
 import { AuthMiddleware } from "../middlewares/AuthMiddleware";
+import BruteForceProtection from "../middlewares/BruteForceProtection";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.post(
   "/login",
   JsonRequiredMiddleware,
   ValidateRequest(UserDTO, ["login"]),
+  BruteForceProtection,
   AuthController.login
 );
 

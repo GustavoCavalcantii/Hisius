@@ -43,23 +43,27 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
--- Tabela Atendimento
-CREATE TABLE Atendimento (
+CREATE TABLE eventos_fila (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    descricao TEXT NOT NULL,
-    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_atendimento_usuario FOREIGN KEY (usuario_id) REFERENCES Usuario(id)
+    paciente_id INT NOT NULL,
+    fila ENUM('triagem', 'atendimento') NOT NULL,
+    entrou_em DATETIME NOT NULL,
+    iniciou_em DATETIME NULL,
+    CONSTRAINT fk_eventos_fila_paciente
+        FOREIGN KEY (paciente_id) REFERENCES Paciente(id)
+        ON DELETE CASCADE
 );
 
--- Tabela Registro (Log)
-CREATE TABLE Registro (
+-- Tabela de estatísticas diárias (o "produto final" para a API)
+CREATE TABLE estatisticas_fila (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    descricao TEXT NOT NULL,
-    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_registro_usuario FOREIGN KEY (usuario_id) REFERENCES Usuario(id)
+    `data` DATE NOT NULL,
+    fila ENUM('triagem', 'atendimento') NOT NULL,
+    tempo_medio_espera_minutos INT NOT NULL,
+    pico_demanda INT NULL,
+    total_atendidos INT NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_data_fila (`data`, fila)
 );
 
 -- Tabela Relatorio
@@ -70,3 +74,6 @@ CREATE TABLE Relatorio (
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_relatorio_atendimento FOREIGN KEY (atendimento_id) REFERENCES Atendimento(id)
 );
+
+-- Índice para performance
+CREATE INDEX idx_eventos_fila_entrou_em ON eventos_fila(entrou_em);

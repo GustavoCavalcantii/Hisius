@@ -3,6 +3,17 @@ import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
 import { IModel } from "../../interfaces/IModel";
+import { User } from "./User";
+import { Patient } from "./Patient";
+import { EventoFila } from "./EventoFila";
+import { EstatisticaFila } from "./EstatisticasFila"; 
+import { RefreshToken } from "./RefreshToken";
+import { Manager } from "./Manager";
+import { Log } from "./Log";
+
+
+export { User, Patient, EventoFila, EstatisticaFila, RefreshToken, Manager, Log };
+
 
 export const initializeModels = async (sequelize: Sequelize) => {
   const modelsPath = path.resolve(__dirname);
@@ -11,19 +22,26 @@ export const initializeModels = async (sequelize: Sequelize) => {
   const models: IModel[] = [];
 
   for (const file of files) {
+  
     if (file === "index.ts") continue;
 
     const modulePath = path.join(modelsPath, file);
     const moduleUrl = pathToFileURL(modulePath).href;
 
-    const { [path.basename(file, path.extname(file))]: ModelClass } =
-      await import(moduleUrl);
+   
+    const { default: ModelClass } = await import(moduleUrl);
 
     if (ModelClass && typeof ModelClass.initialize === "function") {
       models.push(ModelClass);
     }
   }
 
+  
   models.forEach((model) => model.initialize(sequelize));
-  models.forEach((model) => model.associate?.());
+ 
+  models.forEach((model) => {
+    if (typeof model.associate === "function") {
+      model.associate();
+    }
+  });
 };

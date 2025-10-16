@@ -1,20 +1,57 @@
 import { color } from "@hisius/ui/theme/colors";
-import { StyleSheet, View } from "react-native";
-import React from "react";
+import { StyleSheet, ViewStyle, TextStyle } from "react-native";
 
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: color.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
+interface ButtonStyles {
+  button: ViewStyle;
+  buttonHover: ViewStyle;
+  buttonPressed: ViewStyle;
+  buttonDisabled: ViewStyle;
+  text: TextStyle;
+  textDisabled: TextStyle;
+}
+
+const baseButton: ViewStyle = {
+  backgroundColor: color.primary,
+  paddingVertical: 14,
+  paddingHorizontal: 32,
+  borderRadius: 6,
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: 50,
+};
+
+const styles = StyleSheet.create<ButtonStyles>({
+  button: baseButton,
+
+  buttonHover: {
+    ...baseButton,
   },
+
+  buttonPressed: {
+    ...baseButton,
+    transform: [{ scale: 0.99 }],
+  },
+
+  buttonDisabled: {
+    ...baseButton,
+    backgroundColor: color.deactive,
+    borderColor: color.gray,
+  },
+
   text: {
     color: color.front,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Montserrat",
+    fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+
+  textDisabled: {
+    color: color.gray,
+    fontSize: 16,
+    fontFamily: "Montserrat",
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
 });
 

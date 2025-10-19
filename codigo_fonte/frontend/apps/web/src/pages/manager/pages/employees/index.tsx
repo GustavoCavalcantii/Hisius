@@ -1,7 +1,8 @@
 import { QueueHeader } from "../../../../components/navbar";
 import { Sidebar } from "../../components/sidebar";
 import { Employee } from "./components/employee";
-import { Container, EmployeContainer } from "./styles";
+import { HiPlus } from "react-icons/hi2";
+import { AddButton, Container, EmployeContainer } from "./styles";
 
 export function EmployeesList() {
   return (
@@ -31,6 +32,9 @@ export function EmployeesList() {
           <Employee />
           <Employee />
         </EmployeContainer>
+        <AddButton>
+          <HiPlus />
+        </AddButton>
       </Container>
     </>
   );

@@ -15,6 +15,40 @@ export const EmployeContainer = styled.div`
   grid-template-columns: repeat(9, 1fr);
 `;
 
+export const AddButton = styled.button`
+  width: 60px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  place-items: center;
+
+  position: fixed;
+
+  right: 5%;
+  bottom: 5%;
+
+  z-index: 9999;
+
+  padding: 1rem;
+
+  &:active {
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  background-color: ${color.primary};
+  color: ${color.front};
+
+  & svg {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1/1;
+  }
+`;
+
 export const TitleInfo = styled.div`
   font-size: 16px;
   font-weight: 200;

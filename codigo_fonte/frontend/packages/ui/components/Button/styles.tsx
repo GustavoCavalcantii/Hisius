@@ -18,6 +18,7 @@ const baseButton: ViewStyle = {
   alignItems: "center",
   justifyContent: "center",
   minHeight: 50,
+  minWidth: 300
 };
 
 const styles = StyleSheet.create<ButtonStyles>({
@@ -40,9 +41,9 @@ const styles = StyleSheet.create<ButtonStyles>({
 
   text: {
     color: color.front,
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "Montserrat",
-    fontWeight: "600",
+    fontWeight: "400",
     letterSpacing: 0.5,
   },
 

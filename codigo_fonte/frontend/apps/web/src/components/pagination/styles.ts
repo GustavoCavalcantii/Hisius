@@ -20,6 +20,11 @@ export const PageButton = styled.button<{ $active?: boolean; $dots?: boolean }>`
   min-width: 2.5rem;
   font-family: inherit;
 
+  &:active {
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+
   &:hover {
     background-color: ${color.front};
     border-color: ${color.primary};

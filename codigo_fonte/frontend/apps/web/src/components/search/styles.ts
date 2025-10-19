@@ -3,16 +3,40 @@ import styled from "styled-components";
 
 export const SearchContainer = styled.div`
   position: relative;
+  display: flex;
   min-width: 500px;
+  background: ${color.front};
+  border: 0.7px solid rgba(13, 19, 41, 0.12);
+  border-radius: 5px;
+`;
+
+export const IconContainer = styled.button`
+  width: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+  & svg {
+    color: ${color.text};
+  }
 `;
 
 export const SearchInput = styled.input`
-  width: 100%;
+  flex: 1;
   padding: 15px 20px;
-  border: .7px solid rgba(13, 19, 41, 0.12);
+  border: none;
+
   border-radius: 5px;
   font-size: 13px;
-  background: ${color.front};
+  background: none;
   transition: all 0.2s;
 
   &:focus {

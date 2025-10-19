@@ -6,12 +6,14 @@ import { ForbiddenError } from "../utils/errors/ForbiddenError";
 import { ITokenPayload } from "../interfaces/ITokenPayload";
 import { TokenUtils } from "../utils/TokenUtils";
 import { EmailUtils } from "../utils/EmailUtils";
+import { BruteForceProtectionRepository } from "../repositories/BruteForceProtectionRepository";
 
 export class AuthService {
   private userService = new UserService();
   private tokenRepo = new TokenRepository();
   private tokenUtils = new TokenUtils();
   private emailUtils = new EmailUtils();
+  private bruteRepo = new BruteForceProtectionRepository();
 
   private async validateRefreshToken(token: string): Promise<ITokenPayload> {
     try {
@@ -58,12 +60,13 @@ export class AuthService {
       ]);
 
     const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid)
+    if (!isValid) {
+      await this.bruteRepo.registerFailedAttempt(email);
       throw new BadRequestError("Email ou senha inválido", [
         { field: "email", message: "Email inválido" },
         { field: "password", message: "Senha inválido" },
       ]);
-
+    }
     const accessToken = this.tokenUtils.generateAccessToken(user.id, user.role);
 
     const refreshToken = this.tokenUtils.generateRefreshToken(
@@ -93,7 +96,7 @@ export class AuthService {
       userId,
       newEmail
     );
-    
+
     this.emailUtils.sendResetEmail(newEmail, user.name, resetEmailToken);
   }
 

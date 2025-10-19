@@ -1,54 +1,35 @@
-import { Request, Response } from "express";
-import { ReportService } from "../../service/ReportService";
+import { NextFunction, Request, Response } from "express";
+import { ReportService } from "../service/ReportService";
+import { SuccessResponse } from "../utils/responses/SuccessResponse";
+import { plainToInstance } from "class-transformer";
+import { ReportParamsDto } from "../dtos/report/ReportParamsDto";
 
 const reportService = new ReportService();
 
 export class ReportController {
-  async createReport(req: Request, res: Response) {
+  static async getReport(req: Request, res: Response, next: NextFunction) {
     try {
-      const { atendimento_id, tempo_medio } = req.body;
-      const report = await reportService.createReport(atendimento_id, tempo_medio);
-      res.status(201).json(report);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
+      const params = plainToInstance(ReportParamsDto, req.query);
 
-  async getAllReports(req: Request, res: Response) {
-    try {
-      const reports = await reportService.getAllReports();
-      res.json(reports);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  }
+      const startDateObj = new Date(
+        parseInt(params.startDate.split("-")[2]),
+        parseInt(params.startDate.split("-")[1]) - 1,
+        parseInt(params.startDate.split("-")[0])
+      );
 
-  async getReportById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const report = await reportService.getReportById(Number(id));
-      if (report) {
-        res.json(report);
-      } else {
-        res.status(404).json({ message: "O Relatório não foi encontrado" });
-      }
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
+      const endDateObj = new Date(
+        parseInt(params.endDate.split("-")[2]),
+        parseInt(params.endDate.split("-")[1]) - 1,
+        parseInt(params.endDate.split("-")[0])
+      );
 
-  async exportReport(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const { format } = req.query;
-      if (format !== "pdf" && format !== "csv") {
-        return res.status(400).json({ message: "Formato inválido" });
-      }
+      const response = await reportService.getQueueReport(startDateObj, endDateObj);
 
-      const result = await reportService.exportReport(Number(id), format as "pdf" | "csv");
-      res.json({ message: result });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      return res.json(
+        SuccessResponse(response, "Dados coletados com sucesso", 200)
+      );
+    } catch (err) {
+      next(err);
     }
   }
 }

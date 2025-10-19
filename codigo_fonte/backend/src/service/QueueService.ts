@@ -9,15 +9,19 @@ import { QueueTypePT } from "../enums/Queue/QueueTypePT";
 import { calculateAge, calculateScore } from "../utils/CalculateUtils";
 import { parseClassification } from "../utils/Helper";
 import { QueueRepository } from "../repositories/QueueRepository";
-import { QueueStatus } from "../interfaces/queue/QueueStatus";
+import { QueueStatus } from "../enums/Queue/QueueStatus";
 import Patient from "../database/models/Patient";
 import User from "../database/models/User";
 import { NotificationService } from "./NotificationService";
+import { v4 as uuid } from "uuid";
+import { ReportService } from "./ReportService";
+import { ICreateQueueEventInput } from "../interfaces/queue/ICreateQueueEventInput";
 
 export class QueueService {
   private patientService = new PatientService();
   private userService = new UserService();
   private queueRepo = new QueueRepository();
+  private reportService = new ReportService();
 
   private async getPatientWithUser(
     patientId: number
@@ -41,7 +45,7 @@ export class QueueService {
       name: user.name,
       age: calculateAge(patient.birthDate),
       gender: patient.gender,
-      classification: parseClassification(meta.classification),
+      classification: parseClassification(meta.classification) || null,
     };
   }
 
@@ -76,13 +80,23 @@ export class QueueService {
     const score = calculateScore(today, age, classification);
 
     const queueKey = `queue:${type}`;
+    const id = uuid().toString();
     await this.queueRepo.addPatientToQueue(queueKey, patient.id, score);
     await this.queueRepo.setPatientMeta(patient.id, {
+      queueId: id,
       joinedAt: today.toISOString(),
       ...(classification ? { classification } : {}),
       type,
       status: QueueStatus.WAITING,
     });
+
+    const data: ICreateQueueEventInput = {
+      patientId: patient.id,
+      queueId: id,
+      enteredAt: new Date(),
+    };
+
+    this.reportService.createEvent(type, data);
   }
 
   async getPatientsByQueue(
@@ -254,6 +268,11 @@ export class QueueService {
     if (!meta || Object.keys(meta).length === 0)
       throw new BadRequestError("Paciente não está em nenhuma fila");
 
+    if (meta.status !== QueueStatus.IN_PROGRESS)
+      throw new BadRequestError(
+        "O paciente ainda não foi chamado para a triagem."
+      );
+
     if (meta.type === QueueType.TREATMENT)
       throw new BadRequestError("Paciente já está na fila de atendimento");
 
@@ -301,7 +320,14 @@ export class QueueService {
     if (!wasInQueue)
       throw new BadRequestError("Paciente não está em nenhuma fila.");
 
+    if (meta.status !== QueueStatus.IN_PROGRESS)
+      throw new BadRequestError(
+        "O paciente ainda não foi chamado para o atendimento."
+      );
+
     const queueTypes = Object.values(QueueType);
+
+    await this.reportService.updateExit(meta.queueId, new Date());
 
     for (const queueType of queueTypes) {
       const queueKey = `queue:${queueType}`;
@@ -315,7 +341,7 @@ export class QueueService {
     }
   }
 
-  async dequeuePatient(userId: number) {
+  async dequeuePatient(userId: number, exit: boolean = false) {
     const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
@@ -323,6 +349,7 @@ export class QueueService {
     if (!meta || Object.keys(meta).length === 0)
       throw new BadRequestError("Paciente não está em nenhuma fila");
 
+    if (!exit) await this.reportService.updateExit(meta.queueId, new Date());
     const queueKey = `queue:${meta.type}`;
     await this.queueRepo.removePatientFromQueue(queueKey, patient.id);
     await this.queueRepo.deletePatientMeta(patient.id);

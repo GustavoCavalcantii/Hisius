@@ -109,7 +109,7 @@ export class QueueController {
       const loggedInUser = req.user;
       if (!loggedInUser) throw new BadRequestError("Acesso negado");
 
-      await queueService.dequeuePatient(loggedInUser.id);
+      await queueService.dequeuePatient(loggedInUser.id, true);
 
       return res
         .status(200)

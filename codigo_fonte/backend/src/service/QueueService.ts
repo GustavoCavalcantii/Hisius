@@ -229,7 +229,7 @@ export class QueueService {
     const historyKey = `queue:history:${meta.type}`;
     const lastTimestamps = (
       await this.queueRepo.getLastTimestamps(historyKey, 10)
-    ).map((t) => Number(t));
+    ).map((t: any) => Number(t));
 
     let averageTime = 10 * 60 * 1000;
     if (lastTimestamps.length >= 2) {

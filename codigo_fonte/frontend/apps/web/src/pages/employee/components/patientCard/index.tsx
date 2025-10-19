@@ -12,6 +12,7 @@ import { TextValue } from "../../../../components/textValue";
 import { ManchesterTriage } from "@hisius/enums/src";
 import { Select } from "../../../../components/select";
 import Button from "@hisius/ui/components/Button";
+import { useNavigate } from "react-router-dom";
 
 interface PatientCardProp {
   key: number;
@@ -22,6 +23,7 @@ export function PatientCard(props: PatientCardProp) {
   const [isSelected, setIsSelected] = useState(false);
   const [selectedClassification, setSelectedClassification] =
     useState<string>();
+  const navigate = useNavigate();
 
   const classificationOptions = Object.values(ManchesterTriage).map(
     (value) => ({
@@ -42,8 +44,8 @@ export function PatientCard(props: PatientCardProp) {
     setSelectedClassification(event.target.value);
   };
 
-  const handleButtonClick = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setIsSelected(false);
+  const handleButtonClick = () => {
+    navigate(`/funcionario/filas/${props.patient.id}`);
   };
   const notSelectedCard = () => {
     return (

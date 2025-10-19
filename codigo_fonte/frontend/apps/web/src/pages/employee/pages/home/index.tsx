@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { QueueHeader } from "./components/navbar";
-import Toggle from "./components/toggle";
+import { QueueHeader } from "../../../../components/navbar";
+import Toggle from "../../components/toggle";
 import {
   Container,
   NextButton,
   PatientButtonContainer,
   PatientContainer,
 } from "./styles";
-import { PatientCard } from "./components/patientCard";
+import { PatientCard } from "../../components/patientCard";
 import type { IPatient } from "@hisius/interfaces/src";
 import { ManchesterTriage } from "@hisius/enums/src";
-import Pagination from "../../components/pagination";
+import Pagination from "../../../../components/pagination";
 import { FaPlus } from "react-icons/fa";
+import { Sidebar } from "../../components/sidebar";
 
 export const mockPatients: IPatient[] = [
   {
@@ -54,11 +55,8 @@ export const mockPatients: IPatient[] = [
   },
 ];
 
-const generateCard = (
-  patients: IPatient[],
-  onTopCardButtonClick?: () => void
-) => {
-  return patients.map((patient, index) => (
+const generateCard = (patients: IPatient[]) => {
+  return patients.map((patient) => (
     <PatientCard key={patient.id} patient={patient} />
   ));
 };
@@ -74,24 +72,33 @@ export function Employee() {
     console.log(`Changed to page: ${page}`);
   };
   return (
-    <Container>
-      <QueueHeader
-        searhTerm={searchTerm}
-        onChange={setSearchTerm}
-        placeholder="Buscar pacientes..."
-      />
-      <Toggle labels={{ on: "Atendimento", off: "Triagem" }} />
-      <PatientButtonContainer>
-        <PatientContainer>{generateCard(patients)}</PatientContainer>
-        <NextButton><FaPlus/>Próximo paciente</NextButton>
-      </PatientButtonContainer>
-      <Pagination
-        totalItems={totalItems}
-        itemsPerPage={10}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        maxVisibleButtons={3}
-      />
-    </Container>
+    <>
+      <Sidebar />
+      <Container className="containerSide">
+        <QueueHeader
+          queueTitle="Consultar Paciente"
+          queueSubtitle="Consulta paciente na fila"
+          searhTerm={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Buscar pacientes..."
+          canSearch
+        />
+        <Toggle labels={{ on: "Atendimento", off: "Triagem" }} />
+        <PatientButtonContainer>
+          <PatientContainer>{generateCard(patients)}</PatientContainer>
+          <NextButton>
+            <FaPlus />
+            Próximo paciente
+          </NextButton>
+        </PatientButtonContainer>
+        <Pagination
+          totalItems={totalItems}
+          itemsPerPage={10}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          maxVisibleButtons={3}
+        />
+      </Container>
+    </>
   );
 }

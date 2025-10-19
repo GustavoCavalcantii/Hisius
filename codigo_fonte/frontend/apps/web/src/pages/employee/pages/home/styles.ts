@@ -53,7 +53,6 @@ export const NextButton = styled.button`
 
 export const Container = styled.div`
   display: flex;
-  width: 100%;
   min-height: 100%;
   flex-direction: column;
   gap: 1rem;

@@ -6,5 +6,5 @@ export interface IQueuedPatient {
   name: string;
   age: number;
   gender: Gender;
-  classification?: ManchesterClassification;
+  classification: ManchesterClassification | null;
 }

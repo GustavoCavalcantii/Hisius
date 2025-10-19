@@ -14,6 +14,7 @@ import EnvRoute from "./routes/EnviromentRoute";
 import AuthRoute from "./routes/AuthRoute";
 import QueueRoute from "./routes/QueueRoute";
 import PatientRoute from "./routes/PatientRoute";
+import ReportRoute from "./routes/ReportRoute";
 import EmployeeRoute from "./routes/EmployeeRoute";
 
 import { setupSwagger } from "../swagger";
@@ -55,6 +56,7 @@ app.use(MaintenanceMiddleware);
 */
 app.use(EnvRoute);
 app.use("/queue", QueueRoute);
+app.use("/reports", ReportRoute);
 app.use("/auth", AuthRoute);
 app.use("/users", UserRoute);
 app.use("/admins", ManagerRoute);

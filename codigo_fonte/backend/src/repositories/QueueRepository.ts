@@ -1,5 +1,5 @@
 import { RedisClientType } from "redis";
-import { QueueStatus } from "../interfaces/queue/QueueStatus";
+import { QueueStatus } from "../enums/Queue/QueueStatus";
 import { getRedis } from "../config/Redis";
 
 export class QueueRepository {

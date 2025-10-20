@@ -8,11 +8,10 @@ import {
   TriageBadge,
 } from "./styles";
 import { useState } from "react";
-import { TextValue } from "../../../../components/textValue";
+import { TextValue } from "../../../../../../components/textValue";
 import { ManchesterTriage } from "@hisius/enums/src";
-import { Select } from "../../../../components/select";
+import { Select } from "../../../../../../components/select";
 import Button from "@hisius/ui/components/Button";
-import { useNavigate } from "react-router-dom";
 
 interface PatientCardProp {
   key: number;
@@ -23,7 +22,6 @@ export function PatientCard(props: PatientCardProp) {
   const [isSelected, setIsSelected] = useState(false);
   const [selectedClassification, setSelectedClassification] =
     useState<string>();
-  const navigate = useNavigate();
 
   const classificationOptions = Object.values(ManchesterTriage).map(
     (value) => ({
@@ -44,9 +42,7 @@ export function PatientCard(props: PatientCardProp) {
     setSelectedClassification(event.target.value);
   };
 
-  const handleButtonClick = () => {
-    navigate(`/funcionario/filas/${props.patient.id}`);
-  };
+  const handleButtonClick = () => {};
   const notSelectedCard = () => {
     return (
       <Description>
@@ -85,10 +81,7 @@ export function PatientCard(props: PatientCardProp) {
           onChange={handleSelectChange}
           value={selectedClassification}
         />
-        <Button
-          title="Mudar classificação de risco"
-          onPress={handleButtonClick}
-        />
+        <Button title="Alterar classificação" onPress={handleButtonClick} />
       </SelectedCardContainer>
     );
   };

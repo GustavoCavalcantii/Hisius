@@ -18,7 +18,6 @@ const baseButton: ViewStyle = {
   alignItems: "center",
   justifyContent: "center",
   minHeight: 50,
-  minWidth: 300
 };
 
 const styles = StyleSheet.create<ButtonStyles>({

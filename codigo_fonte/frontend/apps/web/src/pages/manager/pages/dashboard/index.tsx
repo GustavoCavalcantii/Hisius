@@ -6,6 +6,7 @@ import {
   InfoCardContainer,
   InfoContainer,
   InfoIcon,
+  LogContainer,
   QueueContainer,
   SectionTitle,
   SubtitleInfo,
@@ -45,7 +46,7 @@ export function Dashboard() {
             </InfoContainer>
           </QueueContainer>
 
-          <InfoContainer>
+          <InfoContainer style={{ justifySelf: "end" }}>
             <TextContainer>
               <TitleInfo>Codigo do Hospital</TitleInfo>
               <SubtitleInfo>123458</SubtitleInfo>
@@ -53,7 +54,13 @@ export function Dashboard() {
           </InfoContainer>
         </InfoCardContainer>
         <SectionTitle>Atividades recentes</SectionTitle>
-        <Log />
+        <LogContainer>
+          <Log />
+          <Log />
+          <Log />
+          <Log />
+          <Log />
+        </LogContainer>
       </Container>
     </>
   );

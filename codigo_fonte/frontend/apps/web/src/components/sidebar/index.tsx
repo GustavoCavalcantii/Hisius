@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { useMatch, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   BottomSection,
   ExpandButton,
@@ -15,12 +15,13 @@ import {
   SidebarContainer,
 } from "./styles";
 import logo from "@hisius/ui/assets/images/logo.png";
-import { MdOutlineFilterList } from "react-icons/md";
+import { TbLayoutSidebarLeftExpand } from "react-icons/tb";
 
 interface Routes {
   icon: ReactNode;
   text: string;
   path: string;
+  exact?: boolean;
 }
 
 interface SidebarProps {
@@ -39,9 +40,16 @@ export default function Sidebar({ menuItems }: SidebarProps) {
     navigate(path);
   };
 
-  const isActive = (path: string) => {
-    const match = useMatch(`${path}/*`);
-    return match !== null;
+  const location = useLocation();
+
+  const isActive = (path: string, exact?: boolean) => {
+    const currentPath = location.pathname;
+
+    if (exact) {
+      return path === currentPath;
+    }
+
+    return currentPath.startsWith(path + "/") || path === currentPath;
   };
 
   return (
@@ -63,7 +71,7 @@ export default function Sidebar({ menuItems }: SidebarProps) {
               <MenuItem
                 key={index}
                 $isExpanded={isExpanded}
-                className={isActive(item.path) ? "active" : ""}
+                className={isActive(item.path, item.exact) ? "active" : ""}
                 onClick={() => handleMenuItemClick(item.path)}
               >
                 <MenuIcon $isExpanded={isExpanded}>{item.icon}</MenuIcon>
@@ -75,7 +83,7 @@ export default function Sidebar({ menuItems }: SidebarProps) {
 
         <BottomSection>
           <ExpandButton onClick={handleExpand} $isExpanded={isExpanded}>
-            <MdOutlineFilterList />
+            <TbLayoutSidebarLeftExpand />
           </ExpandButton>
         </BottomSection>
       </SidebarContainer>

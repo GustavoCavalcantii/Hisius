@@ -1,5 +1,6 @@
 import { color } from "@hisius/ui/theme/colors";
 import styled from "styled-components";
+import { clickAnim } from "../../assets/animations";
 
 export const Container = styled.div`
   display: flex;
@@ -20,10 +21,7 @@ export const PageButton = styled.button<{ $active?: boolean; $dots?: boolean }>`
   min-width: 2.5rem;
   font-family: inherit;
 
-  &:active {
-    transform: scale(0.98);
-    transition: all 0.1s ease;
-  }
+  ${clickAnim}
 
   &:hover {
     background-color: ${color.front};

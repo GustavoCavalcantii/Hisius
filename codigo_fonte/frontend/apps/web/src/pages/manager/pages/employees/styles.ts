@@ -1,4 +1,5 @@
 import { color } from "@hisius/ui/theme/colors";
+import { fadeInAnim } from "../../../../assets/animations";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -12,7 +13,12 @@ export const EmployeContainer = styled.div`
   display: grid;
   gap: 1rem;
   place-items: center;
-  grid-template-columns: repeat(9, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(8, 1fr);
+  }
+  ${fadeInAnim}
 `;
 
 export const AddButton = styled.button`

@@ -1,5 +1,6 @@
 import { color } from "@hisius/ui/theme/colors";
 import styled from "styled-components";
+import { clickAnim } from "../../assets/animations";
 
 export const SearchContainer = styled.div`
   position: relative;
@@ -8,6 +9,10 @@ export const SearchContainer = styled.div`
   background: ${color.front};
   border: 0.7px solid rgba(13, 19, 41, 0.12);
   border-radius: 5px;
+
+  @media (max-width: 877px) {
+    min-width: 200px;
+  }
 `;
 
 export const IconContainer = styled.button`
@@ -20,10 +25,8 @@ export const IconContainer = styled.button`
 
   cursor: pointer;
 
-  &:active {
-    transform: scale(0.98);
-    transition: all 0.1s ease;
-  }
+  ${clickAnim}
+
   & svg {
     color: ${color.text};
   }

@@ -1,18 +1,20 @@
-import { HiQueueList } from "react-icons/hi2";
+import { HiOutlineQueueList } from "react-icons/hi2";
 import { HiOutlineUser } from "react-icons/hi2";
 import SidebarComponent from "../../../../components/sidebar";
 
 export function Sidebar() {
   const menuItems = [
     {
-      icon: <HiQueueList />,
+      icon: <HiOutlineQueueList />,
       text: "Filas",
-      path: "funcionario",
+      path: "/funcionario",
+      exact: true,
     },
     {
       icon: <HiOutlineUser />,
       text: "Perfil",
-      path: "funcionario/perfil",
+      path: "/funcionario/perfil",
+      exact: true,
     },
   ];
 

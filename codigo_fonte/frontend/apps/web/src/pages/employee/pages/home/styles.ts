@@ -1,4 +1,5 @@
 import { color } from "@hisius/ui/theme/colors";
+import { fadeInAnim } from "../../../../assets/animations";
 import styled from "styled-components";
 
 export const PatientButtonContainer = styled.div`
@@ -7,6 +8,14 @@ export const PatientButtonContainer = styled.div`
   grid-template-columns: 1fr 2fr 1fr;
   align-items: start;
   gap: 2rem;
+
+  @media (max-width: 969px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const PatientContainer = styled.div`
@@ -16,6 +25,15 @@ export const PatientContainer = styled.div`
   align-items: center;
   gap: 1rem;
   width: 100%;
+
+  @media (max-width: 969px) {
+    grid-column: 1 / span 2;
+    order: 2;
+  }
+
+  @media (max-width: 480px) {
+    grid-column: 1;
+  }
 `;
 
 export const NextButton = styled.button`
@@ -37,6 +55,19 @@ export const NextButton = styled.button`
   flex-shrink: 0;
   margin-left: 1rem;
 
+  @media (max-width: 969px) {
+    grid-column: 1;
+    order: 1;
+    margin-left: 0;
+  }
+
+  @media (max-width: 480px) {
+    grid-column: 1;
+    justify-self: stretch;
+    order: 1;
+    margin-top: 1rem;
+  }
+
   &:hover {
     background-color: ${color.primary};
     color: ${color.front};
@@ -57,4 +88,5 @@ export const Container = styled.div`
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+  ${fadeInAnim}
 `;

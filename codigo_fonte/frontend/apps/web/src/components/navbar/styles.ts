@@ -1,5 +1,6 @@
 import { color } from "@hisius/ui/theme/colors";
 import styled from "styled-components";
+import { subtleSlideAnim } from "../../assets/animations";
 
 export const Container = styled.div`
   width: 100%;
@@ -7,13 +8,23 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
   gap: 1rem;
 
-  @media (max-width: 768px) {
+  ${subtleSlideAnim}
+
+  @media (max-width: 877px) {
     flex-direction: column;
     align-items: stretch;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+  }
+
+  @media (max-width: 480px) {
+    gap: 1rem;
+    align-items: stretch;
+    margin-top: 0.5rem;
   }
 `;
 

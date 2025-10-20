@@ -7,12 +7,13 @@ import {
   PatientButtonContainer,
   PatientContainer,
 } from "./styles";
-import { PatientCard } from "../../components/patientCard";
+import { PatientCard } from "./components/patientCard";
 import type { IPatient } from "@hisius/interfaces/src";
 import { ManchesterTriage } from "@hisius/enums/src";
 import Pagination from "../../../../components/pagination";
 import { FaPlus } from "react-icons/fa";
 import { Sidebar } from "../../components/sidebar";
+import { useNavigate } from "react-router-dom";
 
 export const mockPatients: IPatient[] = [
   {
@@ -66,6 +67,11 @@ export function Employee() {
   const [patients, setPatients] = useState<IPatient[]>(mockPatients);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const totalItems = 156;
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/funcionario/filas`);
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -86,7 +92,7 @@ export function Employee() {
         <Toggle labels={{ on: "Atendimento", off: "Triagem" }} />
         <PatientButtonContainer>
           <PatientContainer>{generateCard(patients)}</PatientContainer>
-          <NextButton>
+          <NextButton onClick={handleClick}>
             <FaPlus />
             Próximo paciente
           </NextButton>

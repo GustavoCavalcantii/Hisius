@@ -1,6 +1,11 @@
 import { color } from "@hisius/ui/theme/colors";
-import styled, { css, keyframes } from "styled-components";
+import styled, { css } from "styled-components";
 import { ManchesterTriage } from "@hisius/enums";
+import {
+  contractAnimationAnim,
+  expandAnimationAnim,
+  tabAnim,
+} from "../../../../../../assets/animations";
 
 interface TextProps {
   type?: ManchesterTriage;
@@ -18,32 +23,6 @@ const mapColors: Record<ManchesterTriage, string> = {
   [ManchesterTriage.NonUrgent]: color.triage.nonUrgent,
 } as const;
 
-const expandAnimation = keyframes`
-  0% { 
-    transform: scaleY(0.8);
-    opacity: 0.7;
-    max-height: 80px;
-  }
-  100% { 
-    transform: scaleY(1);
-    opacity: 1;
-    max-height: 1000px;
-  }
-`;
-
-const contractAnimation = keyframes`
-  0% { 
-    transform: scaleY(1);
-    opacity: 1;
-    max-height: 1000px;
-  }
-  100% { 
-    transform: scaleY(0.98);
-    opacity: 0.9;
-    max-height: 80px;
-  }
-`;
-
 export const Container = styled.div<TextProps & MutableProps>`
   width: 100%;
   min-height: 100px;
@@ -57,21 +36,40 @@ export const Container = styled.div<TextProps & MutableProps>`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 22px 20px;
+  padding: 1rem;
   position: relative;
   gap: 0.4rem;
   cursor: pointer;
   transform-origin: top center;
   transition: all 0.3s ease;
-  animation: ${(props: MutableProps) =>
-      props.isSelected ? expandAnimation : contractAnimation}
-    0.4s ease forwards;
+  ${(props: MutableProps) =>
+    props.isSelected ? expandAnimationAnim : contractAnimationAnim};
 
   &:hover {
     transform: scale(1.005);
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.05);
   }
+
   z-index: 1;
+
+  @media (max-width: 768px) {
+    min-height: 90px;
+    padding: 0.8rem;
+    gap: 0.3rem;
+  }
+
+  @media (max-width: 480px) {
+    min-height: 80px;
+    padding: 0.6rem;
+    gap: 0.2rem;
+
+    ${(props: MutableProps) =>
+      props.isSelected ? `padding: 1rem 0.5rem;` : `padding: 0.6rem;`};
+
+    &:hover {
+      transform: none;
+    }
+  }
 `;
 
 export const SelectContainer = styled.div`
@@ -80,6 +78,18 @@ export const SelectContainer = styled.div`
   align-items: center;
   font-size: 13px;
   font-weight: 400;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 0.8rem;
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.5rem;
+    font-size: 11px;
+    justify-content: space-between;
+  }
 `;
 
 export const TriageBadge = styled.span<TextProps>`
@@ -89,6 +99,14 @@ export const TriageBadge = styled.span<TextProps>`
   }};
   font-size: 13px;
   font-weight: 400;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 11px;
+  }
 `;
 
 export const SelectedCardContainer = styled.div`
@@ -99,12 +117,37 @@ export const SelectedCardContainer = styled.div`
   padding: 2rem;
   overflow: hidden;
   transform-origin: top;
+
+  @media (max-width: 1024px) {
+    min-width: 50%;
+    padding: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    min-width: 60%;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    min-width: 100%;
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
 `;
 
 export const TitleContainer = styled.div`
   position: relative;
   width: 100%;
   height: 30px;
+
+  @media (max-width: 768px) {
+    height: 26px;
+  }
+
+  @media (max-width: 480px) {
+    height: 24px;
+  }
 `;
 
 export const NameTitle = styled.h1<MutableProps>`
@@ -121,20 +164,57 @@ export const NameTitle = styled.h1<MutableProps>`
     !props.isSelected &&
     css`
       ${Container}:hover & {
-        transform: translateX(5px);
-        color: ${color.primary};
+        ${tabAnim}
       }
     `}
+
+  @media (max-width: 768px) {
+    font-size: 15px;
+    left: ${(props: MutableProps) => (props.isSelected ? "50%" : "0")};
+    transform: ${(props: MutableProps) =>
+      props.isSelected ? "translateX(-50%)" : "translateX(0)"};
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+    position: static;
+    transform: none;
+    text-align: ${(props: MutableProps) =>
+      props.isSelected ? "center" : "left"};
+    margin-bottom: 0.2rem;
+
+    ${(props: MutableProps) =>
+      !props.isSelected &&
+      css`
+        ${Container}:hover & {
+          animation: none;
+        }
+      `}
+  }
 `;
 
 export const Description = styled.p`
   font-size: 13px;
   font-weight: 200;
   transition: all 0.3s ease;
+  line-height: 1.4;
 
   ${Container}:hover & {
+    ${tabAnim}
     color: #555;
-    transform: translateX(5px);
-    font-weight: 400;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 11px;
+    line-height: 1.2;
+
+    ${Container}:hover & {
+      animation: none;
+    }
   }
 `;

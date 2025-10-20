@@ -1,4 +1,5 @@
 import { color } from "@hisius/ui/theme/colors";
+import { fadeInAnim } from "../../../../assets/animations";
 import styled from "styled-components";
 
 export const PatientButtonContainer = styled.div`
@@ -68,4 +69,6 @@ export const Container = styled.div`
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+
+  ${fadeInAnim}
 `;

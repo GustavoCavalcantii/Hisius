@@ -12,7 +12,7 @@ interface TextProps {
 }
 
 interface MutableProps {
-  isSelected: boolean;
+  $isSelected: boolean;
 }
 
 const mapColors: Record<ManchesterTriage, string> = {
@@ -43,7 +43,7 @@ export const Container = styled.div<TextProps & MutableProps>`
   transform-origin: top center;
   transition: all 0.3s ease;
   ${(props: MutableProps) =>
-    props.isSelected ? expandAnimationAnim : contractAnimationAnim};
+    props.$isSelected ? expandAnimationAnim : contractAnimationAnim};
 
   &:hover {
     transform: scale(1.005);
@@ -64,7 +64,7 @@ export const Container = styled.div<TextProps & MutableProps>`
     gap: 0.2rem;
 
     ${(props: MutableProps) =>
-      props.isSelected ? `padding: 1rem 0.5rem;` : `padding: 0.6rem;`};
+      props.$isSelected ? `padding: 1rem 0.5rem;` : `padding: 0.6rem;`};
 
     &:hover {
       transform: none;
@@ -156,12 +156,12 @@ export const NameTitle = styled.h1<MutableProps>`
   margin: 0;
   transition: all 0.3s ease;
   position: absolute;
-  left: ${(props: MutableProps) => (props.isSelected ? "50%" : "0")};
+  left: ${(props: MutableProps) => (props.$isSelected ? "50%" : "0")};
   transform: ${(props: MutableProps) =>
-    props.isSelected ? "translateX(-50%)" : "translateX(0)"};
+    props.$isSelected ? "translateX(-50%)" : "translateX(0)"};
 
   ${(props: MutableProps) =>
-    !props.isSelected &&
+    !props.$isSelected &&
     css`
       ${Container}:hover & {
         ${tabAnim}
@@ -170,9 +170,9 @@ export const NameTitle = styled.h1<MutableProps>`
 
   @media (max-width: 768px) {
     font-size: 15px;
-    left: ${(props: MutableProps) => (props.isSelected ? "50%" : "0")};
+    left: ${(props: MutableProps) => (props.$isSelected ? "50%" : "0")};
     transform: ${(props: MutableProps) =>
-      props.isSelected ? "translateX(-50%)" : "translateX(0)"};
+      props.$isSelected ? "translateX(-50%)" : "translateX(0)"};
   }
 
   @media (max-width: 480px) {
@@ -180,11 +180,11 @@ export const NameTitle = styled.h1<MutableProps>`
     position: static;
     transform: none;
     text-align: ${(props: MutableProps) =>
-      props.isSelected ? "center" : "left"};
+      props.$isSelected ? "center" : "left"};
     margin-bottom: 0.2rem;
 
     ${(props: MutableProps) =>
-      !props.isSelected &&
+      !props.$isSelected &&
       css`
         ${Container}:hover & {
           animation: none;

@@ -6,5 +6,5 @@ export interface IPatient {
   name: string;
   age: number;
   classification?: ManchesterTriage;
-  queuePos: number;
+  position: number;
 }

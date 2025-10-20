@@ -89,12 +89,12 @@ export function PatientCard(props: PatientCardProp) {
   return (
     <>
       <Container
-        isSelected={isSelected}
+        $isSelected={isSelected}
         type={props.patient.classification}
         onClick={handleCardClick}
       >
         <TitleContainer>
-          <NameTitle isSelected={isSelected}>{props.patient.name}</NameTitle>
+          <NameTitle $isSelected={isSelected}>{props.patient.name}</NameTitle>
         </TitleContainer>
         {!isSelected ? notSelectedCard() : selectedCard()}
       </Container>

@@ -15,7 +15,7 @@ function App() {
           <Routes>
             <Route path="/funcionario">
               <Route index element={<Employee />} />
-              <Route path="filas/" element={<AddPatient />} />
+              <Route path="filas/:id" element={<AddPatient />} />
             </Route>
 
             <Route path="/admin">

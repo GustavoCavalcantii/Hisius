@@ -14,6 +14,7 @@ import { FaPlus } from "react-icons/fa";
 import { Sidebar } from "../../components/sidebar";
 import { useNavigate } from "react-router-dom";
 import { Queue } from "@hisius/services";
+import { useNotification } from "../../../../components/notification/context";
 
 const generateCard = (patients: IPatient[]) => {
   return patients.map((patient) => (
@@ -28,6 +29,7 @@ export function Employee() {
   const [isTriage, setIsTriage] = useState<boolean>(false);
   const totalItems = patients.length || 0;
   const navigate = useNavigate();
+  const { addNotification } = useNotification();
   const queueService = new Queue();
 
   useEffect(() => {
@@ -58,7 +60,16 @@ export function Employee() {
   };
 
   const handleClick = () => {
-    navigate(`/funcionario/filas`);
+    const nextPatient = patients.find((patient) => !patient.classification);
+    const nextPatientId = nextPatient?.id || patients[0]?.id;
+
+    if (nextPatientId) {
+      navigate(`/funcionario/filas/${nextPatientId}`);
+      return;
+    }
+
+    console.warn("Nenhum paciente disponível para próximo");
+    addNotification("Nenhum paciente na fila", "warning");
   };
 
   const handlePageChange = (page: number) => {

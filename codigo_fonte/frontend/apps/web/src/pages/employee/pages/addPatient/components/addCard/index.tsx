@@ -5,7 +5,19 @@ import { Select } from "../../../../../../components/select";
 import { useState } from "react";
 import { Container, Title } from "./styles";
 
-export function AddCard() {
+interface AddCardProps {
+  name: string;
+  age: number;
+  gender: string;
+  initialClassification?: string;
+}
+
+export function AddCard({
+  name,
+  age,
+  gender,
+  initialClassification,
+}: AddCardProps) {
   const classificationOptions = Object.values(ManchesterTriage).map(
     (value) => ({
       value: value,
@@ -13,8 +25,9 @@ export function AddCard() {
     })
   );
 
-  const [selectedClassification, setSelectedClassification] =
-    useState<string>();
+  const [selectedClassification, setSelectedClassification] = useState<string>(
+    initialClassification || ""
+  );
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedClassification(event.target.value);
@@ -27,9 +40,9 @@ export function AddCard() {
   return (
     <FrontContainer>
       <Container>
-        <Title>Jorge Alfredo</Title>
-        <TextValue title="Idade:">a</TextValue>
-        <TextValue title="Sexo:">a</TextValue>
+        <Title>{name}</Title>
+        <TextValue title="Idade:">{age}</TextValue>
+        <TextValue title="Sexo:">{gender}</TextValue>
         <Select
           label="Classificação"
           options={classificationOptions}

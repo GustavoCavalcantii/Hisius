@@ -30,14 +30,14 @@ router.put(
 // Rotas do administrador
 router.get(
   "/:id",
-  ValidateRoles(UserRole.EMPLOYEE),
   AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
   PatientController.getPatient
 );
 router.put(
   "/:id",
-  ValidateRoles(UserRole.EMPLOYEE),
   AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
   JsonRequiredMiddleware,
   ValidateRequest(PatientDto, ["update"]),
   PatientController.updatePatient

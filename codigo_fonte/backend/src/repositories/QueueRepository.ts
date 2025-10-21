@@ -1,11 +1,12 @@
 import { RedisClientType } from "redis";
-import { QueueStatus } from "../interfaces/queue/QueueStatus";
+import { QueueStatus } from "../enums/Queue/QueueStatus";
 import { getRedis } from "../config/Redis";
+import Redis from "ioredis";
 
 export class QueueRepository {
-  private redis: RedisClientType;
+  private redis: Redis;
 
-  private getRedisClient(): RedisClientType {
+  private getRedisClient(): Redis {
     if (!this.redis) {
       this.redis = getRedis();
     }
@@ -14,13 +15,13 @@ export class QueueRepository {
 
   async getPatientMeta(patientId: number): Promise<Record<string, string>> {
     const redis = this.getRedisClient();
-    const meta = await redis.hGetAll(`patient:${patientId}:queueData`);
+    const meta = await redis.hgetall(`patient:${patientId}:queueData`);
     return meta || {};
   }
 
   async setPatientMeta(patientId: number, meta: Record<string, string>) {
     const redis = this.getRedisClient();
-    await redis.hSet(`patient:${patientId}:queueData`, meta);
+    await redis.hset(`patient:${patientId}:queueData`, meta);
   }
 
   async deletePatientMeta(patientId: number) {
@@ -30,23 +31,17 @@ export class QueueRepository {
 
   async addPatientToQueue(queueKey: string, patientId: number, score: number) {
     const redis = this.getRedisClient();
-    await redis.zAdd(queueKey, {
-      score,
-      value: patientId.toString(),
-    });
+    await redis.zadd(queueKey, score, patientId.toString());
   }
 
-  async removePatientFromHistory(
-    historyKey: string,
-    patientId: number
-  ) {
+  async removePatientFromHistory(historyKey: string, patientId: number) {
     const redis = this.getRedisClient();
-    await redis.zRem(historyKey, patientId.toString());
+    await redis.zrem(historyKey, patientId.toString());
   }
 
   async removePatientFromQueue(queueKey: string, patientId: number) {
     const redis = this.getRedisClient();
-    await redis.zRem(queueKey, patientId.toString());
+    await redis.zrem(queueKey, patientId.toString());
   }
 
   async getQueuePatients(
@@ -55,42 +50,39 @@ export class QueueRepository {
     end: number
   ): Promise<string[]> {
     const redis = this.getRedisClient();
-    return await redis.zRange(queueKey, start, end);
+    return await redis.zrange(queueKey, start, end);
   }
 
   async getQueueLength(queueKey: string): Promise<number> {
     const redis = this.getRedisClient();
-    return await redis.zCard(queueKey);
+    return await redis.zcard(queueKey);
   }
 
   async getNextPatientId(queueKey: string): Promise<string | null> {
     const redis = this.getRedisClient();
-    const ids = await redis.zRange(queueKey, 0, 0);
+    const ids = await redis.zrange(queueKey, 0, 0);
     return ids.length > 0 ? ids[0] : null;
   }
 
   async getPatientPosition(queueKey: string, patientId: number) {
-    const rank = await this.redis.zRank(queueKey, patientId.toString());
+    const rank = await this.redis.zrank(queueKey, patientId.toString());
     return rank !== null ? rank + 1 : 0;
   }
 
   async getLastTimestamps(historyKey: string, limit = 10) {
-    const timestamps = await this.redis.zRange(historyKey, -limit, -1);
+    const timestamps = await this.redis.zrange(historyKey, -limit, -1);
     return timestamps.map((t) => Number(t));
   }
 
   async setPatientStatus(patientId: number, status: QueueStatus) {
     const redis = this.getRedisClient();
-    await redis.hSet(`patient:${patientId}:queueData`, { status });
+    await redis.hset(`patient:${patientId}:queueData`, { status });
   }
 
   async registerPatientCalled(queueType: string, patientId: number) {
     const historyKey = `queue:history:${queueType}`;
     const timestamp = Date.now();
-    await this.redis.zAdd(historyKey, {
-      score: timestamp,
-      value: patientId.toString(),
-    });
+    await this.redis.zadd(historyKey, timestamp, patientId.toString());
   }
 
   async patientExistsInQueue(patientId: number): Promise<boolean> {

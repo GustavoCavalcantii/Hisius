@@ -2,15 +2,25 @@ import { PatientRepository } from "../repositories/PatientRepository";
 import { PatientDto } from "../dtos/patient/PatientDto";
 import { Patient } from "../database/models/Patient";
 import { BadRequestError } from "../utils/errors/BadRequestError";
+import { calculateAge } from "../utils/CalculateUtils";
+import { UserRepository } from "../repositories/UserRepository";
 
 export class PatientService {
   private patientRepo = new PatientRepository();
+  private userRepo = new UserRepository();
 
-  private _sanitizePatient(patient: Patient | null) {
+  private async _sanitizePatient(patient: Patient | null) {
     if (!patient) return null;
+    const age = calculateAge(patient.birthDate);
+    const user = await this.userRepo.findById(patient.userId);
+
+    if (!user) throw new BadRequestError("Usuario não encontrado");
+
     const patientJSON = patient.toJSON();
-    const { data_criacao, data_atualizacao, usuario_id, ...rest } = patientJSON;
-    return rest;
+    const { data_criacao, data_atualizacao, usuario_id, birthDate, ...rest } =
+      patientJSON;
+
+    return { age, name: user.name, ...rest };
   }
 
   async getPatientByUserId(userId: number) {
@@ -20,18 +30,18 @@ export class PatientService {
         "Perfil de paciente não encontrado para este usuário."
       );
     }
-    return this._sanitizePatient(patient);
+    return await this._sanitizePatient(patient);
   }
 
   async updatePatientByUserId(userId: number, dto: PatientDto) {
     const updatedPatient = await this.patientRepo.updateByUserId(userId, dto);
-    return this._sanitizePatient(updatedPatient);
+    return await this._sanitizePatient(updatedPatient);
   }
 
   async createPatient(dto: PatientDto, userId: number) {
     const patientData = { ...dto, userId };
     const patient = await this.patientRepo.create(patientData);
-    return this._sanitizePatient(patient);
+    return await this._sanitizePatient(patient);
   }
 
   async getPatientById(id: number) {
@@ -39,11 +49,11 @@ export class PatientService {
     if (!patient) {
       throw new BadRequestError("Paciente não encontrado.");
     }
-    return this._sanitizePatient(patient);
+    return await this._sanitizePatient(patient);
   }
 
   async updatePatient(id: number, dto: PatientDto) {
     const updatedPatient = await this.patientRepo.update(id, dto);
-    return this._sanitizePatient(updatedPatient);
+    return await this._sanitizePatient(updatedPatient);
   }
 }

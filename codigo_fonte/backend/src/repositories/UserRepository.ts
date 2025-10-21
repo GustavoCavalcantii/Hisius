@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import User from "../database/models/User";
 import { UserRole } from "../enums/User/UserRole";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser";
@@ -19,6 +20,40 @@ export class UserRepository {
 
   async findById(id: number) {
     return User.findOne({ where: { id, deletado: false } });
+  }
+
+  async findPaginated(params: {
+    offset: number;
+    limit: number;
+    name?: string;
+    role?: UserRole;
+  }) {
+    const { offset, limit, name, role } = params;
+    const whereClause: any = {};
+
+    if (name) {
+      whereClause.name = {
+        [Op.like]: `%${name}`,
+      };
+    }
+
+    if (role !== undefined) {
+      whereClause.role = {
+        [Op.eq]: role,
+      };
+    }
+
+    const { count, rows } = await User.findAndCountAll({
+      where: whereClause,
+      limit,
+      offset,
+      order: [["data_criacao", "DESC"]],
+    });
+
+    return {
+      users: rows,
+      total: count,
+    };
   }
 
   async delete(id: number) {

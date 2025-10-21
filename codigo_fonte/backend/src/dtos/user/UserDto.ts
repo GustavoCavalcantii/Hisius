@@ -1,7 +1,14 @@
-import { IsString, IsEmail, Length, IsIn } from "class-validator";
+import {
+  IsString,
+  IsEmail,
+  Length,
+  IsIn,
+  IsStrongPassword,
+} from "class-validator";
 import { Match } from "../../decorators/Match";
 import { UserRole } from "../../enums/User/UserRole";
 import { Type } from "class-transformer";
+import { PasswordRequirements } from "../../decorators/PasswordRequirements";
 
 export class UserDTO {
   /**
@@ -32,14 +39,13 @@ export class UserDTO {
 
   /**
    * Senha do usuário
-   * Deve ter no mínimo 6 caracteres
+   * Deve ter no mínimo 8 caracteres
    */
   @IsString({
     message: "A senha deve ser um texto",
     groups: ["create", "login", "reset"],
   })
-  @Length(6, 255, {
-    message: "A senha deve ter pelo menos 6 caracteres",
+  @PasswordRequirements({
     groups: ["create", "reset"],
   })
   password!: string;

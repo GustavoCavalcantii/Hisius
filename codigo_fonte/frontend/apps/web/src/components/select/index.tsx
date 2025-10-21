@@ -1,3 +1,4 @@
+import { capitalizeWords } from "../../utils";
 import {
   SelectContainer,
   SelectLabel,
@@ -66,7 +67,7 @@ export function Select({
 
         {options.map((option) => (
           <Options key={option.value} value={option.value}>
-            {option.label}
+            {capitalizeWords(option.label)}
           </Options>
         ))}
       </SelectComponent>

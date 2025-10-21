@@ -16,25 +16,28 @@ export const Container = styled.div`
   transform-origin: top center;
   transition: all 0.3s ease-out;
 
+  cursor: pointer;
+
   &:hover {
     transform: scale(1.005);
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.05);
   }
   z-index: 1;
+
+  ${clickAnim}
 `;
 
 export const ViewMore = styled.button`
-  cursor: pointer;
-  ${clickAnim}
   font-size: 13px;
   font-weight: 200;
   background: none;
   border-radius: 5px;
   border: 1px solid ${color.secondary};
+  cursor: pointer;
 `;
 
 export const Name = styled.h1`
-  transition: all ease .4s;
+  transition: all ease 0.4s;
   font-size: 13px;
   font-weight: 400;
   ${css`

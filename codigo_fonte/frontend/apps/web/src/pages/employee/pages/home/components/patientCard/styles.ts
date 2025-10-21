@@ -23,16 +23,17 @@ const mapColors: Record<ManchesterTriage, string> = {
   [ManchesterTriage.NonUrgent]: color.triage.nonUrgent,
 } as const;
 
+const getTriageColor = (type?: ManchesterTriage): string => {
+  if (!type) return color.triage.emergency;
+  return mapColors[type] || color.triage.emergency;
+};
+
 export const Container = styled.div<TextProps & MutableProps>`
   width: 100%;
   min-height: 100px;
   background-color: ${color.front};
   border-radius: 5px;
-  border-left: 2px solid
-    ${(props: TextProps) => {
-      const type = props.type || ManchesterTriage.Emergency;
-      return mapColors[type as ManchesterTriage];
-    }};
+  border-left: 2px solid ${(props) => getTriageColor(props.type)};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -93,10 +94,7 @@ export const SelectContainer = styled.div`
 `;
 
 export const TriageBadge = styled.span<TextProps>`
-  color: ${(props: TextProps) => {
-    const type = props.type || ManchesterTriage.Emergency;
-    return mapColors[type as ManchesterTriage];
-  }};
+  color: ${(props) => getTriageColor(props.type)};
   font-size: 13px;
   font-weight: 400;
 

@@ -7,6 +7,12 @@
   font-size: 16px;
 }
 
+input:focus,
+textarea:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 svg {
   stroke-width: 0.7;
 }
@@ -16,12 +22,6 @@ svg {
   padding-right: 30px;
 }
 
-input {
-  &:active {
-    transform: scale(0.98);
-    transition: all 0.1s ease;
-  }
-}
 
 body {
   background-color: #F3F3F3;

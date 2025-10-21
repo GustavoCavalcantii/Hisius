@@ -14,8 +14,35 @@ import {
   TitleInfo,
 } from "./styles";
 import { Log } from "./components/log";
+import { useEffect, useState } from "react";
+import { Admin, Queue } from "@hisius/services";
+import { useNotification } from "../../../../components/notification/context";
 
 export function Dashboard() {
+  const [hospitalCode, setHospitalCode] = useState<string>("");
+  const [triageCount, setTriageCount] = useState<number>();
+  const [treatmentCount, setTreatmentCount] = useState<number>();
+  const adminService = new Admin();
+  const queueService = new Queue();
+  const { addNotification } = useNotification();
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        const hospitalInfo = await adminService.getHospitalInfo();
+        const triageCount = await queueService.getQueueCount("triage");
+        const treatmentCount = await queueService.getQueueCount("treatment");
+        setTriageCount(triageCount);
+        setTreatmentCount(treatmentCount);
+        setHospitalCode(hospitalInfo.hospitalCode);
+      } catch (error) {
+        addNotification("Erro ao buscar informações", "error");
+      }
+    };
+
+    fetchPatientData();
+  }, []);
+
   return (
     <>
       <Sidebar />
@@ -29,7 +56,7 @@ export function Dashboard() {
             <InfoContainer>
               <TextContainer>
                 <TitleInfo>Pessoas na Triagem</TitleInfo>
-                <SubtitleInfo>15</SubtitleInfo>
+                <SubtitleInfo>{triageCount}</SubtitleInfo>
               </TextContainer>
               <InfoIcon>
                 <HiOutlineClipboard />
@@ -37,8 +64,8 @@ export function Dashboard() {
             </InfoContainer>
             <InfoContainer>
               <TextContainer>
-                <TitleInfo>Pessoas na Triagem</TitleInfo>
-                <SubtitleInfo>15</SubtitleInfo>
+                <TitleInfo>Pessoas no Atendimento</TitleInfo>
+                <SubtitleInfo>{treatmentCount}</SubtitleInfo>
               </TextContainer>
               <InfoIcon>
                 <HiOutlineClipboard />
@@ -49,7 +76,7 @@ export function Dashboard() {
           <InfoContainer style={{ justifySelf: "end" }}>
             <TextContainer>
               <TitleInfo>Codigo do Hospital</TitleInfo>
-              <SubtitleInfo>123458</SubtitleInfo>
+              <SubtitleInfo>{hospitalCode}</SubtitleInfo>
             </TextContainer>
           </InfoContainer>
         </InfoCardContainer>

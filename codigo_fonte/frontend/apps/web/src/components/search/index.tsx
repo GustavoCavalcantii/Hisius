@@ -13,7 +13,7 @@ export function SearchPatient({
   value,
   onChange,
   placeholder,
-  onClick
+  onClick,
 }: SearchPatientProps) {
   return (
     <SearchContainer>
@@ -26,9 +26,13 @@ export function SearchPatient({
         }
         placeholder={placeholder}
       />
-      <IconContainer onClick={onClick}>
-        <FaSearch />
-      </IconContainer>
+      {onClick ? (
+        <IconContainer onClick={onClick}>
+          <FaSearch />
+        </IconContainer>
+      ) : (
+        ""
+      )}
     </SearchContainer>
   );
 }

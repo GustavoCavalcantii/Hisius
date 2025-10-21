@@ -32,9 +32,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
     },
     cutout: "70%",
     layout: {
-      padding: {
-        right: 40,
-      },
+      padding: 40
     },
     plugins: {
       legend: {
@@ -60,16 +58,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
       },
       datalabels: {
         color: color.text,
-        formatter: (value: number) => {
-          return value;
-        },
+        formatter: (_value, context) =>
+          context.chart.data.labels?.[context.dataIndex],
         anchor: "end",
         align: "end",
-        offset: 5,
-        display: (context) => {
-          const value = context.dataset.data[context.dataIndex];
-          return typeof value === "number" && value > 5;
-        },
+        display: true,
         font: {
           family: "montserrat",
           size: 13,
@@ -100,8 +93,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
   return (
     <div
       style={{
-        height: `${height}px`,
-        width: `${width}px`,
+        height: `${height}`,
+        width: `${width}`,
         position: "relative",
       }}
     >

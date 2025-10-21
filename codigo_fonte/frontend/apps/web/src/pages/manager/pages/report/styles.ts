@@ -37,6 +37,7 @@ export const PeakContainer = styled.div`
 
 export const GraphContainer = styled.div`
   width: 100%;
+  min-height: 300px;
   place-items: center;
 `;
 

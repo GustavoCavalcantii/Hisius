@@ -1,7 +1,7 @@
 export enum ManchesterTriage {
-  Emergency = "Emergência", // Vermelho - Atendimento Imediato
-  VeryUrgent = "Muito Urgente", // Laranja - Atendimento Muito Urgente
-  Urgent = "Urgente", // Amarelo - Atendimento Urgente
-  Standard = "Pouco Urgente", // Verde - Pouco Urgente
-  NonUrgent = "Não Urgente", // Azul - Não Urgente
+  Emergency = "imediato",
+  VeryUrgent = "muito urgente",
+  Urgent = "urgente",
+  Standard = "pouco urgente",
+  NonUrgent = "não urgente",
 }

@@ -1,18 +1,20 @@
 import api from "./config/axios";
-import type { IPatient } from "@hisius/interfaces";
+import type { ApiError, IPatient } from "@hisius/interfaces";
 
 interface ApiResponse {
   success: boolean;
   message: string;
   statusCode: number;
-  data: IPatient[];
+  data?: any;
+  errors?: ApiError[];
 }
 
 interface ApiResponseGet {
   success: boolean;
   message: string;
   statusCode: number;
-  data: IPatient;
+  data?: IPatient;
+  errors?: ApiError[];
 }
 
 export class Queue {
@@ -39,10 +41,38 @@ export class Queue {
     return response.data.data;
   }
 
-  async getNextPatient(isTriage: boolean): Promise<IPatient[]> {
-    const response = await api.get<ApiResponse>(
-      `/queue/${isTriage ? "triage" : "treatment"}/call-next`
+  async getNextPatient(isTriage: boolean, room: string): Promise<IPatient> {
+    const response = await api.post<ApiResponseGet>(
+      `/queue/${isTriage ? "triage" : "treatment"}/call-next`,
+      { room }
     );
+    return response.data.data;
+  }
+
+  async updateClassification(
+    id: number,
+    classification: string
+  ): Promise<IPatient | ApiError[]> {
+    const response = await api.put<ApiResponseGet>(`/queue/${id}`, {
+      classification: classification.toLowerCase(),
+    });
+
+    return response.data.data;
+  }
+
+  async getQueueCount(type: string): Promise<number> {
+    const response = await api.get<ApiResponse>(`/queue/${type}/count`);
+    return response.data.data.count;
+  }
+
+  async goToTreatment(
+    id: number,
+    classification: string
+  ): Promise<IPatient | ApiError[]> {
+    const response = await api.put<ApiResponseGet>(`/queue/${id}/next`, {
+      classification: classification.toLowerCase(),
+    });
+
     return response.data.data;
   }
 }

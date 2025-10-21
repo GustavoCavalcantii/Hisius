@@ -82,6 +82,19 @@ export const NextButton = styled.button`
   }
 `;
 
+export const InputAndButtonContainer = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+
+  gap: 1rem;
+`;
+
+export const PopupText = styled.p`
+  margin-bottom: 2rem;
+  width: 100%;
+  text-align: center;
+`;
+
 export const Container = styled.div`
   display: flex;
   min-height: 100%;

@@ -21,6 +21,43 @@ export const EmployeContainer = styled.div`
   ${fadeInAnim}
 `;
 
+export const ContactContainer = styled.div`
+  width: fit-content;
+  margin: 2rem auto;
+`;
+
+export const CopyTextContainer = styled.div`
+  display: flex;
+  margin-top: 2rem;
+  justify-content: space-between;
+  background-color: ${color.background};
+  border: 1px solid ${color.gray};
+  border-radius: 4px;
+  padding: 0.5rem;
+  align-items: center;
+`;
+
+export const TextToCopy = styled.span`
+  flex: 1;
+  width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 1rem;
+  color: ${color.text};
+`;
+
+export const DataContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  & svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
 export const AddButton = styled.button`
   width: 60px;
   aspect-ratio: 1/1;
@@ -36,7 +73,7 @@ export const AddButton = styled.button`
   right: 5%;
   bottom: 5%;
 
-  z-index: 9999;
+  z-index: 9;
 
   padding: 1rem;
 

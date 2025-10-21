@@ -12,8 +12,11 @@ import { useNotification } from "../../../../components/notification/context";
 export function AddPatient() {
   const { id } = useParams<{ id: string }>();
   const [patientData, setPatientData] = useState<IPatient | null>(null);
+  const [selectedClassification, setSelectedClassification] =
+    useState<string>("");
   const { addNotification } = useNotification();
   const navigate = useNavigate();
+  const queueService = new Queue();
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -22,7 +25,6 @@ export function AddPatient() {
         return;
       }
       try {
-        const queueService = new Queue();
         const patient = await queueService.getPatient(Number(id));
         setPatientData(patient);
       } catch (error) {
@@ -34,7 +36,36 @@ export function AddPatient() {
     fetchPatientData();
   }, [id]);
 
-  const handleClick = () => {};
+  const handleClassificationChange = (classification: string) => {
+    setSelectedClassification(classification);
+  };
+
+  const handleCallNext = async () => {
+    try {
+      await queueService.goToTreatment(
+        Number(patientData?.id),
+        selectedClassification
+      );
+
+      addNotification("Paciente foi movido para a outra fila", "success");
+      navigate("/funcionario");
+    } catch (err: any) {
+      const errors = err.response?.data?.errors || [];
+      const messages = errors
+        .map((error: any) => error?.message || error)
+        .filter(Boolean);
+
+      if (messages.length === 0) {
+        messages.push(
+          err.response?.data?.message || err.message || "Erro ao mover paciente"
+        );
+      }
+
+      messages.forEach((message: string) => {
+        addNotification(message, "error");
+      });
+    }
+  };
 
   return (
     <>
@@ -50,12 +81,13 @@ export function AddPatient() {
             name={patientData?.name || "Nome não informado"}
             age={patientData?.age || 0}
             gender={patientData?.gender || "Sexo não informado"}
-            initialClassification={patientData?.classification}
+            selectedClassification={selectedClassification}
+            onClassificationChange={handleClassificationChange}
           />
           <ButtonContainer>
             <CustomButton
               title={"Confirmar"}
-              onPress={handleClick}
+              onPress={handleCallNext}
             ></CustomButton>
           </ButtonContainer>
         </ContentContainer>

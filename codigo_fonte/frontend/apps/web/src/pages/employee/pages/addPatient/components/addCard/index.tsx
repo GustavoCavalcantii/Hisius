@@ -2,21 +2,24 @@ import { TextValue } from "../../../../../../components/textValue";
 import { FrontContainer } from "../../../../../../components/frontContainer";
 import { ManchesterTriage } from "@hisius/enums/src";
 import { Select } from "../../../../../../components/select";
-import { useState } from "react";
 import { Container, Title } from "./styles";
 
 interface AddCardProps {
   name: string;
   age: number;
   gender: string;
-  initialClassification?: string;
+  error?: string;
+  selectedClassification: string;
+  onClassificationChange: (classification: string) => void;
 }
 
 export function AddCard({
   name,
   age,
   gender,
-  initialClassification,
+  selectedClassification,
+  onClassificationChange,
+  error,
 }: AddCardProps) {
   const classificationOptions = Object.values(ManchesterTriage).map(
     (value) => ({
@@ -25,12 +28,8 @@ export function AddCard({
     })
   );
 
-  const [selectedClassification, setSelectedClassification] = useState<string>(
-    initialClassification || ""
-  );
-
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedClassification(event.target.value);
+    onClassificationChange(event.target.value);
   };
 
   const handleSelectClick = (event: React.MouseEvent) => {
@@ -49,6 +48,7 @@ export function AddCard({
           onClick={handleSelectClick}
           onChange={handleSelectChange}
           value={selectedClassification}
+          error={error}
         />
       </Container>
     </FrontContainer>

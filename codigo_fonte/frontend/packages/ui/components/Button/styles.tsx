@@ -15,9 +15,9 @@ const baseButton: ViewStyle = {
   paddingVertical: 14,
   paddingHorizontal: 32,
   borderRadius: 6,
+  height:50,
   alignItems: "center",
   justifyContent: "center",
-  minHeight: 50,
 };
 
 const styles = StyleSheet.create<ButtonStyles>({

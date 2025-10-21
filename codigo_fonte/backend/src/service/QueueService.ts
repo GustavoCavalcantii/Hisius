@@ -35,6 +35,11 @@ export class QueueService {
     return { patient, user };
   }
 
+  async getQueueCount(queueType: QueueType): Promise<number> {
+    const queueKey = `queue:${queueType}`;
+    return await this.queueRepo.getQueueLength(queueKey);
+  }
+
   private async formatQueuedPatient(
     user: User,
     patient: Patient,

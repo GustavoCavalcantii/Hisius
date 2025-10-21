@@ -4,6 +4,8 @@ import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { ManagerRepository } from "../repositories/ManagerRepository";
 import Manager from "../database/models/Manager";
 import { BadRequestError } from "../utils/errors/BadRequestError";
+import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
+import { UserRole } from "../enums/User/UserRole";
 
 export class ManagerService {
   private userService = new UserService();
@@ -48,5 +50,12 @@ export class ManagerService {
     if (!manager) throw new BadRequestError("Administrador não encontrado");
 
     return manager.hospitalCode;
+  }
+
+  async getAdminsPaginated(queryParams: IUserQueryParams) {
+    return await this.userService.getUsersPaginated({
+      ...queryParams,
+      role: UserRole.ADMIN,
+    });
   }
 }

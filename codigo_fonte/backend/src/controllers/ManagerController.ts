@@ -4,6 +4,8 @@ import { UserDTO } from "../dtos/user/UserDto";
 import { plainToInstance } from "class-transformer";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import { BadRequestError } from "../utils/errors/BadRequestError";
+import { ManagerDto } from "../dtos/manager/ManagerDto";
+import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
 
 const managerService = new ManagerService();
 
@@ -17,6 +19,29 @@ export class ManagerController {
       return res
         .status(201)
         .json(SuccessResponse(user, "Usuário criado com sucesso!", 201));
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
+  static async getManagers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const queryParams = plainToInstance(ManagerDto, req.query);
+      const page = queryParams.page ? Number(queryParams.page) : 1;
+      const limit = queryParams.limit ? Number(queryParams.limit) : 10;
+      const name = queryParams.nameFilter;
+
+      const result = await managerService.getAdminsPaginated({
+        page,
+        limit,
+        name,
+      } as IUserQueryParams);
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(result, "Administradores capturados com sucesso", 200)
+        );
     } catch (err: any) {
       next(err);
     }

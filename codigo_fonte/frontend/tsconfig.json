@@ -5,7 +5,10 @@
     "baseUrl": ".",
     "jsx": "react-jsx",
     "paths": {
-      "@hisius/ui": ["packages/ui"]
+      "@hisius/ui": ["packages/ui"],
+      "@hisius/enums": ["packages/enums"],
+      "@hisius/interfaces": ["packages/interfaces"],
+      "@hisius/services": ["packages/services"]
     }
   },
   "include": ["apps/**/*", "packages/**/*"]

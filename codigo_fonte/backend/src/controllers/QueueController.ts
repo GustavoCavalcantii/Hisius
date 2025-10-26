@@ -87,6 +87,20 @@ export class QueueController {
     }
   }
 
+  static async getQueueCount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+
+      const count = await queueService.getQueueCount(paramDto.type);
+
+      return res
+        .status(200)
+        .json(SuccessResponse({ count }, "Dado coletado com sucesso", 200));
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async finishTreatment(
     req: Request,
     res: Response,

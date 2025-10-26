@@ -44,6 +44,14 @@ router.put(
   QueueController.moveToNextQueue
 );
 
+router.get(
+  "/:type/count",
+  AuthMiddleware,
+  ValidateRoles(UserRole.ADMIN),
+  ValidateRequest(QueueParamsDto, ["search"], "params"),
+  QueueController.getQueueCount
+);
+
 router.get("/me", AuthMiddleware, QueueController.getSelfInfo);
 
 router.delete(

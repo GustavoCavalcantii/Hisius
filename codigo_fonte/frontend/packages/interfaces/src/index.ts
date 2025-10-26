@@ -1,0 +1,62 @@
+import { ManchesterTriage } from "packages/enums/src";
+
+export interface IPatient {
+  id: number;
+  gender: string;
+  name: string;
+  age: number;
+  classification?: ManchesterTriage;
+  position: number;
+}
+
+export interface UserResponse {
+  users: User[];
+  pagination: Pagination;
+}
+
+export interface ApiError {
+  field: string;
+  message: string;
+}
+
+export interface AvgTime {
+  averageWaitTime: number;
+  count: number;
+}
+
+export interface PeakDemand {
+  DOM?: number;
+  SEG?: number;
+  TER?: number;
+  QUA?: number;
+  QUI?: number;
+  SEX?: number;
+  SAB?: number;
+}
+
+export interface IEmployee {
+  name: string;
+}
+export interface ReportInfo {
+  avgTimeTreatmentInSec: AvgTime[];
+  avgTimeTriageInSec: AvgTime[];
+  peakDemand: PeakDemand;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: number;
+}
+
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+  nextPage: number | null;
+  prevPage: number | null;
+}

@@ -17,7 +17,7 @@ export class PatientService {
     if (!user) throw new BadRequestError("Usuario não encontrado");
 
     const patientJSON = patient.toJSON();
-    const { data_criacao, data_atualizacao, usuario_id, birthDate, ...rest } =
+    const { data_criacao, data_atualizacao, usuario_id, ...rest } =
       patientJSON;
 
     return { age, name: user.name, ...rest };

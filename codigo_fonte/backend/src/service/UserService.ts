@@ -4,6 +4,7 @@ import { UserRepository } from "../repositories/UserRepository";
 import User from "../database/models/User.js";
 import { BadRequestError } from "../utils/errors/BadRequestError";
 import { UserRole } from "../enums/User/UserRole";
+import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
 
 const SALT_ROUNDS = 10;
 
@@ -15,6 +16,42 @@ export class UserService {
 
     const { data_criacao, data_atualizacao, deleted, ...rest } = user.toJSON();
     return rest;
+  }
+
+  async getUsersPaginated(queryParams: IUserQueryParams) {
+    const { page = 1, limit = 10, name, role } = queryParams;
+
+    const offset = (page - 1) * limit;
+
+    const result = await this.userRepo.findPaginated({
+      offset,
+      limit,
+      name,
+      role,
+    });
+
+    const totalPages = Math.ceil(result.total / limit);
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+
+    const sanitizedUsers = result.users.map((user) => {
+      const { password, ...rest } = this.sanitizeUser(user)!;
+      return rest;
+    });
+
+    return {
+      users: sanitizedUsers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: result.total,
+        itemsPerPage: limit,
+        hasNext,
+        hasPrev,
+        nextPage: hasNext ? page + 1 : null,
+        prevPage: hasPrev ? page - 1 : null,
+      },
+    };
   }
 
   async deleteUser(user: User) {

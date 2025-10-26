@@ -27,8 +27,8 @@ export class ManagerController {
   static async getManagers(req: Request, res: Response, next: NextFunction) {
     try {
       const queryParams = plainToInstance(ManagerDto, req.query);
-      const page = queryParams.page ? Number(queryParams.page) : 1;
-      const limit = queryParams.limit ? Number(queryParams.limit) : 10;
+      const page = queryParams.page;
+      const limit = queryParams.limit;
       const name = queryParams.nameFilter;
 
       const result = await managerService.getAdminsPaginated({

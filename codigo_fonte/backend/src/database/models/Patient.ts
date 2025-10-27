@@ -10,6 +10,10 @@ export class Patient extends Model {
   declare phone: string;
   declare birthDate: Date;
 
+  declare cnsNumber: string;
+  declare icePhone: string;
+  declare motherName: string;
+
   declare data_criacao: Date;
   declare data_atualizacao: Date;
 
@@ -40,6 +44,21 @@ export class Patient extends Model {
           type: DataTypes.ENUM(...Object.values(Gender)),
           allowNull: true,
           field: "sexo",
+        },
+        cnsNumber: {
+          type: DataTypes.STRING(20),
+          allowNull: true,
+          field: "numero_cns",
+        },
+        icePhone: {
+          type: DataTypes.STRING(20),
+          allowNull: true,
+          field: "telefone_emergencia",
+        },
+        motherName: {
+          type: DataTypes.STRING(100),
+          allowNull: true,
+          field: "nome_mae",
         },
         birthDate: {
           type: DataTypes.DATEONLY,

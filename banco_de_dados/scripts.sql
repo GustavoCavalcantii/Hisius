@@ -2,13 +2,25 @@ create database hisius_bd;
 
 use hisius_bd;
 
+
+-- Tabela Eventos da Fila
+CREATE TABLE fila_eventos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    paciente_id INT NOT NULL,
+    fila_id CHAR(36) NOT NULL,
+    fila ENUM('triagem', 'atendimento') NOT NULL,
+    entrou_em DATETIME NOT NULL,
+    iniciou_em DATETIME NULL,
+    CONSTRAINT fk_fila_paciente FOREIGN KEY (paciente_id) REFERENCES Paciente(id)
+);
+
 -- Tabela Usuario
 CREATE TABLE Usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    deletado bool default false,
+	deletado bool default false,
     nivel_acesso INT NOT NULL DEFAULT 1,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -18,10 +30,13 @@ CREATE TABLE Usuario (
 CREATE TABLE Paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
-    cpf VARCHAR(14) UNIQUE,
-    telefone VARCHAR(20),
+    cpf VARCHAR(14) UNIQUE NULL,
+    telefone VARCHAR(20) NULL,
     sexo ENUM('MASCULINO', 'FEMININO') NULL,
-    data_nascimento DATE,
+	numero_cns VARCHAR(20) NULL,
+    telefone_emergencia VARCHAR(20) NULL,
+    nome_mae VARCHAR(100) NULL,
+    data_nascimento DATE NULL,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT fk_usuario_paciente
@@ -29,7 +44,6 @@ CREATE TABLE Paciente (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
 
 -- Tabela Token
 CREATE TABLE IF NOT EXISTS refresh_tokens (

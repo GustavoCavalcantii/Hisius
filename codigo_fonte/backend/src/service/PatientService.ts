@@ -11,16 +11,24 @@ export class PatientService {
 
   private async _sanitizePatient(patient: Patient | null) {
     if (!patient) return null;
+
     const age = calculateAge(patient.birthDate);
     const user = await this.userRepo.findById(patient.userId);
 
     if (!user) throw new BadRequestError("Usuario não encontrado");
 
     const patientJSON = patient.toJSON();
-    const { data_criacao, data_atualizacao, usuario_id, ...rest } =
+    const { data_criacao, data_atualizacao, usuario_id, userId, ...rest } =
       patientJSON;
 
-    return { age, name: user.name, ...rest };
+    return {
+      age: age ?? null,
+      name: user.name ?? "",
+
+      ...Object.fromEntries(
+        Object.entries(rest).map(([key, value]) => [key, value ?? ""])
+      ),
+    };
   }
 
   async getPatientByUserId(userId: number) {

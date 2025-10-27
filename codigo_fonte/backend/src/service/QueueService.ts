@@ -16,6 +16,7 @@ import { NotificationService } from "./NotificationService";
 import { v4 as uuid } from "uuid";
 import { ReportService } from "./ReportService";
 import { ICreateQueueEventInput } from "../interfaces/queue/ICreateQueueEventInput";
+import { IPatient } from "../interfaces/patient/IPatient";
 
 export class QueueService {
   private patientService = new PatientService();
@@ -25,7 +26,7 @@ export class QueueService {
 
   private async getPatientWithUser(
     patientId: number
-  ): Promise<{ patient: Patient; user: User }> {
+  ): Promise<{ patient: IPatient; user: User }> {
     const patient = await this.patientService.getPatientById(patientId);
     if (!patient) throw new NotFoundError("Paciente não encontrado");
 
@@ -42,7 +43,7 @@ export class QueueService {
 
   private async formatQueuedPatient(
     user: User,
-    patient: Patient,
+    patient: IPatient,
     meta: Record<string, string>
   ): Promise<IQueuedPatient> {
     return {
@@ -70,6 +71,8 @@ export class QueueService {
   ) {
     const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
+
+    console.log(patient);
 
     await this.ensurePatientNotInQueue(patient.id);
 
@@ -123,7 +126,7 @@ export class QueueService {
     const filteredPatients: Array<{
       patientId: number;
       meta: Record<string, string>;
-      patient: Patient;
+      patient: IPatient;
       user: User;
     }> = [];
 
@@ -143,7 +146,7 @@ export class QueueService {
           continue;
       }
 
-      let patientData: { patient: Patient; user: User } | null = null;
+      let patientData: { patient: IPatient; user: User } | null = null;
       if (nameFilter) {
         patientData = await this.getPatientWithUser(patientId);
         const userName = patientData.user.name.toLowerCase();

@@ -26,8 +26,9 @@ export class Patient extends Model {
           primaryKey: true,
         },
         userId: {
-          type: DataTypes.INTEGER.UNSIGNED,
+          type: DataTypes.INTEGER,
           allowNull: false,
+          unique: true,
           field: "usuario_id",
         },
         cpf: {

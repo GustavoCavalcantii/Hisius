@@ -4,12 +4,15 @@ import { Patient } from "../database/models/Patient";
 import { BadRequestError } from "../utils/errors/BadRequestError";
 import { calculateAge } from "../utils/CalculateUtils";
 import { UserRepository } from "../repositories/UserRepository";
+import { IPatient } from "../interfaces/patient/IPatient";
 
 export class PatientService {
   private patientRepo = new PatientRepository();
   private userRepo = new UserRepository();
 
-  private async _sanitizePatient(patient: Patient | null) {
+  private async _sanitizePatient(
+    patient: Patient | null
+  ): Promise<IPatient | null> {
     if (!patient) return null;
 
     const age = calculateAge(patient.birthDate);
@@ -18,17 +21,14 @@ export class PatientService {
     if (!user) throw new BadRequestError("Usuario não encontrado");
 
     const patientJSON = patient.toJSON();
-    const { data_criacao, data_atualizacao, usuario_id, userId, ...rest } =
+    const { data_criacao, data_atualizacao, usuario_id, ...rest } =
       patientJSON;
 
     return {
+      ...rest,
       age: age ?? null,
       name: user.name ?? "",
-
-      ...Object.fromEntries(
-        Object.entries(rest).map(([key, value]) => [key, value ?? ""])
-      ),
-    };
+    } as IPatient;
   }
 
   async getPatientByUserId(userId: number) {

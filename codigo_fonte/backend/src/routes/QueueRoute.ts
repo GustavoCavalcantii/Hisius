@@ -54,6 +54,14 @@ router.get(
 
 router.get("/me", AuthMiddleware, QueueController.getSelfInfo);
 
+router.get(
+  "/:type/called",
+  AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
+  ValidateRequest(QueueParamsDto, ["search"], "params"),
+  QueueController.getLastCalledPatients
+);
+
 router.delete(
   "/:patientId/finish",
   AuthMiddleware,

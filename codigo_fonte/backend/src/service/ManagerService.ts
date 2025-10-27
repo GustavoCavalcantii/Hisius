@@ -28,6 +28,8 @@ export class ManagerService {
   async create(userInfo: ICreateUserInput) {
     const user = await this.userService.createUser({ ...userInfo, role: 0 });
 
+    if (!user) throw new Error("Erro ao criar usuário");
+
     const manager = await this.managerRepo.create({
       userId: user.id,
       hospitalCode: this.genNumericCode(),

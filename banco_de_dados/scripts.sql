@@ -29,14 +29,14 @@ CREATE TABLE Usuario (
 -- Tabela Paciente
 CREATE TABLE Paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    cpf VARCHAR(14) UNIQUE NULL,
-    telefone VARCHAR(20) NULL,
-    sexo ENUM('MASCULINO', 'FEMININO') NULL,
-	numero_cns VARCHAR(20) NULL,
-    telefone_emergencia VARCHAR(20) NULL,
-    nome_mae VARCHAR(100) NULL,
-    data_nascimento DATE NULL,
+    usuario_id INT NOT NULL UNIQUE,
+    cpf VARCHAR(14) UNIQUE,
+    telefone VARCHAR(20),
+    sexo ENUM('MASCULINO', 'FEMININO'),
+	numero_cns VARCHAR(20),
+    telefone_emergencia VARCHAR(20),
+    nome_mae VARCHAR(100),
+    data_nascimento DATE,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT fk_usuario_paciente

@@ -1,27 +1,31 @@
 import bcrypt from "bcrypt";
 import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { UserRepository } from "../repositories/UserRepository";
-import User from "../database/models/User.js";
+import User from "../database/models/User";
 import { BadRequestError } from "../utils/errors/BadRequestError";
 import { UserRole } from "../enums/User/UserRole";
 import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
+import { IUser } from "../interfaces/user/IUser";
+import { IPagination } from "../interfaces/queue/IPagination";
 
 const SALT_ROUNDS = 10;
 
 export class UserService {
   private userRepo = new UserRepository();
 
-  private sanitizeUser(user: User | null) {
+  private sanitizeUser(user: User | null): IUser | null {
     if (!user) return null;
 
     const { data_criacao, data_atualizacao, deleted, ...rest } = user.toJSON();
-    return rest;
+    return rest as IUser;
   }
 
-  async getUsersPaginated(queryParams: IUserQueryParams) {
-    const { page = 1, limit = 10, name, role } = queryParams;
+  async getUsersPaginated(
+    queryParams: IUserQueryParams
+  ): Promise<{ users: IUser[] | null; pagination: IPagination }> {
+    const { page = 0, limit = 10, name, role } = queryParams;
 
-    const offset = (page - 1) * limit;
+    const offset = page * limit;
 
     const result = await this.userRepo.findPaginated({
       offset,
@@ -31,13 +35,16 @@ export class UserService {
     });
 
     const totalPages = Math.ceil(result.total / limit);
-    const hasNext = page < totalPages;
-    const hasPrev = page > 1;
+    const hasNext = page < totalPages - 1;
+    const hasPrev = page > 0;
 
-    const sanitizedUsers = result.users.map((user) => {
-      const { password, ...rest } = this.sanitizeUser(user)!;
-      return rest;
-    });
+    const sanitizedUsers = result.users
+      .map((user) => this.sanitizeUser(user))
+      .filter((user): user is IUser => user !== null)
+      .map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
 
     return {
       users: sanitizedUsers,
@@ -62,9 +69,7 @@ export class UserService {
     const user = await this.userRepo.findById(id);
     if (!user) throw new BadRequestError("Usuário não encontrado");
 
-    const { password, ...rest } = this.sanitizeUser(user);
-
-    return rest;
+    return this.sanitizeUser(user);
   }
 
   async createUser(userInput: ICreateUserInput) {
@@ -74,9 +79,7 @@ export class UserService {
       password: hashedPassword,
     });
 
-    const { password, ...rest } = this.sanitizeUser(user);
-
-    return rest;
+    return this.sanitizeUser(user);
   }
 
   async updateRole(newRole: UserRole, userId: number) {

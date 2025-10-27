@@ -43,6 +43,30 @@ export class QueueController {
     }
   }
 
+  static async getLastCalledPatients(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+
+      const patients = await queueService.getCalledPatients(paramDto.type);
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(
+            patients,
+            "Pacientes chamados capturado com sucesso",
+            200
+          )
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async getNextPatient(req: Request, res: Response, next: NextFunction) {
     try {
       const paramDto = plainToInstance(QueueParamsDto, req.params);

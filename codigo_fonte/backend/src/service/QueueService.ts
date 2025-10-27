@@ -10,13 +10,14 @@ import { calculateAge, calculateScore } from "../utils/CalculateUtils";
 import { parseClassification } from "../utils/Helper";
 import { QueueRepository } from "../repositories/QueueRepository";
 import { QueueStatus } from "../enums/Queue/QueueStatus";
-import Patient from "../database/models/Patient";
-import User from "../database/models/User";
 import { NotificationService } from "./NotificationService";
 import { v4 as uuid } from "uuid";
 import { ReportService } from "./ReportService";
 import { ICreateQueueEventInput } from "../interfaces/queue/ICreateQueueEventInput";
 import { IPatient } from "../interfaces/patient/IPatient";
+import { IUser } from "../interfaces/user/IUser";
+import { IPagination } from "../interfaces/queue/IPagination";
+import { IQueueHistoryResponse } from "../interfaces/queue/IQueueHistoryResponse";
 
 export class QueueService {
   private patientService = new PatientService();
@@ -26,7 +27,7 @@ export class QueueService {
 
   private async getPatientWithUser(
     patientId: number
-  ): Promise<{ patient: IPatient; user: User }> {
+  ): Promise<{ patient: IPatient; user: IUser }> {
     const patient = await this.patientService.getPatientById(patientId);
     if (!patient) throw new NotFoundError("Paciente não encontrado");
 
@@ -37,22 +38,27 @@ export class QueueService {
   }
 
   async getQueueCount(queueType: QueueType): Promise<number> {
-    const queueKey = `queue:${queueType}`;
-    return await this.queueRepo.getQueueLength(queueKey);
+    return await this.queueRepo.getQueueLength(queueType);
   }
 
   private async formatQueuedPatient(
-    user: User,
+    user: IUser,
     patient: IPatient,
+    position: number,
     meta: Record<string, string>
   ): Promise<IQueuedPatient> {
     return {
       id: patient.id,
       name: user.name,
+      birthDate: patient.birthDate,
+      cnsNumber: patient.cnsNumber,
+      motherName: patient.motherName,
+      dateHourAttendance: meta.joinedAt,
       age: calculateAge(patient.birthDate),
       gender: patient.gender,
+      position,
       classification: parseClassification(meta.classification) || null,
-    };
+    } as IQueuedPatient;
   }
 
   private async ensurePatientNotInQueue(patientId: number) {
@@ -72,8 +78,6 @@ export class QueueService {
     const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
-    console.log(patient);
-
     await this.ensurePatientNotInQueue(patient.id);
 
     if (type === QueueType.TREATMENT && !classification) {
@@ -82,14 +86,12 @@ export class QueueService {
       );
     }
 
-    const { user } = await this.getPatientWithUser(patient.id);
     const age = calculateAge(patient.birthDate);
     const today = new Date();
     const score = calculateScore(today, age, classification);
 
-    const queueKey = `queue:${type}`;
     const id = uuid().toString();
-    await this.queueRepo.addPatientToQueue(queueKey, patient.id, score);
+    await this.queueRepo.addPatientToQueue(type, patient.id, score);
     await this.queueRepo.setPatientMeta(patient.id, {
       queueId: id,
       joinedAt: today.toISOString(),
@@ -113,12 +115,11 @@ export class QueueService {
     limit: number = 10,
     classificationFilter?: ManchesterClassification,
     nameFilter?: string
-  ): Promise<(IQueuedPatient & { position: number })[]> {
-    const queueKey = `queue:${type}`;
-    const total = await this.queueRepo.getQueueLength(queueKey);
+  ): Promise<{ patients: IQueuedPatient[]; pagination: IPagination }> {
+    const total = await this.queueRepo.getQueueLength(type);
 
     const patientsRaw = await this.queueRepo.getQueuePatients(
-      queueKey,
+      type,
       0,
       total - 1
     );
@@ -127,7 +128,7 @@ export class QueueService {
       patientId: number;
       meta: Record<string, string>;
       patient: IPatient;
-      user: User;
+      user: IUser;
     }> = [];
 
     for (const patientIdStr of patientsRaw) {
@@ -146,7 +147,7 @@ export class QueueService {
           continue;
       }
 
-      let patientData: { patient: IPatient; user: User } | null = null;
+      let patientData: { patient: IPatient; user: IUser } | null = null;
       if (nameFilter) {
         patientData = await this.getPatientWithUser(patientId);
         const userName = patientData.user.name.toLowerCase();
@@ -165,23 +166,41 @@ export class QueueService {
       });
     }
 
-    const currentPage = Math.max(page, 1);
-    const start = (currentPage - 1) * limit;
+    const currentPage = Math.max(page, 0);
+    const start = currentPage * limit;
     const end = start + limit;
 
     const pagePatients = filteredPatients.slice(start, end);
 
     const patients = await Promise.all(
       pagePatients.map(async ({ patientId, meta, patient, user }) => {
-        const base = await this.formatQueuedPatient(user, patient, meta);
-        return {
-          ...base,
-          position: patientsRaw.indexOf(patientId.toString()) + 1,
-        };
+        const base = await this.formatQueuedPatient(
+          user,
+          patient,
+          patientsRaw.indexOf(patientId.toString()) + 1,
+          meta
+        );
+        return base;
       })
     );
 
-    return patients;
+    const totalPages = Math.ceil(filteredPatients.length / limit);
+    const hasNext = currentPage < totalPages - 1;
+    const hasPrev = currentPage > 0;
+
+    return {
+      patients,
+      pagination: {
+        currentPage,
+        totalPages,
+        totalItems: filteredPatients.length,
+        itemsPerPage: limit,
+        hasNext,
+        hasPrev,
+        nextPage: hasNext ? currentPage + 1 : null,
+        prevPage: hasPrev ? currentPage - 1 : null,
+      },
+    };
   }
 
   async updateClassification(
@@ -208,10 +227,16 @@ export class QueueService {
       age,
       newClassification
     );
-    const queueKey = `queue:${QueueType.TREATMENT}`;
 
-    await this.queueRepo.removePatientFromQueue(queueKey, patient.id);
-    await this.queueRepo.addPatientToQueue(queueKey, patient.id, newScore);
+    await this.queueRepo.removePatientFromQueue(
+      QueueType.TREATMENT,
+      patient.id
+    );
+    await this.queueRepo.addPatientToQueue(
+      QueueType.TREATMENT,
+      patient.id,
+      newScore
+    );
     await this.queueRepo.setPatientMeta(patient.id, {
       classification: newClassification,
     });
@@ -227,16 +252,13 @@ export class QueueService {
     if (!meta || Object.keys(meta).length === 0)
       throw new BadRequestError("Paciente não está em nenhuma fila");
 
-    const queueKey = `queue:${meta.type}`;
-
     const position = await this.queueRepo.getPatientPosition(
-      queueKey,
+      meta.type as QueueType,
       patient.id
     );
 
-    const historyKey = `queue:history:${meta.type}`;
     const lastTimestamps = (
-      await this.queueRepo.getLastTimestamps(historyKey, 10)
+      await this.queueRepo.getLastTimestamps(meta.type as QueueType, 10)
     ).map((t: any) => Number(t));
 
     let averageTime = 10 * 60 * 1000;
@@ -296,27 +318,42 @@ export class QueueService {
     type: QueueType,
     room: string
   ): Promise<IQueuedPatient | null> {
-    const queueKey = `queue:${type}`;
-    const patientIdStr = await this.queueRepo.getNextPatientId(queueKey);
+    const patientIdStr = await this.queueRepo.getNextPatientId(type);
 
     if (!patientIdStr) throw new NotFoundError("Nenhum paciente na fila");
 
     const patientId = Number(patientIdStr);
+    const position = await this.queueRepo.getPatientPosition(type, patientId);
     await this.queueRepo.setPatientStatus(patientId, QueueStatus.IN_PROGRESS);
-    await this.queueRepo.removePatientFromQueue(queueKey, patientId);
+    await this.queueRepo.removePatientFromQueue(type, patientId);
 
     const { patient, user } = await this.getPatientWithUser(patientId);
-    await this.queueRepo.registerPatientCalled(type, patient.id);
+    await this.queueRepo.registerPatientCalled(type, patientId);
+    await this.queueRepo.addPatientToCalledHistory(
+      type,
+      patientId,
+      user.name,
+      room
+    );
 
     const queuedPatient = await this.formatQueuedPatient(
       user,
       patient,
+      position,
       await this.queueRepo.getPatientMeta(patientId)
     );
 
     await NotificationService.notifyPatientCalled(user.id, room);
+    const patients = await this.queueRepo.getLastCalledPatients(type);
+    await NotificationService.notifyAddInPanel(patients);
 
     return queuedPatient;
+  }
+
+  async getCalledPatients(
+    queueType: QueueType
+  ): Promise<IQueueHistoryResponse[]> {
+    return await this.queueRepo.getLastCalledPatients(queueType);
   }
 
   async finishTreatment(patientId: number) {
@@ -338,14 +375,12 @@ export class QueueService {
     await this.reportService.updateExit(meta.queueId, new Date());
 
     for (const queueType of queueTypes) {
-      const queueKey = `queue:${queueType}`;
-      await this.queueRepo.removePatientFromQueue(queueKey, patient.id);
+      await this.queueRepo.removePatientFromQueue(queueType, patient.id);
     }
     await this.queueRepo.deletePatientMeta(patient.id);
 
     for (const queueType of queueTypes) {
-      const historyKey = `queue:history:${queueType}`;
-      await this.queueRepo.removePatientFromHistory(historyKey, patient.id);
+      await this.queueRepo.removePatientFromHistory(queueType, patient.id);
     }
   }
 
@@ -358,8 +393,10 @@ export class QueueService {
       throw new BadRequestError("Paciente não está em nenhuma fila");
 
     if (!exit) await this.reportService.updateExit(meta.queueId, new Date());
-    const queueKey = `queue:${meta.type}`;
-    await this.queueRepo.removePatientFromQueue(queueKey, patient.id);
+    await this.queueRepo.removePatientFromQueue(
+      meta.type as QueueType,
+      patient.id
+    );
     await this.queueRepo.deletePatientMeta(patient.id);
 
     return meta;

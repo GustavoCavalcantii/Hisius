@@ -5,6 +5,8 @@ import {
   IsDateString,
   IsPhoneNumber,
   Matches,
+  MaxLength,
+  MinLength,
 } from "class-validator";
 import { Gender } from "../../enums/User/Gender";
 
@@ -17,7 +19,7 @@ export class PatientDto {
     message: "CPF deve conter exatamente 11 dígitos",
     groups: ["create", "update"],
   })
-  @IsOptional({ groups: ["create", "update"] })
+  @IsOptional({ groups: ["update"] })
   cpf?: string;
 
   @IsPhoneNumber("BR", {
@@ -28,7 +30,7 @@ export class PatientDto {
   phone?: string;
 
   @IsEnum(Gender, { message: "Sexo inválido" })
-  @IsOptional({ groups: ["create", "update"] })
+  @IsOptional({ groups: ["update"] })
   gender?: Gender;
 
   @IsDateString(
@@ -45,20 +47,28 @@ export class PatientDto {
     message: "CNS deve ser uma string",
     groups: ["create", "update"],
   })
-  @IsOptional({ groups: ["create", "update"] })
+  @Matches(/^\d{15}$/, {
+    message: "CNS deve conter exatamente 15 dígitos numéricos",
+    groups: ["create", "update"],
+  })
+  @IsOptional({ groups: ["update"] })
   cnsNumber?: string;
 
   @IsPhoneNumber("BR", {
     message: "O telefone de emergência deve ser um número de telefone válido",
     groups: ["create", "update"],
   })
-  @IsOptional({ groups: ["create", "update"] })
+  @IsOptional({ groups: ["update"] })
   icePhone?: string;
 
-  @IsString({
-    message: "O nome da mãe deve ser um texto válido",
+  @MaxLength(100, {
+    message: "O nome da mãe deve ter no máximo 100 caracteres",
     groups: ["create", "update"],
   })
-  @IsOptional({ groups: ["create", "update"] })
+  @MinLength(3, {
+    message: "O nome da mãe deve ter no mínimo 3 caracteres",
+    groups: ["create", "update"],
+  })
+  @IsOptional({ groups: ["update"] })
   motherName?: string;
 }

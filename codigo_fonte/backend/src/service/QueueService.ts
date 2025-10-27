@@ -10,13 +10,13 @@ import { calculateAge, calculateScore } from "../utils/CalculateUtils";
 import { parseClassification } from "../utils/Helper";
 import { QueueRepository } from "../repositories/QueueRepository";
 import { QueueStatus } from "../enums/Queue/QueueStatus";
-import Patient from "../database/models/Patient";
-import User from "../database/models/User";
 import { NotificationService } from "./NotificationService";
 import { v4 as uuid } from "uuid";
 import { ReportService } from "./ReportService";
 import { ICreateQueueEventInput } from "../interfaces/queue/ICreateQueueEventInput";
 import { IPatient } from "../interfaces/patient/IPatient";
+import { IUser } from "../interfaces/user/IUser";
+import { IPagination } from "../interfaces/queue/IPagination";
 
 export class QueueService {
   private patientService = new PatientService();
@@ -26,7 +26,7 @@ export class QueueService {
 
   private async getPatientWithUser(
     patientId: number
-  ): Promise<{ patient: IPatient; user: User }> {
+  ): Promise<{ patient: IPatient; user: IUser }> {
     const patient = await this.patientService.getPatientById(patientId);
     if (!patient) throw new NotFoundError("Paciente não encontrado");
 
@@ -42,7 +42,7 @@ export class QueueService {
   }
 
   private async formatQueuedPatient(
-    user: User,
+    user: IUser,
     patient: IPatient,
     position: number,
     meta: Record<string, string>
@@ -119,7 +119,7 @@ export class QueueService {
     limit: number = 10,
     classificationFilter?: ManchesterClassification,
     nameFilter?: string
-  ): Promise<IQueuedPatient[]> {
+  ): Promise<{ patients: IQueuedPatient[]; pagination: IPagination }> {
     const queueKey = `queue:${type}`;
     const total = await this.queueRepo.getQueueLength(queueKey);
 
@@ -133,7 +133,7 @@ export class QueueService {
       patientId: number;
       meta: Record<string, string>;
       patient: IPatient;
-      user: User;
+      user: IUser;
     }> = [];
 
     for (const patientIdStr of patientsRaw) {
@@ -152,7 +152,7 @@ export class QueueService {
           continue;
       }
 
-      let patientData: { patient: IPatient; user: User } | null = null;
+      let patientData: { patient: IPatient; user: IUser } | null = null;
       if (nameFilter) {
         patientData = await this.getPatientWithUser(patientId);
         const userName = patientData.user.name.toLowerCase();
@@ -171,8 +171,8 @@ export class QueueService {
       });
     }
 
-    const currentPage = Math.max(page, 1);
-    const start = (currentPage - 1) * limit;
+    const currentPage = Math.max(page, 0);
+    const start = currentPage * limit;
     const end = start + limit;
 
     const pagePatients = filteredPatients.slice(start, end);
@@ -185,13 +185,27 @@ export class QueueService {
           patientsRaw.indexOf(patientId.toString()) + 1,
           meta
         );
-        return {
-          ...base,
-        };
+        return base;
       })
     );
 
-    return patients;
+    const totalPages = Math.ceil(filteredPatients.length / limit);
+    const hasNext = currentPage < totalPages - 1;
+    const hasPrev = currentPage > 0;
+
+    return {
+      patients,
+      pagination: {
+        currentPage,
+        totalPages,
+        totalItems: filteredPatients.length,
+        itemsPerPage: limit,
+        hasNext,
+        hasPrev,
+        nextPage: hasNext ? currentPage + 1 : null,
+        prevPage: hasPrev ? currentPage - 1 : null,
+      },
+    };
   }
 
   async updateClassification(

@@ -64,8 +64,8 @@ const startServer = async () => {
     const sequelize = await initDB(CONFIG);
     logger.info("Inicializando modelos...");
     await initializeModels(sequelize);
-    //logger.info("Conectando com serviço SMTP...");
-    //await initSMTP(CONFIG);
+    logger.info("Conectando com serviço SMTP...");
+    await initSMTP(CONFIG);
     logger.info("Conectando com Redis...");
     await connectRedis();
 

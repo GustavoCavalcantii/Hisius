@@ -59,7 +59,7 @@ export class AuthService {
         { field: "password", message: "Senha inválido" },
       ]);
 
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.password!);
     if (!isValid) {
       await this.bruteRepo.registerFailedAttempt(email);
       throw new BadRequestError("Email ou senha inválido", [
@@ -82,6 +82,8 @@ export class AuthService {
 
   async requestResetEmailToken(userId: number, newEmail: string) {
     const user = await this.userService.getUserById(userId);
+
+    if (!user) throw new BadRequestError("Usuário não encontrado");
 
     if (user.email === newEmail) {
       throw new BadRequestError("Email inválido", [
@@ -106,6 +108,7 @@ export class AuthService {
 
   async requestResetPassToken(email: string) {
     const user = await this.userService.getUserByEmail(email);
+    if (!user) throw new BadRequestError("Usuário não encontrado");
     const resetPassToken = this.tokenUtils.generateResetPassToken(user.id);
     this.emailUtils.sendResetPass(user.email, user.name, resetPassToken);
   }

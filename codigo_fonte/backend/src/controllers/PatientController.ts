@@ -64,8 +64,6 @@ export class PatientController {
     try {
       const { id } = req.params;
       const patient = await patientService.getPatientById(Number(id));
-      console.log("teste");
-
       return res.json(
         SuccessResponse(patient, "Paciente encontrado pelo administrador", 200)
       );

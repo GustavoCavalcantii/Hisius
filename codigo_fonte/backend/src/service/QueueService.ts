@@ -44,15 +44,21 @@ export class QueueService {
   private async formatQueuedPatient(
     user: User,
     patient: IPatient,
+    position: number,
     meta: Record<string, string>
   ): Promise<IQueuedPatient> {
     return {
       id: patient.id,
       name: user.name,
+      birthDate: patient.birthDate,
+      cnsNumber: patient.cnsNumber,
+      motherName: patient.motherName,
+      dateHourAttendance: meta.joinedAt,
       age: calculateAge(patient.birthDate),
       gender: patient.gender,
+      position,
       classification: parseClassification(meta.classification) || null,
-    };
+    } as IQueuedPatient;
   }
 
   private async ensurePatientNotInQueue(patientId: number) {
@@ -113,7 +119,7 @@ export class QueueService {
     limit: number = 10,
     classificationFilter?: ManchesterClassification,
     nameFilter?: string
-  ): Promise<(IQueuedPatient & { position: number })[]> {
+  ): Promise<IQueuedPatient[]> {
     const queueKey = `queue:${type}`;
     const total = await this.queueRepo.getQueueLength(queueKey);
 
@@ -173,10 +179,14 @@ export class QueueService {
 
     const patients = await Promise.all(
       pagePatients.map(async ({ patientId, meta, patient, user }) => {
-        const base = await this.formatQueuedPatient(user, patient, meta);
+        const base = await this.formatQueuedPatient(
+          user,
+          patient,
+          patientsRaw.indexOf(patientId.toString()) + 1,
+          meta
+        );
         return {
           ...base,
-          position: patientsRaw.indexOf(patientId.toString()) + 1,
         };
       })
     );
@@ -302,6 +312,10 @@ export class QueueService {
     if (!patientIdStr) throw new NotFoundError("Nenhum paciente na fila");
 
     const patientId = Number(patientIdStr);
+    const position = await this.queueRepo.getPatientPosition(
+      queueKey,
+      patientId
+    );
     await this.queueRepo.setPatientStatus(patientId, QueueStatus.IN_PROGRESS);
     await this.queueRepo.removePatientFromQueue(queueKey, patientId);
 
@@ -311,6 +325,7 @@ export class QueueService {
     const queuedPatient = await this.formatQueuedPatient(
       user,
       patient,
+      position,
       await this.queueRepo.getPatientMeta(patientId)
     );
 

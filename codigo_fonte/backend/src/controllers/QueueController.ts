@@ -185,6 +185,37 @@ export class QueueController {
     }
   }
 
+  static async getPatientsByRoom(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const queryDto = plainToInstance(QueueDto, req.query);
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+
+      const enquedPatients = await queueService.getPatientsInRoom(
+        paramDto.type,
+        queryDto.page,
+        queryDto.limit,
+        queryDto.classification,
+        queryDto.nameFilter
+      );
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(
+            enquedPatients,
+            "Dados das salas capturado com sucesso!",
+            200
+          )
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async getPatientsByQueue(
     req: Request,
     res: Response,
@@ -207,7 +238,7 @@ export class QueueController {
         .json(
           SuccessResponse(
             enquedPatients,
-            "Dados da fila captura com sucesso!",
+            "Dados da fila capturado com sucesso!",
             200
           )
         );

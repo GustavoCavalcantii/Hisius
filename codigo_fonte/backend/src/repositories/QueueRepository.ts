@@ -15,6 +15,18 @@ export class QueueRepository {
     return this.redis;
   }
 
+  async getAllPatientsWithQueueData(): Promise<number[]> {
+    const redis = this.getRedisClient();
+    const keys = await redis.keys("patient:*:queueData");
+
+    return keys
+      .map((key) => {
+        const match = key.match(/patient:(\d+):queueData/);
+        return match ? Number(match[1]) : null;
+      })
+      .filter((id): id is number => id !== null);
+  }
+
   async getPatientMeta(patientId: number): Promise<Record<string, string>> {
     const redis = this.getRedisClient();
     const meta = await redis.hgetall(`patient:${patientId}:queueData`);

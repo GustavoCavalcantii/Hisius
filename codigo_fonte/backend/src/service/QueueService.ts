@@ -384,6 +384,72 @@ export class QueueService {
     }
   }
 
+  async getPatientsInRoom(
+    type: QueueType,
+    page: number = 1,
+    limit: number = 10,
+    classificationFilter?: ManchesterClassification,
+    nameFilter?: string
+  ): Promise<{ patients: IQueuedPatient[]; pagination: IPagination }> {
+    const allPatientIds = await this.queueRepo.getAllPatientsWithQueueData();
+    const filteredPatients = [];
+
+    for (const patientId of allPatientIds) {
+      const meta = await this.queueRepo.getPatientMeta(patientId);
+
+      if (
+        !meta ||
+        meta.type !== type ||
+        meta.status !== QueueStatus.IN_PROGRESS
+      )
+        continue;
+
+      if (classificationFilter && meta.classification !== classificationFilter)
+        continue;
+
+      const { patient, user } = await this.getPatientWithUser(patientId);
+
+      if (
+        nameFilter &&
+        !user.name.toLowerCase().startsWith(nameFilter.toLowerCase())
+      )
+        continue;
+
+      filteredPatients.push({ patientId, meta, patient, user });
+    }
+
+    const start = page * limit;
+    const end = start + limit;
+    const pagePatients = filteredPatients.slice(start, end);
+
+    const patients = await Promise.all(
+      pagePatients.map(async ({ patientId, meta, patient, user }) =>
+        this.formatQueuedPatient(
+          user,
+          patient,
+          0, // Posição não se aplica para sala
+          meta
+        )
+      )
+    );
+
+    const totalPages = Math.ceil(filteredPatients.length / limit);
+
+    return {
+      patients,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: filteredPatients.length,
+        itemsPerPage: limit,
+        hasNext: page < totalPages - 1,
+        hasPrev: page > 0,
+        nextPage: page < totalPages - 1 ? page + 1 : null,
+        prevPage: page > 0 ? page - 1 : null,
+      },
+    };
+  }
+
   async dequeuePatient(userId: number, exit: boolean = false) {
     const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");

@@ -79,4 +79,13 @@ router.get(
   QueueController.getPatientsByQueue
 );
 
+router.get(
+  "/:type/room",
+  AuthMiddleware,
+  ValidateRoles(UserRole.EMPLOYEE),
+  ValidateRequest(QueueParamsDto, ["search"], "params"),
+  ValidateRequest(QueueDto, ["search"], "query"),
+  QueueController.getPatientsByRoom
+);
+
 export default router;

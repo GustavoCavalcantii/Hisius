@@ -13,7 +13,7 @@ export const initDB = async (CONFIG: any): Promise<Sequelize> => {
     host,
     port,
     dialect: "mysql",
-    logging: msg => Logger.debug(msg)
+    logging: (msg) => Logger.debug(msg),
   };
   sequelize = new Sequelize(config);
 
@@ -25,6 +25,13 @@ export const initDB = async (CONFIG: any): Promise<Sequelize> => {
     throw error;
   }
 
+  return sequelize;
+};
+
+export const getSequelize = (): Sequelize => {
+  if (!sequelize) {
+    throw new Error("Sequelize não foi inicializado. Chame initDB primeiro.");
+  }
   return sequelize;
 };
 

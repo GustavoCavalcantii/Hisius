@@ -6,6 +6,8 @@ import Manager from "../database/models/Manager";
 import { BadRequestError } from "../utils/errors/BadRequestError";
 import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
 import { UserRole } from "../enums/User/UserRole";
+import { getSequelize } from "../database/Connection";
+import { Transactional } from "../utils/Transaction";
 
 export class ManagerService {
   private userService = new UserService();
@@ -25,6 +27,7 @@ export class ManagerService {
     return rest;
   }
 
+  @Transactional()
   async create(userInfo: ICreateUserInput) {
     const user = await this.userService.createUser({ ...userInfo, role: 0 });
 

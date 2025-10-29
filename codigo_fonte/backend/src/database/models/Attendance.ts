@@ -1,13 +1,36 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
 import User from "./User";
-import { IModel } from "../../interfaces/IModel";
+import Patient from "./Patient";
+import { ManchesterClassification } from "../../enums/Queue/ManchesterClassification";
+import { Destination } from "../../enums/Attendance/Destination";
+import { AttendanceStatus } from "../../enums/Attendance/AttendanceStatus";
 
-export class Attendance extends Model{
+export class Attendance extends Model {
   declare id: number;
   declare userId: number;
-  declare description: string;
+  declare patientId: number;
 
-  declare data_criacao: Date;
+  declare entryDate: Date;
+  declare attendanceDate: Date;
+  declare dischargeDate: Date | null;
+
+  declare priority: ManchesterClassification;
+  declare mainComplaint: string;
+  declare currentIllnessHistory: string | null;
+  declare allergies: string | null;
+  declare currentMedications: string | null;
+
+  declare mainDiagnosis: string | null;
+  declare secondaryDiagnoses: string | null;
+  declare proceduresPerformed: string | null;
+
+  declare destination: Destination;
+  declare referralTo: string | null;
+  declare dischargeNotes: string | null;
+
+  declare status: AttendanceStatus;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 
   static initialize(sequelize: Sequelize): void {
     Attendance.init(
@@ -22,10 +45,104 @@ export class Attendance extends Model{
           allowNull: false,
           field: "usuario_id",
         },
-        description: {
-          type: DataTypes.TEXT,
+        patientId: {
+          type: DataTypes.INTEGER.UNSIGNED,
           allowNull: false,
-          field: "descricao",
+          field: "paciente_id",
+        },
+
+        entryDate: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          field: "data_entrada",
+        },
+        attendanceDate: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          field: "data_atendimento",
+        },
+        dischargeDate: {
+          type: DataTypes.DATE,
+          allowNull: true,
+          field: "data_alta",
+        },
+
+        priority: {
+          type: DataTypes.ENUM(...Object.values(ManchesterClassification)),
+          allowNull: false,
+          field: "prioridade",
+        },
+        mainComplaint: {
+          type: DataTypes.STRING(500),
+          allowNull: false,
+          field: "queixa_principal",
+        },
+        currentIllnessHistory: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+          field: "historico_doenca_atual",
+        },
+        allergies: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+          field: "alergias",
+        },
+        currentMedications: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+          field: "medicamentos_uso",
+        },
+
+        mainDiagnosis: {
+          type: DataTypes.STRING(500),
+          allowNull: true,
+          field: "diagnostico_principal",
+        },
+        secondaryDiagnoses: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+          field: "diagnosticos_secundarios",
+        },
+        proceduresPerformed: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+          field: "procedimentos_realizados",
+        },
+
+        destination: {
+          type: DataTypes.ENUM(...Object.values(Destination)),
+          allowNull: false,
+          defaultValue: Destination.DISCHARGE,
+          field: "destino",
+        },
+        referralTo: {
+          type: DataTypes.STRING(300),
+          allowNull: true,
+          field: "encaminhamento_para",
+        },
+        dischargeNotes: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+          field: "observacoes_alta",
+        },
+
+        status: {
+          type: DataTypes.ENUM(...Object.values(AttendanceStatus)),
+          allowNull: false,
+          defaultValue: AttendanceStatus.COMPLETED,
+          field: "status",
+        },
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: DataTypes.NOW,
+          field: "data_criacao",
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: DataTypes.NOW,
+          field: "data_atualizacao",
         },
       },
       {
@@ -33,13 +150,31 @@ export class Attendance extends Model{
         tableName: "Atendimento",
         timestamps: true,
         createdAt: "data_criacao",
-        updatedAt: false,
+        updatedAt: "data_atualizacao",
       }
     );
   }
+
   static associate?(): void {
-    Attendance.belongsTo(User, { foreignKey: "usuario_id", as: "user" });
-    User.hasMany(Attendance, { foreignKey: "usuario_id", as: "attendances" });
+    Attendance.belongsTo(User, {
+      foreignKey: "userId",
+      as: "user",
+    });
+
+    Attendance.belongsTo(Patient, {
+      foreignKey: "patientId",
+      as: "patient",
+    });
+
+    User.hasMany(Attendance, {
+      foreignKey: "userId",
+      as: "psAttendances",
+    });
+
+    Patient.hasMany(Attendance, {
+      foreignKey: "patientId",
+      as: "psAttendances",
+    });
   }
 }
 

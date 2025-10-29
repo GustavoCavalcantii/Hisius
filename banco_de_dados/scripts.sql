@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 );
 
 -- Tabela Atendimento 
-CREATE TABLE AtendimentoPS (
+CREATE TABLE Atendimento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,  -- Profissional que registrou
     paciente_id INT NOT NULL,

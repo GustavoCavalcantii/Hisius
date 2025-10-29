@@ -3,6 +3,7 @@ import { Destination } from "../../enums/Attendance/Destination";
 import { ManchesterClassification } from "../../enums/Queue/ManchesterClassification";
 
 export interface ICreateAttendanceInput {
+  userId: number;
   patientId: number;
   entryDate: Date;
   attendanceDate: Date;

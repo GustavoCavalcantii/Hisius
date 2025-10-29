@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsNumber, Min } from "class-validator";
 
-export class AttendanceDto {
+export class AttendanceParamDto {
   /**
    * ID do paciente
    */
@@ -10,12 +10,12 @@ export class AttendanceDto {
     {},
     {
       message: "O patientId deve ser um número",
-      groups: ["create", "update"],
+      groups: ["create", "update", "search"],
     }
   )
   @Min(1, {
     message: "O patientId deve ser pelo menos 1",
-    groups: ["create", "update"],
+    groups: ["create", "update", "search"],
   })
   patientId: number;
 }

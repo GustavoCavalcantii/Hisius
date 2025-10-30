@@ -4,11 +4,12 @@ import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import { AttendanceService } from "../service/AttendanceService";
 import { AttendanceQueryDto } from "../dtos/attendance/AttendanceQueryDto";
 import { AttendanceParamDto } from "../dtos/attendance/AttendanceParamDto";
+import { AttendanceDto } from "../dtos/attendance/AttendanceDto";
 
 const attendanceService = new AttendanceService();
 
 export class AttendanceController {
-  static async getAttendance(req: Request, res: Response, next: NextFunction) {
+  static async getAttendances(req: Request, res: Response, next: NextFunction) {
     try {
       const queryDto = plainToInstance(AttendanceQueryDto, req.query);
       const paramDto = plainToInstance(AttendanceParamDto, req.params);
@@ -23,10 +24,60 @@ export class AttendanceController {
         .json(
           SuccessResponse(
             attendances,
-            "Atendimentos capturados com sucesso",
+            "Registro de atendimentos capturados com sucesso",
             200
           )
         );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getAttendance(req: Request, res: Response, next: NextFunction) {
+    try {
+      const paramDto = plainToInstance(AttendanceParamDto, req.params);
+
+      const attendance = await attendanceService.getById(paramDto.attendanceId);
+      res
+        .status(200)
+        .json(
+          SuccessResponse(
+            attendance,
+            "Registro de atendimento capturado com sucesso",
+            200
+          )
+        );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = plainToInstance(AttendanceDto, req.body);
+      const paramDto = plainToInstance(AttendanceParamDto, req.params);
+
+      await attendanceService.update(dto, paramDto.attendanceId);
+      res
+        .status(200)
+        .json(SuccessResponse(null, "Registro de atendimento atualizado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async deleteAttendance(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const paramDto = plainToInstance(AttendanceParamDto, req.params);
+
+      await attendanceService.delete(paramDto.attendanceId);
+      res
+        .status(200)
+        .json(SuccessResponse(null, "Registro de atendimento deletado", 200));
     } catch (err) {
       next(err);
     }

@@ -7,6 +7,7 @@ import { UserRole } from "../enums/User/UserRole";
 import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
 import { IUser } from "../interfaces/user/IUser";
 import { IPagination } from "../interfaces/queue/IPagination";
+import { NotFoundError } from "../utils/errors/NotFoundError";
 
 const SALT_ROUNDS = 10;
 
@@ -42,7 +43,7 @@ export class UserService {
     const totalPages = Math.ceil(result.total / limit);
     const hasNext = page < totalPages - 1;
     const hasPrev = page > 0;
-
+  
     const sanitizedUsers = result.users
       .map((user) => this.sanitizeUser(user))
       .filter((user): user is IUser => user !== null)

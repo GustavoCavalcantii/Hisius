@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import Attendance from "../database/models/Attendance";
 import { ICreateAttendanceInput } from "../interfaces/attendance/ICreateAttendanceInput";
 import User from "../database/models/User";
+import { IUpdateAttendanceInput } from "../interfaces/attendance/IUpdateAttendanceInput";
 
 export class AttendanceRepository {
   async create(data: ICreateAttendanceInput, options?: any) {
@@ -27,6 +28,28 @@ export class AttendanceRepository {
       },
       options
     );
+  }
+
+  async findById(id: number, options?: any) {
+    const attendance = await Attendance.findByPk(id, options);
+    return attendance;
+  }
+
+  async updateById(id: number, data: IUpdateAttendanceInput, options?: any) {
+    await this.findById(id);
+    const [affectedCount] = await Attendance.update(data, {
+      where: { id },
+      ...options,
+    });
+    return this.findById(id, options);
+  }
+
+  async deleteById(id: number, options?: any) {
+    await this.findById(id);
+    return Attendance.destroy({
+      where: { id },
+      ...options,
+    });
   }
 
   async findPaginated(params: {

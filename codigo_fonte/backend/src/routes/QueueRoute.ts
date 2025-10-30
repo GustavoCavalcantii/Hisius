@@ -10,7 +10,11 @@ import { UserRole } from "../enums/User/UserRole";
 
 const router = Router();
 
-router.post("/join", AuthMiddleware, QueueController.queueJoin);
+router.post(
+  "/join",
+  AuthMiddleware,
+  QueueController.queueJoin
+);
 
 router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 

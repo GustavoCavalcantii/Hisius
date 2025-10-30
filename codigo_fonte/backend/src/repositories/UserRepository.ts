@@ -5,13 +5,16 @@ import { ICreateUserInput } from "../interfaces/user/ICreateUser";
 import { BadRequestError } from "../utils/errors/BadRequestError";
 
 export class UserRepository {
-  async create(data: ICreateUserInput) {
-    return User.create({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      role: data.role,
-    });
+  async create(data: ICreateUserInput, options?: any) {
+    return User.create(
+      {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+      },
+      options
+    );
   }
 
   async findByEmail(email: string) {

@@ -7,17 +7,23 @@ import { UserRole } from "../enums/User/UserRole";
 import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
 import { IUser } from "../interfaces/user/IUser";
 import { IPagination } from "../interfaces/queue/IPagination";
+import { NotFoundError } from "../utils/errors/NotFoundError";
 
 const SALT_ROUNDS = 10;
 
 export class UserService {
   private userRepo = new UserRepository();
 
-  private sanitizeUser(user: User | null): IUser | null {
+  private sanitizeUser(user: User | void | null): IUser | null {
     if (!user) return null;
 
-    const { data_criacao, data_atualizacao, deleted, ...rest } = user.toJSON();
-    return rest as IUser;
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      password: user.password,
+    };
   }
 
   async getUsersPaginated(
@@ -37,7 +43,7 @@ export class UserService {
     const totalPages = Math.ceil(result.total / limit);
     const hasNext = page < totalPages - 1;
     const hasPrev = page > 0;
-
+  
     const sanitizedUsers = result.users
       .map((user) => this.sanitizeUser(user))
       .filter((user): user is IUser => user !== null)
@@ -72,14 +78,22 @@ export class UserService {
     return this.sanitizeUser(user);
   }
 
-  async createUser(userInput: ICreateUserInput) {
+  async createUser(userInput: ICreateUserInput, options?: any) {
     const hashedPassword = await bcrypt.hash(userInput.password, SALT_ROUNDS);
-    const user = await this.userRepo.create({
-      ...userInput,
-      password: hashedPassword,
-    });
+    const user = await this.userRepo.create(
+      {
+        ...userInput,
+        password: hashedPassword,
+      },
+      options
+    );
+    const sanitizedUser = this.sanitizeUser(user);
 
-    return this.sanitizeUser(user);
+    if (!sanitizedUser) throw new Error("Erro ao criar usuário");
+
+    const { password, ...rest } = sanitizedUser;
+
+    return rest;
   }
 
   async updateRole(newRole: UserRole, userId: number) {

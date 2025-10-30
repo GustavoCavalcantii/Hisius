@@ -18,12 +18,17 @@ import { IPatient } from "../interfaces/patient/IPatient";
 import { IUser } from "../interfaces/user/IUser";
 import { IPagination } from "../interfaces/queue/IPagination";
 import { IQueueHistoryResponse } from "../interfaces/queue/IQueueHistoryResponse";
+import { AttendanceService } from "./AttendanceService";
+import { ICreateAttendanceInput } from "../interfaces/attendance/ICreateAttendanceInput";
+import { AttendanceStatus } from "../enums/Attendance/AttendanceStatus";
+import { Destination } from "../enums/Attendance/Destination";
 
 export class QueueService {
   private patientService = new PatientService();
   private userService = new UserService();
   private queueRepo = new QueueRepository();
   private reportService = new ReportService();
+  private attendanceService = new AttendanceService();
 
   private async getPatientWithUser(
     patientId: number
@@ -45,7 +50,8 @@ export class QueueService {
     user: IUser,
     patient: IPatient,
     position: number,
-    meta: Record<string, string>
+    meta: Record<string, string>,
+    attendanceId?: number
   ): Promise<IQueuedPatient> {
     return {
       id: patient.id,
@@ -57,6 +63,7 @@ export class QueueService {
       age: calculateAge(patient.birthDate),
       gender: patient.gender,
       position,
+      attendanceId: attendanceId || null,
       classification: parseClassification(meta.classification) || null,
     } as IQueuedPatient;
   }
@@ -316,7 +323,8 @@ export class QueueService {
 
   async getNextPatient(
     type: QueueType,
-    room: string
+    room: string,
+    userId: number
   ): Promise<IQueuedPatient | null> {
     const patientIdStr = await this.queueRepo.getNextPatientId(type);
 
@@ -335,12 +343,34 @@ export class QueueService {
       user.name,
       room
     );
+    const today = new Date();
+
+    let attendanceId = undefined;
+
+    if (type == QueueType.TREATMENT) {
+      const meta = await this.queueRepo.getPatientMeta(patientId);
+      const entryDate = meta?.joinedAt ? new Date(meta.joinedAt) : new Date();
+
+      const attendance = await this.attendanceService.create({
+        userId,
+        patientId,
+        entryDate,
+        attendanceDate: today,
+        status: AttendanceStatus.DRAFT,
+        priority: meta.classification || ManchesterClassification.BLUE,
+        mainComplaint: "A ser preenchido",
+        destination: Destination.DISCHARGE,
+      } as ICreateAttendanceInput);
+
+      if (attendance) attendanceId = attendance.id;
+    }
 
     const queuedPatient = await this.formatQueuedPatient(
       user,
       patient,
       position,
-      await this.queueRepo.getPatientMeta(patientId)
+      await this.queueRepo.getPatientMeta(patientId),
+      attendanceId
     );
 
     await NotificationService.notifyPatientCalled(user.id, room);
@@ -382,6 +412,72 @@ export class QueueService {
     for (const queueType of queueTypes) {
       await this.queueRepo.removePatientFromHistory(queueType, patient.id);
     }
+  }
+
+  async getPatientsInRoom(
+    type: QueueType,
+    page: number = 1,
+    limit: number = 10,
+    classificationFilter?: ManchesterClassification,
+    nameFilter?: string
+  ): Promise<{ patients: IQueuedPatient[]; pagination: IPagination }> {
+    const allPatientIds = await this.queueRepo.getAllPatientsWithQueueData();
+    const filteredPatients = [];
+
+    for (const patientId of allPatientIds) {
+      const meta = await this.queueRepo.getPatientMeta(patientId);
+
+      if (
+        !meta ||
+        meta.type !== type ||
+        meta.status !== QueueStatus.IN_PROGRESS
+      )
+        continue;
+
+      if (classificationFilter && meta.classification !== classificationFilter)
+        continue;
+
+      const { patient, user } = await this.getPatientWithUser(patientId);
+
+      if (
+        nameFilter &&
+        !user.name.toLowerCase().startsWith(nameFilter.toLowerCase())
+      )
+        continue;
+
+      filteredPatients.push({ patientId, meta, patient, user });
+    }
+
+    const start = page * limit;
+    const end = start + limit;
+    const pagePatients = filteredPatients.slice(start, end);
+
+    const patients = await Promise.all(
+      pagePatients.map(async ({ patientId, meta, patient, user }) =>
+        this.formatQueuedPatient(
+          user,
+          patient,
+          0, // Posição não se aplica para sala
+          meta
+        )
+      )
+    );
+
+    const totalPages = Math.ceil(filteredPatients.length / limit);
+
+    return {
+      patients,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: filteredPatients.length,
+        itemsPerPage: limit,
+        hasNext: page < totalPages - 1,
+        hasPrev: page > 0,
+        nextPage: page < totalPages - 1 ? page + 1 : null,
+        prevPage: page > 0 ? page - 1 : null,
+      },
+    };
   }
 
   async dequeuePatient(userId: number, exit: boolean = false) {

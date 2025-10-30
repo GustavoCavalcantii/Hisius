@@ -69,12 +69,16 @@ export class QueueController {
 
   static async getNextPatient(req: Request, res: Response, next: NextFunction) {
     try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
       const paramDto = plainToInstance(QueueParamsDto, req.params);
       const dto = plainToInstance(QueueDto, req.body);
 
       const patient = await queueService.getNextPatient(
         paramDto.type,
-        dto.room
+        dto.room,
+        loggedInUser.id
       );
 
       if (!patient) throw new NotFoundError("Não há nenhum paciente na fila");
@@ -185,6 +189,37 @@ export class QueueController {
     }
   }
 
+  static async getPatientsByRoom(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const queryDto = plainToInstance(QueueDto, req.query);
+      const paramDto = plainToInstance(QueueParamsDto, req.params);
+
+      const enquedPatients = await queueService.getPatientsInRoom(
+        paramDto.type,
+        queryDto.page,
+        queryDto.limit,
+        queryDto.classification,
+        queryDto.nameFilter
+      );
+
+      return res
+        .status(200)
+        .json(
+          SuccessResponse(
+            enquedPatients,
+            "Dados das salas capturado com sucesso!",
+            200
+          )
+        );
+    } catch (err: any) {
+      next(err);
+    }
+  }
+
   static async getPatientsByQueue(
     req: Request,
     res: Response,
@@ -207,7 +242,7 @@ export class QueueController {
         .json(
           SuccessResponse(
             enquedPatients,
-            "Dados da fila captura com sucesso!",
+            "Dados da fila capturado com sucesso!",
             200
           )
         );

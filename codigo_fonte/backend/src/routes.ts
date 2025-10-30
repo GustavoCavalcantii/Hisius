@@ -16,6 +16,7 @@ import QueueRoute from "./routes/QueueRoute";
 import PatientRoute from "./routes/PatientRoute";
 import ReportRoute from "./routes/ReportRoute";
 import EmployeeRoute from "./routes/EmployeeRoute";
+import AttendanceRoute from "./routes/AttendanceRoute";
 
 import { setupSwagger } from "../swagger";
 
@@ -61,6 +62,7 @@ app.use("/auth", AuthRoute);
 app.use("/users", UserRoute);
 app.use("/admins", ManagerRoute);
 app.use("/patients", PatientRoute);
+app.use("/attendances", AttendanceRoute);
 app.use("/employees", EmployeeRoute);
 setupSwagger(app);
 

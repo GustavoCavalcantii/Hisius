@@ -12,9 +12,7 @@ export class AuthController {
     try {
       const dto = plainToInstance(UserDTO, req.body);
       const response = await authService.login(dto.email, dto.password);
-      const { password, ...safeUser } = response.user;
-
-      const payload = { ...safeUser, accessToken: response.accessToken };
+      const payload = { ...response.user, accessToken: response.accessToken };
       AuthController.createRefreshCookie(res, response.refreshToken);
 
       return res
@@ -82,11 +80,7 @@ export class AuthController {
     }
   }
 
-  static async changeEmail (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  static async changeEmail(req: Request, res: Response, next: NextFunction) {
     try {
       const loggedInUser = req.user;
       if (!loggedInUser) throw new BadRequestError("Acesso negado");

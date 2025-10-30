@@ -11,5 +11,6 @@ export interface IQueuedPatient {
   dateHourAttendance: string;
   gender: Gender;
   position: number;
+  attendanceId?: number;
   classification: ManchesterClassification | null;
 }

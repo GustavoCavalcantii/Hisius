@@ -7,14 +7,11 @@ import { QueueParamsDto } from "../dtos/queue/QueueParamsDto";
 import JsonRequiredMiddleware from "../middlewares/JsonRequired";
 import { ValidateRoles } from "../middlewares/ValidateRoles";
 import { UserRole } from "../enums/User/UserRole";
+import { LoggerMiddleware } from "../middlewares/LoggerMiddleware";
 
 const router = Router();
 
-router.post(
-  "/join",
-  AuthMiddleware,
-  QueueController.queueJoin
-);
+router.post("/join", AuthMiddleware, QueueController.queueJoin);
 
 router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 
@@ -25,6 +22,10 @@ router.post(
   JsonRequiredMiddleware,
   ValidateRequest(QueueDto, ["next-patient"]),
   ValidateRequest(QueueParamsDto, ["search"], "params"),
+  LoggerMiddleware({
+    action: "CHAMAR_PROXIMO_PACIENTE",
+    resource: "FILA",
+  }),
   QueueController.getNextPatient
 );
 
@@ -35,6 +36,10 @@ router.put(
   JsonRequiredMiddleware,
   ValidateRequest(QueueParamsDto, ["next"], "params"),
   ValidateRequest(QueueDto, ["next"], "body"),
+  LoggerMiddleware({
+    action: "ATUALIZAR_CLASSIFICACAO_FILA",
+    resource: "FILA",
+  }),
   QueueController.updateQueueClassification
 );
 
@@ -45,6 +50,10 @@ router.put(
   JsonRequiredMiddleware,
   ValidateRequest(QueueParamsDto, ["next"], "params"),
   ValidateRequest(QueueDto, ["next"], "body"),
+  LoggerMiddleware({
+    action: "MOVER_PARA_PROXIMA_FILA",
+    resource: "FILA",
+  }),
   QueueController.moveToNextQueue
 );
 
@@ -71,6 +80,10 @@ router.delete(
   AuthMiddleware,
   ValidateRoles(UserRole.EMPLOYEE),
   ValidateRequest(QueueParamsDto, ["next"], "params"),
+  LoggerMiddleware({
+    action: "FINALIZAR_ATENDIMENTO",
+    resource: "FILA",
+  }),
   QueueController.finishTreatment
 );
 

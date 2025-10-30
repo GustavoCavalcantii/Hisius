@@ -152,7 +152,6 @@ CREATE TABLE Registro (
     usuario_id INT NOT NULL,
     acao VARCHAR(100) NOT NULL, 
     modulo VARCHAR(50) NOT NULL,
-    descricao TEXT NOT NULL,
     ip_origem VARCHAR(45) NULL, 
     user_agent TEXT NULL,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,

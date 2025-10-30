@@ -7,6 +7,7 @@ import { AttendanceQueryDto } from "../dtos/attendance/AttendanceQueryDto";
 import { AttendanceParamDto } from "../dtos/attendance/AttendanceParamDto";
 import { AttendanceController } from "../controllers/AttendanceController";
 import { AttendanceDto } from "../dtos/attendance/AttendanceDto";
+import { LoggerMiddleware } from "../middlewares/LoggerMiddleware";
 
 const router = Router();
 
@@ -32,6 +33,10 @@ router.delete(
   AuthMiddleware,
   ValidateRoles(UserRole.ADMIN),
   ValidateRequest(AttendanceParamDto, ["delete"], "params"),
+  LoggerMiddleware({
+    action: "EXCLUIR_ATENDIMENTO",
+    resource: "ATENDIMENTO",
+  }),
   AttendanceController.deleteAttendance
 );
 
@@ -41,6 +46,10 @@ router.put(
   ValidateRoles(UserRole.ADMIN),
   ValidateRequest(AttendanceDto, ["update"]),
   ValidateRequest(AttendanceParamDto, ["update"], "params"),
+  LoggerMiddleware({
+    action: "ATUALIZAR_ATENDIMENTO",
+    resource: "ATENDIMENTO",
+  }),
   AttendanceController.update
 );
 

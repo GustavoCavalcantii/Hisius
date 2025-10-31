@@ -76,8 +76,7 @@ export class AuthService {
 
     await this.tokenRepo.saveOrUpdateRefreshToken(user.id, refreshToken);
 
-    const { password: _, ...safeUser } = user;
-    return { user: safeUser, accessToken, refreshToken };
+    return { user: user.sanitize(), accessToken, refreshToken };
   }
 
   async requestResetEmailToken(userId: number, newEmail: string) {

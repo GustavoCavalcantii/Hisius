@@ -7,24 +7,11 @@ import { UserRole } from "../enums/User/UserRole";
 import { IUserQueryParams } from "../interfaces/user/IUserQueryParams";
 import { IUser } from "../interfaces/user/IUser";
 import { IPagination } from "../interfaces/queue/IPagination";
-import { NotFoundError } from "../utils/errors/NotFoundError";
 
 const SALT_ROUNDS = 10;
 
 export class UserService {
   private userRepo = new UserRepository();
-
-  private sanitizeUser(user: User | void | null): IUser | null {
-    if (!user) return null;
-
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      password: user.password,
-    };
-  }
 
   async getUsersPaginated(
     queryParams: IUserQueryParams
@@ -43,14 +30,10 @@ export class UserService {
     const totalPages = Math.ceil(result.total / limit);
     const hasNext = page < totalPages - 1;
     const hasPrev = page > 0;
-  
+
     const sanitizedUsers = result.users
-      .map((user) => this.sanitizeUser(user))
-      .filter((user): user is IUser => user !== null)
-      .map((user) => {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
+      .map((user) => user.sanitize())
+      .filter((user): user is IUser => user !== null);
 
     return {
       users: sanitizedUsers,
@@ -75,7 +58,7 @@ export class UserService {
     const user = await this.userRepo.findById(id);
     if (!user) throw new BadRequestError("Usuário não encontrado");
 
-    return this.sanitizeUser(user);
+    return user.sanitize();
   }
 
   async createUser(userInput: ICreateUserInput, options?: any) {
@@ -87,13 +70,9 @@ export class UserService {
       },
       options
     );
-    const sanitizedUser = this.sanitizeUser(user);
 
-    if (!sanitizedUser) throw new Error("Erro ao criar usuário");
-
-    const { password, ...rest } = sanitizedUser;
-
-    return rest;
+    if (!user) throw new Error("Erro ao criar usuário");
+    return user.sanitize();
   }
 
   async updateRole(newRole: UserRole, userId: number) {
@@ -105,7 +84,7 @@ export class UserService {
 
     const updateUser = await this.userRepo.updateRole(newRole, userId);
 
-    return this.sanitizeUser(updateUser);
+    return updateUser.sanitize();
   }
 
   async changeEmail(userId: number, email: string) {
@@ -113,7 +92,7 @@ export class UserService {
     if (!user) throw new BadRequestError("Usuário não encontrado.");
 
     const newUser = await this.userRepo.updateEmail(user.id, email);
-    return this.sanitizeUser(newUser);
+    return newUser.sanitize();
   }
 
   async changePassword(userId: number, password: string) {
@@ -134,13 +113,13 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     const newUser = await this.userRepo.updatePassword(user.id, hashedPassword);
-    return this.sanitizeUser(newUser);
+    return newUser.sanitize();
   }
 
   async getUserByEmail(email: string) {
     const user = await this.userRepo.findByEmail(email);
     if (!user) throw new BadRequestError("Usuário não encontrado.");
 
-    return this.sanitizeUser(user);
+    return user;
   }
 }

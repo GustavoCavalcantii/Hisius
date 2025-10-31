@@ -1,4 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
+import { IUser } from "../../interfaces/user/IUser";
 
 export class User extends Model {
   declare id: number;
@@ -10,6 +11,15 @@ export class User extends Model {
 
   declare data_criacao: Date;
   declare data_atualizacao: Date;
+
+  sanitize(): IUser {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      role: this.role,
+    };
+  }
 
   static initialize(sequelize: Sequelize): void {
     User.init(

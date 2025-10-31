@@ -1,43 +1,49 @@
 import Attendance from "../database/models/Attendance";
+import { IAttendance } from "../interfaces/attendance/IAttendance";
 import { IAttendanceQueryParams } from "../interfaces/attendance/IAttendanceQueryParams";
 import { ICreateAttendanceInput } from "../interfaces/attendance/ICreateAttendanceInput";
 import { IUpdateAttendanceInput } from "../interfaces/attendance/IUpdateAttendanceInput";
+import { IPagination } from "../interfaces/queue/IPagination";
 import { AttendanceRepository } from "../repositories/AttendanceRepository";
 import { NotFoundError } from "../utils/errors/NotFoundError";
 
 export class AttendanceService {
   private attendanceRepo = new AttendanceRepository();
 
-  private sanitizeAttendance(attendance: any) {
-    if (!attendance) return null;
+  private sanitizeAttendances(attendances: Attendance[] | null): IAttendance[] {
+    if (!attendances || !Array.isArray(attendances)) {
+      return [];
+    }
 
-    let data: any;
-    if (attendance && typeof attendance.toJSON === "function")
-      data = attendance.toJSON();
-
-    if (!data) data = attendance;
-
-    const { data_criacao, data_atualizacao, createdAt, updatedAt, ...rest } =
-      data;
-    return rest;
+    return attendances
+      .filter(
+        (attendance): attendance is Attendance =>
+          attendance !== null &&
+          attendance !== undefined &&
+          typeof attendance.sanitize === "function"
+      )
+      .map((attendance) => attendance.sanitize());
   }
 
-  private sanitizeAttendances(attendances: Attendance[] | null | void) {
-    if (!attendances) return [];
-    return attendances.map((a) => this.sanitizeAttendance(a));
-  }
-
-  async create(attendanceInput: ICreateAttendanceInput, options?: any) {
-    const attendance = await this.sanitizeAttendance(
-      await this.attendanceRepo.create(attendanceInput, options)
+  async create(
+    attendanceInput: ICreateAttendanceInput,
+    options?: any
+  ): Promise<IAttendance> {
+    const attendance = await await this.attendanceRepo.create(
+      attendanceInput,
+      options
     );
 
     if (!attendance)
       throw new NotFoundError("Registro de atendimento não encontrado");
-    return this.sanitizeAttendance(attendance);
+
+    return attendance.sanitize();
   }
 
-  async update(attendanceInput: IUpdateAttendanceInput, id: number) {
+  async update(
+    attendanceInput: IUpdateAttendanceInput,
+    id: number
+  ): Promise<IAttendance> {
     const attendance = await this.attendanceRepo.updateById(
       id,
       attendanceInput
@@ -45,24 +51,29 @@ export class AttendanceService {
 
     if (!attendance)
       throw new NotFoundError("Registro de atendimento não encontrado");
-    return this.sanitizeAttendance(attendance);
+    return attendance.sanitize();
   }
 
-  async getById(id: number) {
+  async getById(id: number): Promise<IAttendance> {
     const attendance = await this.attendanceRepo.findById(id);
+
     if (!attendance)
       throw new NotFoundError("Registro de atendimento não encontrado");
-    return this.sanitizeAttendance(attendance);
+
+    return attendance.sanitize();
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<number> {
     const attendance = await this.attendanceRepo.deleteById(id);
     if (!attendance)
       throw new NotFoundError("Registro de atendimento não encontrado");
-    return this.sanitizeAttendance(attendance);
+
+    return attendance;
   }
 
-  async getPaginated(queryParams: IAttendanceQueryParams) {
+  async getPaginated(
+    queryParams: IAttendanceQueryParams
+  ): Promise<{ attendances: IAttendance[]; pagination: IPagination }> {
     const { page = 0, limit = 10, patientId, startDate, endDate } = queryParams;
     const offset = page * limit;
 

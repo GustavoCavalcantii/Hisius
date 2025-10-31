@@ -4,6 +4,7 @@ import Patient from "./Patient";
 import { ManchesterClassification } from "../../enums/Queue/ManchesterClassification";
 import { Destination } from "../../enums/Attendance/Destination";
 import { AttendanceStatus } from "../../enums/Attendance/AttendanceStatus";
+import { IAttendance } from "../../interfaces/attendance/IAttendance";
 
 export class Attendance extends Model {
   declare id: number;
@@ -31,6 +32,34 @@ export class Attendance extends Model {
   declare status: AttendanceStatus;
   declare createdAt: Date;
   declare updatedAt: Date;
+
+  sanitize(): IAttendance {
+    return {
+      id: this.id,
+      userId: this.userId,
+      patientId: this.patientId,
+
+      entryDate: this.entryDate,
+      attendanceDate: this.attendanceDate,
+      dischargeDate: this.dischargeDate,
+
+      priority: this.priority,
+      mainComplaint: this.mainComplaint,
+      currentIllnessHistory: this.currentIllnessHistory,
+      allergies: this.allergies,
+      currentMedications: this.currentMedications,
+
+      mainDiagnosis: this.mainDiagnosis,
+      secondaryDiagnoses: this.secondaryDiagnoses,
+      proceduresPerformed: this.proceduresPerformed,
+
+      destination: this.destination,
+      referralTo: this.referralTo,
+      dischargeNotes: this.dischargeNotes,
+
+      status: this.status,
+    };
+  }
 
   static initialize(sequelize: Sequelize): void {
     Attendance.init(
@@ -131,18 +160,6 @@ export class Attendance extends Model {
           allowNull: false,
           defaultValue: AttendanceStatus.COMPLETED,
           field: "status",
-        },
-        createdAt: {
-          type: DataTypes.DATE,
-          allowNull: false,
-          defaultValue: DataTypes.NOW,
-          field: "data_criacao",
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          allowNull: false,
-          defaultValue: DataTypes.NOW,
-          field: "data_atualizacao",
         },
       },
       {

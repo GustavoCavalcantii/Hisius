@@ -64,22 +64,7 @@ export class PatientController {
     try {
       const { id } = req.params;
       const patient = await patientService.getPatientById(Number(id));
-      return res.json(
-        SuccessResponse(patient, "Paciente encontrado pelo administrador", 200)
-      );
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  static async updatePatient(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { id } = req.params;
-      const dto = plainToInstance(PatientDto, req.body);
-      await patientService.updatePatient(Number(id), dto);
-      return res.json(
-        SuccessResponse(null, "Registro atualizado pelo administrador!", 200)
-      );
+      return res.json(SuccessResponse(patient, "Paciente encontrado.", 200));
     } catch (err) {
       next(err);
     }

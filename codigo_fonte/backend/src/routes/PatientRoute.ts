@@ -34,13 +34,5 @@ router.get(
   ValidateRoles(UserRole.EMPLOYEE),
   PatientController.getPatient
 );
-router.put(
-  "/:id",
-  AuthMiddleware,
-  ValidateRoles(UserRole.EMPLOYEE),
-  JsonRequiredMiddleware,
-  ValidateRequest(PatientDto, ["update"]),
-  PatientController.updatePatient
-);
 
 export default router;

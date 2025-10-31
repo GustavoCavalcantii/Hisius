@@ -13,6 +13,12 @@ export class ManagerRepository {
     return Manager.findByPk(id);
   }
 
+  async findByHospitalCode(hospitalCode: string) {
+    return Manager.findOne({
+      where: { hospitalCode },
+    });
+  }
+
   async findByUserId(userId: number) {
     return Manager.findOne({ where: { userId } });
   }

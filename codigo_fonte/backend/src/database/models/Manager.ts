@@ -1,5 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import User from "./User";
+import { IManager } from "../../interfaces/manager/IManager";
 
 export class Manager extends Model {
   declare id: number;
@@ -8,6 +9,14 @@ export class Manager extends Model {
 
   declare data_criacao: Date;
   declare data_atualizacao: Date;
+
+  sanitize(): IManager {
+    return {
+      id: this.id,
+      userId: this.userId,
+      hospitalCode: this.hospitalCode,
+    };
+  }
 
   static initialize(sequelize: Sequelize): void {
     Manager.init(

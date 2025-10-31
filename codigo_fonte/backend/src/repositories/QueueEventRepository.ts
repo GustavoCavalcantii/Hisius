@@ -11,7 +11,7 @@ export class QueueEventRepository {
   async create(queue: QueueType, data: ICreateQueueEventInput) {
     const queueName = QueueTypePT[queue as QueueType];
 
-    return QueueEvent.create({
+    return await QueueEvent.create({
       queueId: data.queueId,
       queue: queueName.toLowerCase(),
       patientId: data.patientId,
@@ -80,13 +80,13 @@ export class QueueEventRepository {
   async getPeakDemandByWeek(startDate: Date, endDate: Date) {
     const result = await QueueEvent.sequelize!.query(
       `
-            SELECT 
-                DATE_FORMAT(entrou_em, '%a') as day,
-                COUNT(*) as total_entries
-            FROM fila_eventos 
-            WHERE entrou_em BETWEEN ? AND ?
-            GROUP BY DATE_FORMAT(entrou_em, '%a')
-        `,
+          SELECT 
+              DATE_FORMAT(entrou_em, '%a') as day,
+              COUNT(*) as total_entries
+          FROM fila_eventos 
+          WHERE entrou_em BETWEEN ? AND ?
+          GROUP BY DATE_FORMAT(entrou_em, '%a')
+      `,
       {
         replacements: [startDate, endDate],
         type: QueryTypes.SELECT,
@@ -116,21 +116,20 @@ export class QueueEventRepository {
     const result = await QueueEvent.sequelize!.query(
       `
         WITH wait_times AS (
-            SELECT 
-                fila AS queue,
-                ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em)) AS wait_time_seconds,
-                COUNT(*) AS frequency,
-                DENSE_RANK() OVER (PARTITION BY fila ORDER BY COUNT(*) DESC) AS \`rank\`
-            FROM fila_eventos 
-            WHERE entrou_em BETWEEN ? AND ?
-            AND iniciou_em IS NOT NULL
-            GROUP BY fila, ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em))
+          SELECT 
+              fila AS queue,
+              ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em)) AS wait_time_seconds,
+              COUNT(*) AS frequency
+          FROM fila_eventos 
+          WHERE entrou_em BETWEEN ? AND ?
+          AND iniciou_em IS NOT NULL
+          GROUP BY fila, ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em))
         )
         SELECT queue, wait_time_seconds, frequency
         FROM wait_times 
-        WHERE \`rank\` <= 3
-        ORDER BY queue, frequency DESC
-  `,
+        ORDER BY frequency DESC
+        LIMIT 5
+      `,
       {
         replacements: [startDate, endDate],
         type: QueryTypes.SELECT,

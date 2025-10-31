@@ -14,16 +14,27 @@ export class ReportController {
       const startDateObj = new Date(
         parseInt(params.startDate.split("-")[2]),
         parseInt(params.startDate.split("-")[1]) - 1,
-        parseInt(params.startDate.split("-")[0])
+        parseInt(params.startDate.split("-")[0]),
+        0,
+        0,
+        0,
+        0
       );
 
       const endDateObj = new Date(
         parseInt(params.endDate.split("-")[2]),
         parseInt(params.endDate.split("-")[1]) - 1,
-        parseInt(params.endDate.split("-")[0])
+        parseInt(params.endDate.split("-")[0]),
+        23,
+        59,
+        59,
+        999
       );
 
-      const response = await reportService.getQueueReport(startDateObj, endDateObj);
+      const response = await reportService.getQueueReport(
+        startDateObj,
+        endDateObj
+      );
 
       return res.json(
         SuccessResponse(response, "Dados coletados com sucesso", 200)

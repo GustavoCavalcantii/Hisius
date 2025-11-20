@@ -2,6 +2,7 @@ export const color = {
   primary: "#395499",
   secondary: "#90CBF3",
   background: "#F3F3F3",
+  card: "#FFFFFF",
   front: "#FFFFFF",
   text: "#0D1329",
   gray: "#D5D6D9",

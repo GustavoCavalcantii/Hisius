@@ -1,68 +1,66 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import AuthNavigator from "./routers/authNavigator";
-import AppNavigator from "./routers/appNavigator";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { QueueScreen } from "./src/screens/Queue";
+import { IPatient } from "@hisius/interfaces";
+import * as Font from "expo-font";
+import React, { useEffect, useState } from "react";
 
-const AuthContext = createContext<any>(null);
+export type RootStackParamList = {
+  Queue: {
+    patient: IPatient;
+    estimatedWaitingTimeInMinutes: number;
+  };
+};
 
-function AuthProvider({ children }: any) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-  useEffect(() => {
-    setTimeout(() => {
-      setUser(null);
-      setLoading(false);
-    }, 500);
-  }, []);
-
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-function useAuth() {
-  return useContext(AuthContext);
-}
-
-function Routes() {
-  const { user } = useAuth();
-  return user ? <AppNavigator /> : <AuthNavigator />;
-}
+const mockPatient: IPatient = {
+  id: 1233,
+  name: "Fulano Ciclano Bezerra",
+  age: 32,
+  birthDate: new Date("1993-01-01"),
+  cnsNumber: "123 456 789 000",
+  motherName: "Maria de Tal",
+  dateHourAttendance: "2025-11-17T20:00:00Z",
+  gender: 0 as any,
+  position: 1,
+  attendanceId: 999,
+  classification: null,
+};
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        Montserrat: require("@hisius/ui/assets/fonts/Montserrat-Regular.ttf"),
+      });
 
-      setTimeout(() => {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-      }, 2000);
-    };
+      setLoaded(true);
+    }
 
-    checkAuth();
+    loadFonts();
   }, []);
 
-  if (isLoading) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} id={undefined}>
-          <Stack.Screen name="Splash" component={splash} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  }
+  if (!loaded) return null;
 
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <Routes />
-      </NavigationContainer>
-    </AuthProvider>
+    <NavigationContainer>
+      <Stack.Navigator
+        id={undefined}
+        initialRouteName="Queue"
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen
+          name="Queue"
+          component={QueueScreen}
+          initialParams={{
+            patient: mockPatient,
+            estimatedWaitingTimeInMinutes: 5,
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

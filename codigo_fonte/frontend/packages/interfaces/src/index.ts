@@ -4,9 +4,21 @@ export interface IPatient {
   id: number;
   gender: string;
   name: string;
+  birthDate: Date;
+  cnsNumber: string;
+  motherName: string;
+  dateHourAttendance: string;
   age: number;
+  attendanceId?: number;
   classification?: ManchesterTriage;
   position: number;
+}
+
+export interface IQueuedInfo {
+  id: number;
+  classification: ManchesterTriage;
+  estimatedWaitMinutes: number;
+  queueType: string;
 }
 
 export interface UserResponse {

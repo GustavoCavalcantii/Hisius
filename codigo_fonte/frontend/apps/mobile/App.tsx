@@ -1,13 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { AppStackParamList, AuthStackParamList } from "../../packages/@types/navigation";
-import example from "apps/mobile/src/screens/example";
-import splash from "apps/mobile/src/screens/splash";
-import AuthNavigator from "../../packages/routers/AuthNavigator";
-import AppNavigator from "../../packages/routers/AppNavigator";
+import AuthNavigator from "./routers/authNavigator";
+import AppNavigator from "./routers/appNavigator";
 
-const Stack = createNativeStackNavigator();
+const AuthContext = createContext<any>(null);
+
+function AuthProvider({ children }: any) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setUser(null);
+      setLoading(false);
+    }, 500);
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+function useAuth() {
+  return useContext(AuthContext);
+}
+
+function Routes() {
+  const { user } = useAuth();
+  return user ? <AppNavigator /> : <AuthNavigator />;
+}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -36,8 +59,10 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      {isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Routes />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }

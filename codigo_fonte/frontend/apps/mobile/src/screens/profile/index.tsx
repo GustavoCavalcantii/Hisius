@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import styled from "styled-components/native";
-import CustomInput from "./CustomInput";
 import { Ionicons } from "@expo/vector-icons";
-import { getProfile as profileService } from "../../services/profile";
+import CustomInput from "@hisius/ui/components/CustomInput";
+import { getProfile } from "@hisius/services";
 
 export function Profile() {
   const [email, setEmail] = useState("");
@@ -13,7 +13,7 @@ export function Profile() {
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    profileService()
+    getProfile(123)
       .then((data) => {
         setEmail(data?.email ?? "");
         setBirthdate(data?.birthdate ?? "");
@@ -37,19 +37,48 @@ export function Profile() {
       </Header>
 
       <InputWrapper>
-        <CustomInput placeholder="Email" value={email} onChangeText={setEmail} icon="mail-outline" />
+        <CustomInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          icon="mail-outline"
+        />
       </InputWrapper>
+
       <InputWrapper>
-        <CustomInput placeholder="Data de Nascimento" value={birthdate} onChangeText={setBirthdate} icon="calendar-outline" />
+        <CustomInput
+          placeholder="Data de Nascimento"
+          value={birthdate}
+          onChangeText={setBirthdate}
+          icon="calendar-outline"
+        />
       </InputWrapper>
+
       <InputWrapper>
-        <CustomInput placeholder="CPF" value={cpf} onChangeText={setCpf} icon="person-outline" />
+        <CustomInput
+          placeholder="CPF"
+          value={cpf}
+          onChangeText={setCpf}
+          icon="person-outline"
+        />
       </InputWrapper>
+
       <InputWrapper>
-        <CustomInput placeholder="Sexo" value={gender} onChangeText={setGender} icon="male-female-outline" />
+        <CustomInput
+          placeholder="Sexo"
+          value={gender}
+          onChangeText={setGender}
+          icon="male-female-outline"
+        />
       </InputWrapper>
+
       <InputWrapper>
-        <CustomInput placeholder="Telefone" value={phone} onChangeText={setPhone} icon="call-outline" />
+        <CustomInput
+          placeholder="Telefone"
+          value={phone}
+          onChangeText={setPhone}
+          icon="call-outline"
+        />
       </InputWrapper>
 
       <SaveButton>
@@ -58,8 +87,6 @@ export function Profile() {
     </Container>
   );
 }
-
-
 
 const Container = styled(ScrollView)`
   flex: 1;

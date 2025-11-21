@@ -1,4 +1,4 @@
-import styled from 'styled-components/native';
+import styled from "styled-components/native";
 
 export const Container = styled.View`
   flex: 1;
@@ -19,6 +19,10 @@ export const Subtitle = styled.Text`
   font-size: 14px;
   color: #444;
   margin-bottom: 40px;
+`;
+
+export const ButtonContainer = styled.View`
+  margin-top: 30px;
 `;
 
 export const CodeContainer = styled.View`
@@ -42,7 +46,6 @@ export const CodeInput = styled.TextInput`
 export const SeparatorContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-vertical: 20px;
 `;
 
 export const Line = styled.View`
@@ -63,8 +66,7 @@ export const QrButton = styled.TouchableOpacity`
   border-width: 1px;
   border-color: #bfd5f9;
   border-radius: 8px;
-  padding-vertical: 10px;
-  padding-horizontal: 20px;
+  padding: .5rem 1rem;
 `;
 
 export const QrText = styled.Text`
@@ -77,8 +79,6 @@ export const EnterButton = styled.TouchableOpacity`
   margin-top: 40px;
   background-color: #2c4484;
   border-radius: 8px;
-  padding-vertical: 14px;
-  padding-horizontal: 60px;
 `;
 
 export const EnterText = styled.Text`

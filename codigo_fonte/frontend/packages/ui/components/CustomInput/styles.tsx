@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 8,
-    backgroundColor: "#fff",
+    backgroundColor: "#fff", 
     height: 50,
     justifyContent: "center",
     flexDirection: "row",
@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
   input: {
     fontSize: 16,
     color: "#333",
-    padding: 0,
+    padding: 12,
     borderWidth: 0,
     height: "100%",
     flex: 1,

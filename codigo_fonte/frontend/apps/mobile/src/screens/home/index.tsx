@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import * as S from './style';
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import * as S from "./style";
+import CustomButton from "@hisius/ui/components/Button";
 
 export default function Home() {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
 
   const handleChange = (text: string, index: number) => {
     const newCode = [...code];
@@ -39,9 +40,9 @@ export default function Home() {
         <S.QrText>Escanear QR Code</S.QrText>
       </S.QrButton>
 
-      <S.EnterButton>
-        <S.EnterText>Entrar</S.EnterText>
-      </S.EnterButton>
+      <S.ButtonContainer>
+        <CustomButton title="Entrar" onPress={() => {}} />
+      </S.ButtonContainer>
     </S.Container>
   );
-};
+}

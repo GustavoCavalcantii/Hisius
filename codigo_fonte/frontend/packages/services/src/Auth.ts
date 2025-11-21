@@ -1,46 +1,37 @@
-import api from './config/axios';
-import type { userLogin } from '../../@types/userLogin';
-import type { userRegister } from '../../@types/userRegister';
+import api from "./config/axios";
+import type { userLogin } from "../../@types/userLogin";
+import type { userRegister } from "../../@types/userRegister";
+import { ApiError } from "@hisius/interfaces/src";
 
 interface LoginResponse {
-  token: string;
+  id: number;
+  name: string;
+  email: string;
+  role: number;
+  accessToken: string | null;
 }
 
-export async function Login(userData: userLogin): Promise<LoginResponse> {
-  try {
-    console.log('🔄 Enviando login:', userData);
-
-  const response = await api.post<LoginResponse>('/auth/login', userData, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true, 
-  });
-  console.log('✅ Login response:', response);
-  return response.data;
-} catch (error: any) {
-    console.error('❌ Erro completo:', error);
-    console.error('❌ Response data:', error.response?.data);
-    console.error('❌ Response status:', error.response?.status);
-  throw error;
-}
+interface ApiResponseGet {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data?: LoginResponse;
+  errors?: ApiError[];
 }
 
-export async function Register(userData: userRegister): Promise<void> {
-  try {
-    console.log('🔄 Enviando registro:', userData);
+export class Auth {
+  async Login(userData: userLogin): Promise<LoginResponse> {
+    const response = await api.post<ApiResponseGet>(`/auth/login`, userData);
+    return response.data.data;
+  }
 
-    const response = await api.post('/users', userData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
-    });
-    console.log('✅ Registro response:', response);
-  } catch (error: any) {
-    console.error('❌ Erro completo:', error);
-    console.error('❌ Response data:', error.response?.data);
-    console.error('❌ Response status:', error.response?.status);
-    throw error;
+  async register(userData: userRegister): Promise<LoginResponse> {
+    const response = await api.post<ApiResponseGet>(`/users`, userData);
+    return response.data.data;
+  }
+
+  async leaveQueue() {
+    const response = await api.delete<ApiResponseGet>(`/queue/leave`);
+    return response.data.data != null;
   }
 }

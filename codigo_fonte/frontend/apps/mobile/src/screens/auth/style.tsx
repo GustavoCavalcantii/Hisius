@@ -11,9 +11,11 @@ export const Container = styled.View`
 
 export const Title = styled.Text`
   font-size: 32px;
+  font-family: "Montserrat";
+  letter-spacing: 0.5rem;
   text-align: center;
   margin: 80px 0;
-  font-weight: bold;
+  font-weight: 700;
 `;
 
 export const TabContainer = styled.View`
@@ -30,6 +32,7 @@ export const TabButton = styled.TouchableOpacity<{ active: boolean }>`
 `;
 
 export const TabText = styled.Text`
+  font-family: "Montserrat";
   font-size: 18px;
   color: #333;
 `;
@@ -57,6 +60,7 @@ export const Button = styled.TouchableOpacity`
 `;
 
 export const ButtonText = styled.Text`
+  font-family: "Montserrat";
   color: white;
   font-size: 18px;
   font-weight: bold;

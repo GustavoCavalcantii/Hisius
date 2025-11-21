@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { ActivityIndicator, Alert, View } from "react-native";
-import Input from "@hisius/ui/components/CustomInput";
+import { Alert, View } from "react-native";
 import * as S from "./style";
 
-import { Login as AuthServiceLogin } from "../../../../../packages/services/src/Auth";
-import { Register as AuthServiceRegister } from "../../../../../packages/services/src/Auth";
+import { Auth } from "@hisius/services";
 import CustomInput from "@hisius/ui/components/CustomInput";
-import CustomButton from "packages/ui/components/Button";
+import CustomButton from "@hisius/ui/components/Button";
+import {
+  HiOutlineEnvelope,
+  HiOutlineLockClosed,
+  HiOutlineUser,
+} from "react-icons/hi2";
 
 export default function LoginRegister() {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -15,6 +18,7 @@ export default function LoginRegister() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const AuthService = new Auth();
 
   const [loading, setLoading] = useState(false);
 
@@ -23,15 +27,15 @@ export default function LoginRegister() {
       setLoading(true);
 
       if (mode === "login") {
-        const data = await AuthServiceLogin({ email, password });
-        console.log("Token recebido:", data.token);
+        const data = await AuthService.Login({ email, password });
+        console.log("Token recebido:", data.accessToken);
       } else {
         if (password !== confirmPassword) {
           Alert.alert("Erro", "As senhas não coincidem");
           return;
         }
 
-        const data = await AuthServiceRegister({
+        const data = await AuthService.register({
           name,
           email,
           password,
@@ -73,19 +77,26 @@ export default function LoginRegister() {
 
         <S.InputContainer>
           {mode === "register" && (
-            <Input placeholder="Nome" value={name} onChangeText={setName} />
+            <CustomInput
+              placeholder="Nome"
+              value={name}
+              icon={<HiOutlineUser />}
+              onChangeText={setName}
+            />
           )}
 
           <CustomInput
             placeholder="E-mail"
             value={email}
             onChangeText={setEmail}
+            icon={<HiOutlineEnvelope />}
             keyboardType="email-address"
           />
 
           <CustomInput
             placeholder="Senha"
             value={password}
+            icon={<HiOutlineLockClosed />}
             onChangeText={setPassword}
             secureTextEntry
           />
@@ -94,6 +105,7 @@ export default function LoginRegister() {
             <CustomInput
               placeholder="Confirmar senha"
               value={confirmPassword}
+              icon={<HiOutlineLockClosed />}
               onChangeText={setConfirmPassword}
               secureTextEntry
             />

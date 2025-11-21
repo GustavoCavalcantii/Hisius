@@ -19,7 +19,7 @@ export function QueueScreen() {
   useEffect(() => {
     async function fetchPatient() {
       try {
-        const info = await patientInstance.getInfo();
+        const info = await patientInstance.getQueueInfo();
         setPatient(info);
         setEstimatedWaitingTimeInMinutes(info.estimatedWaitMinutes ?? 0);
       } catch (err) {

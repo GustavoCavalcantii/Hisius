@@ -2,10 +2,13 @@ import { ManchesterTriage } from "packages/enums/src";
 
 export interface IPatient {
   id: number;
-  gender: string;
+  gender: "MASCULINO" | "FEMININO";
   name: string;
-  birthDate: Date;
+  cpf: string;
+  birthDate: string;
   cnsNumber: string;
+  email: string;
+  phone: string;
   motherName: string;
   dateHourAttendance: string;
   age: number;

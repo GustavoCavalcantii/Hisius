@@ -1,25 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import styled from "styled-components/native";
-import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "@hisius/ui/components/CustomInput";
-import { getProfile } from "@hisius/services";
+import {
+  HiOutlineArrowLeft,
+  HiOutlineEnvelope,
+  HiOutlineCalendarDays,
+  HiOutlineIdentification,
+  HiOutlineUser,
+  HiOutlinePhone,
+  HiOutlineUsers,
+  HiOutlineClipboard,
+} from "react-icons/hi2";
+import CustomButton from "@hisius/ui/components/Button";
+import { Patient } from "@hisius/services/src";
 
 export function Profile() {
-  const [email, setEmail] = useState("");
-  const [birthdate, setBirthdate] = useState("");
+  const patientInstance = new Patient();
+
+  const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState<"MASCULINO" | "FEMININO" | "">("");
+  const [birthDate, setBirthDate] = useState("");
+  const [cnsNumber, setCnsNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [motherName, setMotherName] = useState("");
 
   useEffect(() => {
-    getProfile(123)
+    patientInstance
+      .getProfile()
       .then((data) => {
-        setEmail(data?.email ?? "");
-        setBirthdate(data?.birthdate ?? "");
-        setCpf(data?.cpf ?? "");
-        setGender(data?.gender ?? "");
-        setPhone(data?.phone ?? "");
+        if (!data) return;
+
+        setName(data.name);
+        setCpf(data.cpf);
+        setGender(data.gender);
+        setBirthDate(data.birthDate);
+        setCnsNumber(data.cnsNumber);
+        setEmail(data.email);
+        setPhone(data.phone);
+        setMotherName(data.motherName);
       })
       .catch(console.error);
   }, []);
@@ -28,65 +49,97 @@ export function Profile() {
     <Container>
       <Header>
         <BackButton>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <HiOutlineArrowLeft />
         </BackButton>
+
         <TitleBox>
           <Subtitle>EDITE</Subtitle>
           <Title>SEUS DADOS</Title>
         </TitleBox>
       </Header>
 
-      <InputWrapper>
-        <CustomInput
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          icon="mail-outline"
-        />
-      </InputWrapper>
+      {/* NOME */}
 
-      <InputWrapper>
-        <CustomInput
-          placeholder="Data de Nascimento"
-          value={birthdate}
-          onChangeText={setBirthdate}
-          icon="calendar-outline"
-        />
-      </InputWrapper>
+      <CustomInput
+        placeholder="Nome completo"
+        value={name}
+        onChangeText={setName}
+        icon={<HiOutlineUser />}
+      />
 
-      <InputWrapper>
-        <CustomInput
-          placeholder="CPF"
-          value={cpf}
-          onChangeText={setCpf}
-          icon="person-outline"
-        />
-      </InputWrapper>
+      {/* EMAIL */}
 
-      <InputWrapper>
-        <CustomInput
-          placeholder="Sexo"
-          value={gender}
-          onChangeText={setGender}
-          icon="male-female-outline"
-        />
-      </InputWrapper>
+      <CustomInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        icon={<HiOutlineEnvelope />}
+      />
 
-      <InputWrapper>
-        <CustomInput
-          placeholder="Telefone"
-          value={phone}
-          onChangeText={setPhone}
-          icon="call-outline"
-        />
-      </InputWrapper>
+      {/* DATA DE NASCIMENTO */}
 
-      <SaveButton>
-        <SaveText>Salvar</SaveText>
-      </SaveButton>
+      <CustomInput
+        placeholder="Data de Nascimento"
+        value={birthDate}
+        onChangeText={setBirthDate}
+        icon={<HiOutlineCalendarDays />}
+      />
+
+      {/* CPF */}
+
+      <CustomInput
+        placeholder="CPF"
+        value={cpf}
+        onChangeText={setCpf}
+        icon={<HiOutlineIdentification />}
+      />
+
+      {/* GÊNERO */}
+
+      <CustomInput
+        placeholder="Sexo"
+        value={gender}
+        onChangeText={(t) => setGender(t as any)}
+        icon={<HiOutlineUser />}
+      />
+
+      {/* TELEFONE */}
+
+      <CustomInput
+        placeholder="Telefone"
+        value={phone}
+        onChangeText={setPhone}
+        icon={<HiOutlinePhone />}
+      />
+
+      {/* NOME DA MÃE */}
+
+      <CustomInput
+        placeholder="Nome da Mãe"
+        value={motherName}
+        onChangeText={setMotherName}
+        icon={<HiOutlineUsers />}
+      />
+
+      {/* CNS */}
+
+      <CustomInput
+        placeholder="CNS"
+        value={cnsNumber}
+        onChangeText={setCnsNumber}
+        icon={<HiOutlineClipboard />}
+      />
+
+      <ButtonContainer>
+        <CustomButton title="Salvar" onPress={() => {}} />
+      </ButtonContainer>
     </Container>
   );
 }
+
+const ButtonContainer = styled(View)`
+  margin-top: 70px;
+`;
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -109,35 +162,15 @@ const TitleBox = styled(View)`
 `;
 
 const Title = styled(Text)`
+  font-family: "Montserrat";
   font-size: 22px;
   font-weight: 700;
   color: #000;
 `;
 
 const Subtitle = styled(Text)`
+  font-family: "Montserrat";
   font-size: 22px;
   font-weight: 300;
   color: #000;
-`;
-
-const InputWrapper = styled(View)`
-  width: 100%;
-  margin-top: 16px;
-`;
-
-const SaveButton = styled(TouchableOpacity)`
-  width: 60%;
-  height: 46px;
-  background-color: #2f4a8a;
-  align-self: center;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px;
-  margin-top: 40px;
-`;
-
-const SaveText = styled(Text)`
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
 `;

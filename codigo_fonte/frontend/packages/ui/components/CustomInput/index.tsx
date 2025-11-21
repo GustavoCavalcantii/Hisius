@@ -50,6 +50,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
+          secureTextEntry={secureTextEntry}
           placeholderTextColor="#999"
           selectionColor="#000"
           {...props}

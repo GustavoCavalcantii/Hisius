@@ -24,7 +24,7 @@ export class PatientRepository {
         {
           model: User,
           as: "user",
-          attributes: ["name"],
+          attributes: ["name", "email"],
         },
       ],
     });
@@ -56,7 +56,13 @@ export class PatientRepository {
     const patient = await this.findByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado.");
 
-    await patient.update(data);
+    const sanitizedData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => {
+        return value !== undefined && value !== null && value !== "";
+      })
+    );
+
+    await patient.update(sanitizedData);
     return patient;
   }
 }

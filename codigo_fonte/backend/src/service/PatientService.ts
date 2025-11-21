@@ -1,11 +1,9 @@
 import { PatientRepository } from "../repositories/PatientRepository";
 import { PatientDto } from "../dtos/patient/PatientDto";
 import { BadRequestError } from "../utils/errors/BadRequestError";
-import { UserRepository } from "../repositories/UserRepository";
 
 export class PatientService {
   private patientRepo = new PatientRepository();
-  private userRepo = new UserRepository();
 
   async getPatientByUserId(userId: number) {
     const patient = await this.patientRepo.findByUserId(userId);
@@ -17,6 +15,7 @@ export class PatientService {
     return {
       ...patient.sanitize(),
       name: patient.user?.name,
+      email: patient.user?.email,
     };
   }
 
@@ -35,7 +34,7 @@ export class PatientService {
     if (!patient) {
       throw new BadRequestError("Erro ao criar perfil de paciente.");
     }
-    
+
     return {
       ...patient.sanitize(),
       name: patient.user?.name,

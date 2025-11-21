@@ -1,7 +1,7 @@
 import { ManchesterTriage } from "packages/enums/src";
 
 export interface IPatient {
-  id: number;
+  id?: number;
   gender: "MASCULINO" | "FEMININO";
   name: string;
   cpf: string;
@@ -10,11 +10,11 @@ export interface IPatient {
   email: string;
   phone: string;
   motherName: string;
-  dateHourAttendance: string;
-  age: number;
+  dateHourAttendance?: string;
+  age?: number;
   attendanceId?: number;
   classification?: ManchesterTriage;
-  position: number;
+  position?: number;
 }
 
 export interface IQueuedInfo {

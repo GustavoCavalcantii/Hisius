@@ -1,28 +1,35 @@
 import styled from "styled-components/native";
+import { CodeInputBase } from "../../components/codeInput";
+import { GlobalText } from "../../components/globalText";
+import { scale } from "../../utils/scale";
+import { color } from "@hisius/ui/theme/colors";
 
 export const Container = styled.View`
   flex: 1;
   background-color: #f8f8f8;
   align-items: center;
-  justify-content: center;
+
+  gap: 5rem;
   padding: 20px;
 `;
 
-export const Title = styled.Text`
-  font-size: 20px;
-  font-weight: 600;
-  color: #0e1d47;
-  margin-bottom: 6px;
+export const Title = styled(GlobalText)`
+  font-size: ${scale(18)};
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  margin-top: 8rem;
 `;
 
-export const Subtitle = styled.Text`
-  font-size: 14px;
-  color: #444;
+export const Subtitle = styled(GlobalText)`
+  font-size: ${scale(12)};
+  color: ${color.text};
   margin-bottom: 40px;
+  text-align: center;
 `;
 
 export const ButtonContainer = styled.View`
   margin-top: 30px;
+  width: 60%;
 `;
 
 export const CodeContainer = styled.View`
@@ -31,18 +38,23 @@ export const CodeContainer = styled.View`
   margin-bottom: 30px;
 `;
 
-export const CodeInput = styled.TextInput`
+export const CodeInput = styled(CodeInputBase).attrs({
+  placeholderTextColor: color.gray,
+  selectionHandleColor: color.secondary,
+})`
+  font-family: "Montserrat";
   width: 45px;
   height: 50px;
   border-width: 1px;
-  border-color: #ddd;
+  border-color: ${color.gray};
   border-radius: 6px;
   text-align: center;
-  font-size: 20px;
+  font-size: ${scale(18)};
   margin: 0 5px;
-  background-color: #fff;
+  background-color: ${color.card};
 `;
 
+/*
 export const SeparatorContainer = styled.View`
   flex-direction: row;
   align-items: center;
@@ -51,12 +63,12 @@ export const SeparatorContainer = styled.View`
 export const Line = styled.View`
   flex: 1;
   height: 1px;
-  background-color: #000;
+  background-color: ${color.text};
 `;
 
-export const OrText = styled.Text`
+
+export const OrText = styled(GlobalText)`
   margin: 0 10px;
-  color: #000;
 `;
 
 export const QrButton = styled.TouchableOpacity`
@@ -66,7 +78,7 @@ export const QrButton = styled.TouchableOpacity`
   border-width: 1px;
   border-color: #bfd5f9;
   border-radius: 8px;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
 `;
 
 export const QrText = styled.Text`
@@ -74,15 +86,4 @@ export const QrText = styled.Text`
   color: #0e1d47;
   font-weight: 500;
 `;
-
-export const EnterButton = styled.TouchableOpacity`
-  margin-top: 40px;
-  background-color: #2c4484;
-  border-radius: 8px;
-`;
-
-export const EnterText = styled.Text`
-  color: #fff;
-  font-weight: 600;
-  font-size: 16px;
-`;
+*/

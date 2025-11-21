@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TouchableOpacity, Text, LayoutAnimation } from "react-native";
 import { styles } from "./styles";
 
-const CustomButton = ({ title, onPress, disabled = false }) => {
+const CustomButton = ({ title, onPress, style = {}, disabled = false }) => {
   const [isPressed, setIsPressed] = useState(false);
 
   const handlePressIn = () => {
@@ -50,7 +50,7 @@ const CustomButton = ({ title, onPress, disabled = false }) => {
 
   return (
     <TouchableOpacity
-      style={getButtonStyle()}
+      style={[...getButtonStyle(), style]}
       onPress={onPress}
       disabled={disabled}
       onPressIn={handlePressIn}

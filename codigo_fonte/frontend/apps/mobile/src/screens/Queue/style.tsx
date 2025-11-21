@@ -7,7 +7,7 @@ import { color } from "@hisius/ui/theme/colors";
 const PRIMARY_TEXT = color.text;
 const LIGHT_BG = color.background;
 const CARD_BG = color.card;
-const LIGHT_BORDER = color.gray;
+const LIGHT_BORDER = color.error.error  ;
 
 const { height } = Dimensions.get("window");
 
@@ -17,6 +17,7 @@ export const createStyles = (risk: ManchesterTriage) => {
   return StyleSheet.create({
     container: {
       flex: 1,
+      padding: 24,
       backgroundColor: LIGHT_BG,
       overflow: "scroll",
     },
@@ -119,7 +120,6 @@ export const createStyles = (risk: ManchesterTriage) => {
 
     infoLabel: {
       fontSize: moderateScale(14),
-      color: "#8B90A0",
     },
 
     infoValue: {
@@ -169,7 +169,6 @@ export const createStyles = (risk: ManchesterTriage) => {
 
     instructionsItem: {
       fontSize: moderateScale(13),
-      color: "#707787",
       lineHeight: moderateScale(18),
     },
 
@@ -184,12 +183,12 @@ export const createStyles = (risk: ManchesterTriage) => {
       borderRadius: scale(5),
       borderWidth: 1,
       borderColor: LIGHT_BORDER,
-      backgroundColor: "#F8FAFF",
+      backgroundColor: "transparent",
     },
 
     leaveButtonText: {
       fontSize: moderateScale(14),
-      color: "#7A8AA0",
+      color: color.error.error,
       fontWeight: "500",
     },
   });

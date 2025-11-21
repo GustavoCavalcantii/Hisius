@@ -1,4 +1,6 @@
+import { color } from "@hisius/ui/theme/colors";
 import styled from "styled-components/native";
+import { GlobalText } from "../../components/globalText";
 
 export const Container = styled.View`
   padding: 32px;
@@ -6,12 +8,11 @@ export const Container = styled.View`
   flex-direction: column;
   gap: 5rem;
   height: 100%;
-  background-color: white;
+  background-color: ${color.background};
 `;
 
-export const Title = styled.Text`
+export const Title = styled(GlobalText)`
   font-size: 32px;
-  font-family: "Montserrat";
   letter-spacing: 0.5rem;
   text-align: center;
   margin: 80px 0;
@@ -31,16 +32,14 @@ export const TabButton = styled.TouchableOpacity<{ active: boolean }>`
   padding-bottom: 8px;
 `;
 
-export const TabText = styled.Text`
-  font-family: "Montserrat";
+export const TabText = styled(GlobalText)`
   font-size: 18px;
-  color: #333;
 `;
 
 export const ActiveBar = styled.View`
   width: 100%;
   height: 3px;
-  background-color: #007bff;
+  background-color: ${color.secondary};
   border-radius: 2px;
   margin-top: 4px;
 `;
@@ -53,15 +52,13 @@ export const InputContainer = styled.View`
 
 export const Button = styled.TouchableOpacity`
   width: 100%;
-  background-color: #007bff;
+  background-color: ${color.secondary};
   padding: 14px;
   border-radius: 8px;
   align-items: center;
 `;
 
-export const ButtonText = styled.Text`
-  font-family: "Montserrat";
-  color: white;
+export const ButtonText = styled(GlobalText)`
   font-size: 18px;
   font-weight: bold;
 `;

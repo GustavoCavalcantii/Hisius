@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
+    "react-native-vector-icons": "^10.3.0",
     "styled-components": "^6.1.19"
   }
 }

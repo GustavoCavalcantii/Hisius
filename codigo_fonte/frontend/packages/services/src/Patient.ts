@@ -20,8 +20,13 @@ export class Patient {
     return response.data.data;
   }
 
+  async updateProfile(patient: IPatient): Promise<boolean> {
+    const response = await api.put<ApiResponseGet>(`/patients/me`, patient);
+    return response.data != null;
+  }
+
   async leaveQueue() {
     const response = await api.delete<ApiResponseGet>(`/queue/leave`);
-    return response.data.data != null;
+    return response.data != null;
   }
 }

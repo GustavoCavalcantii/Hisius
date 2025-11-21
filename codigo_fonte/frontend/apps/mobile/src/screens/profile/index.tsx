@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import styled from "styled-components/native";
 import CustomInput from "@hisius/ui/components/CustomInput";
-import {
-  HiOutlineArrowLeft,
-  HiOutlineEnvelope,
-  HiOutlineCalendarDays,
-  HiOutlineIdentification,
-  HiOutlineUser,
-  HiOutlinePhone,
-  HiOutlineUsers,
-  HiOutlineClipboard,
-} from "react-icons/hi2";
 import CustomButton from "@hisius/ui/components/Button";
-import { Patient } from "@hisius/services/src";
+import { logout, Patient } from "@hisius/services/src";
+import { GlobalText } from "../../components/globalText";
+import { color } from "@hisius/ui/theme/colors";
+import { Feather } from "@expo/vector-icons";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { IPatient } from "packages/interfaces/src";
+import CustomPicker from "../../components/customPicker";
+import { RootStackParamList } from "apps/mobile/navigation/types";
 
 export function Profile() {
   const patientInstance = new Patient();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
@@ -27,20 +25,58 @@ export function Profile() {
   const [phone, setPhone] = useState("");
   const [motherName, setMotherName] = useState("");
 
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
+  const handleLogout = async () => {
+    await logout();
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Login" }],
+    });
+  };
+
+  const handleSave = async () => {
+    const updatedPatient: IPatient = {
+      name,
+      cpf,
+      gender: gender as "MASCULINO" | "FEMININO",
+      birthDate,
+      cnsNumber,
+      email,
+      phone,
+      motherName,
+    };
+
+    try {
+      const success = await patientInstance.updateProfile(updatedPatient);
+      if (success) {
+        alert("Perfil atualizado com sucesso!");
+      } else {
+        alert("Erro ao atualizar perfil.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao atualizar perfil.");
+    }
+  };
+
   useEffect(() => {
     patientInstance
       .getProfile()
       .then((data) => {
         if (!data) return;
 
-        setName(data.name);
-        setCpf(data.cpf);
-        setGender(data.gender);
-        setBirthDate(data.birthDate);
-        setCnsNumber(data.cnsNumber);
-        setEmail(data.email);
-        setPhone(data.phone);
-        setMotherName(data.motherName);
+        setName(data.name ?? "");
+        setCpf(data.cpf ?? "");
+        setGender(data.gender ?? "");
+        setBirthDate(data.birthDate ?? "");
+        setCnsNumber(data.cnsNumber ?? "");
+        setEmail(data.email ?? "");
+        setPhone(data.phone ?? "");
+        setMotherName(data.motherName ?? "");
       })
       .catch(console.error);
   }, []);
@@ -48,8 +84,8 @@ export function Profile() {
   return (
     <Container>
       <Header>
-        <BackButton>
-          <HiOutlineArrowLeft />
+        <BackButton onPress={handleBack}>
+          <Feather name="arrow-left" size={24} color={color.text} />
         </BackButton>
 
         <TitleBox>
@@ -58,80 +94,72 @@ export function Profile() {
         </TitleBox>
       </Header>
 
-      {/* NOME */}
-
       <CustomInput
         placeholder="Nome completo"
-        value={name}
+        value={name ?? ""}
         onChangeText={setName}
-        icon={<HiOutlineUser />}
+        icon={<Feather name="user" size={15} color={color.text} />}
       />
-
-      {/* EMAIL */}
 
       <CustomInput
         placeholder="Email"
-        value={email}
+        value={email ?? ""}
         onChangeText={setEmail}
-        icon={<HiOutlineEnvelope />}
+        icon={<Feather name="mail" size={15} color={color.text} />}
       />
-
-      {/* DATA DE NASCIMENTO */}
 
       <CustomInput
         placeholder="Data de Nascimento"
-        value={birthDate}
+        value={birthDate ?? ""}
         onChangeText={setBirthDate}
-        icon={<HiOutlineCalendarDays />}
+        icon={<Feather name="calendar" size={15} color={color.text} />}
       />
-
-      {/* CPF */}
 
       <CustomInput
         placeholder="CPF"
-        value={cpf}
+        value={cpf ?? ""}
         onChangeText={setCpf}
-        icon={<HiOutlineIdentification />}
+        icon={<Feather name="credit-card" size={15} color={color.text} />}
       />
 
-      {/* GÊNERO */}
-
-      <CustomInput
-        placeholder="Sexo"
+      <CustomPicker
         value={gender}
-        onChangeText={(t) => setGender(t as any)}
-        icon={<HiOutlineUser />}
+        onValueChange={(v) => setGender(v as "" | "MASCULINO" | "FEMININO")}
+        options={[
+          { label: "Masculino", value: "MASCULINO" },
+          { label: "Feminino", value: "FEMININO" },
+        ]}
+        placeholder="Sexo"
+        icon={<Feather name="user" size={15} color={color.text} />}
       />
-
-      {/* TELEFONE */}
 
       <CustomInput
         placeholder="Telefone"
-        value={phone}
+        value={phone ?? ""}
         onChangeText={setPhone}
-        icon={<HiOutlinePhone />}
+        icon={<Feather name="phone" size={15} color={color.text} />}
       />
-
-      {/* NOME DA MÃE */}
 
       <CustomInput
         placeholder="Nome da Mãe"
-        value={motherName}
+        value={motherName ?? ""}
         onChangeText={setMotherName}
-        icon={<HiOutlineUsers />}
+        icon={<Feather name="users" size={15} color={color.text} />}
       />
-
-      {/* CNS */}
 
       <CustomInput
         placeholder="CNS"
-        value={cnsNumber}
+        value={cnsNumber ?? ""}
         onChangeText={setCnsNumber}
-        icon={<HiOutlineClipboard />}
+        icon={<Feather name="clipboard" size={15} color={color.text} />}
       />
 
+      <TouchableOpacity onPress={handleLogout}>
+        <LogoutText>Sair da conta</LogoutText>
+      </TouchableOpacity>
+
       <ButtonContainer>
-        <CustomButton title="Salvar" onPress={() => {}} />
+        <CustomButton title="Salvar" onPress={handleSave} />
       </ButtonContainer>
     </Container>
   );
@@ -141,9 +169,16 @@ const ButtonContainer = styled(View)`
   margin-top: 70px;
 `;
 
+const LogoutText = styled(GlobalText)`
+  color: ${color.error.error};
+  font-size: 16px;
+  margin-top: 20px;
+  text-align: center;
+`;
+
 const Container = styled(ScrollView)`
   flex: 1;
-  background-color: #f3f3f3;
+  background-color: ${color.background};
   padding: 24px;
 `;
 
@@ -161,16 +196,21 @@ const TitleBox = styled(View)`
   margin-top: 10px;
 `;
 
-const Title = styled(Text)`
-  font-family: "Montserrat";
+const Title = styled(GlobalText)`
   font-size: 22px;
   font-weight: 700;
-  color: #000;
 `;
 
-const Subtitle = styled(Text)`
-  font-family: "Montserrat";
+const Subtitle = styled(GlobalText)`
   font-size: 22px;
   font-weight: 300;
-  color: #000;
+`;
+
+const PickerContainer = styled(View)`
+  border-width: 1px;
+  border-color: ${color.gray};
+  border-radius: 6px;
+  margin-bottom: 15px;
+  padding: 5px;
+  background-color: ${color.card};
 `;

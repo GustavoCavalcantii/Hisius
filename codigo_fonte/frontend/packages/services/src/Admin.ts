@@ -2,11 +2,7 @@ import api from "./config/axios";
 import type {
   ApiError,
   UserResponse,
-  IEmployee,
-  IPatient,
-  Pagination,
   ReportInfo,
-  User,
 } from "@hisius/interfaces";
 
 interface ApiResponse {

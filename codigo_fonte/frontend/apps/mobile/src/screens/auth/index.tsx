@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 import * as S from "./style";
 
-import { Auth } from "@hisius/services";
+import { Auth, getToken, saveToken } from "@hisius/services";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
-import {
-  HiOutlineEnvelope,
-  HiOutlineLockClosed,
-  HiOutlineUser,
-} from "react-icons/hi2";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "apps/mobile/navigation/types";
+import { Feather } from "@expo/vector-icons";
+import { color } from "@hisius/ui/theme/colors";
 
 export default function LoginRegister() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const [mode, setMode] = useState<"login" | "register">("login");
 
   const [email, setEmail] = useState("");
@@ -22,28 +23,48 @@ export default function LoginRegister() {
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await getToken();
+      if (token) {
+        navigation.navigate("Home");
+      }
+    };
+    checkToken();
+  }, []);
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
       if (mode === "login") {
         const data = await AuthService.Login({ email, password });
-        console.log("Token recebido:", data.accessToken);
-      } else {
-        if (password !== confirmPassword) {
-          Alert.alert("Erro", "As senhas não coincidem");
-          return;
-        }
+        saveToken(data.accessToken);
 
-        const data = await AuthService.register({
-          name,
-          email,
-          password,
-          confirmPassword,
-        });
-
-        console.log("Usuário registrado:", data);
+        navigation.navigate("Home");
+        return;
       }
+
+      if (password !== confirmPassword) {
+        Alert.alert("Erro", "As senhas não coincidem");
+        return;
+      }
+
+      const registerData = await AuthService.register({
+        name,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      console.log("Usuário registrado:", registerData);
+
+      const loginData = await AuthService.Login({ email, password });
+      saveToken(loginData.accessToken);
+
+      navigation.navigate("Home");
+
+      console.log("Usuário logado automaticamente:", loginData);
     } catch (error) {
       Alert.alert("Erro", "Falha ao processar a ação.");
     } finally {
@@ -80,7 +101,7 @@ export default function LoginRegister() {
             <CustomInput
               placeholder="Nome"
               value={name}
-              icon={<HiOutlineUser />}
+              icon={<Feather name="user" size={15} color={color.text} />}
               onChangeText={setName}
             />
           )}
@@ -89,14 +110,14 @@ export default function LoginRegister() {
             placeholder="E-mail"
             value={email}
             onChangeText={setEmail}
-            icon={<HiOutlineEnvelope />}
+            icon={<Feather name="mail" size={15} color={color.text} />}
             keyboardType="email-address"
           />
 
           <CustomInput
             placeholder="Senha"
             value={password}
-            icon={<HiOutlineLockClosed />}
+            icon={<Feather name="lock" size={15} color={color.text} />}
             onChangeText={setPassword}
             secureTextEntry
           />
@@ -105,7 +126,7 @@ export default function LoginRegister() {
             <CustomInput
               placeholder="Confirmar senha"
               value={confirmPassword}
-              icon={<HiOutlineLockClosed />}
+              icon={<Feather name="lock" size={15} color={color.text} />}
               onChangeText={setConfirmPassword}
               secureTextEntry
             />
@@ -115,6 +136,7 @@ export default function LoginRegister() {
         <CustomButton
           title={mode === "login" ? "Entrar" : "Registrar"}
           onPress={handleSubmit}
+          disabled={loading}
         />
       </View>
     </S.Container>

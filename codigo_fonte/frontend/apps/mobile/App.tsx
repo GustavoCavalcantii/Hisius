@@ -31,7 +31,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         id={undefined}
-        initialRouteName="Home"
+        initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Home" component={Home} />

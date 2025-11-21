@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { createStyles } from "./style";
 import { GlobalText as Text } from "../../components/globalText";
 import { Patient } from "@hisius/services";
 import { IQueuedInfo } from "@hisius/interfaces/src";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "apps/mobile/navigation/types";
+import Header from "../../components/header";
 
 export function QueueScreen() {
   const [patient, setPatient] = useState<IQueuedInfo | null>(null);
   const patientInstance = new Patient();
   const [estimatedWaitingTimeInMinutes, setEstimatedWaitingTimeInMinutes] =
     useState<number>(0);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const handleLeaveQueue = () => {
-    patientInstance.leaveQueue();
+  const handleProfile = () => {
+    navigation.navigate("Profile");
+  };
+
+  const handleLeaveQueue = async () => {
+    await patientInstance.leaveQueue();
+    navigation.navigate("Home");
   };
 
   useEffect(() => {
@@ -53,7 +62,8 @@ export function QueueScreen() {
   const riskLabel = patient.classification ?? "Não classificado";
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
+      <Header softwareName="Hisius" onProfilePress={handleProfile} />
       {/* Card principal */}
       <View style={styles.card}>
         <View style={styles.cardContent}>
@@ -63,7 +73,7 @@ export function QueueScreen() {
               <Text style={styles.titleText}>
                 Fila para{" "}
                 <Text style={styles.titleHighlight}>
-                  {patient.queueType ?? "triagem"}
+                  {patient.classification ? "atendimento" : "triagem"}
                 </Text>
               </Text>
             </View>
@@ -117,6 +127,6 @@ export function QueueScreen() {
           <Text style={styles.leaveButtonText}>Sair da fila</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 }

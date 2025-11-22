@@ -60,6 +60,11 @@ export class ManagerService {
     return manager.hospitalCode;
   }
 
+  async checkIfCodeExists(hospitalCode: string): Promise<boolean> {
+    const existing = await this.managerRepo.findByHospitalCode(hospitalCode);
+    return !!existing;
+  }
+
   async getAdminsPaginated(queryParams: IUserQueryParams) {
     return await this.userService.getUsersPaginated({
       ...queryParams,

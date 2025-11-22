@@ -22,6 +22,7 @@ import { AttendanceService } from "./AttendanceService";
 import { ICreateAttendanceInput } from "../interfaces/attendance/ICreateAttendanceInput";
 import { AttendanceStatus } from "../enums/Attendance/AttendanceStatus";
 import { Destination } from "../enums/Attendance/Destination";
+import { ManagerService } from "../service/ManagerService";
 
 export class QueueService {
   private patientService = new PatientService();
@@ -29,6 +30,7 @@ export class QueueService {
   private queueRepo = new QueueRepository();
   private reportService = new ReportService();
   private attendanceService = new AttendanceService();
+  private managerService = new ManagerService();
 
   private async getPatientWithUser(
     patientId: number
@@ -80,8 +82,16 @@ export class QueueService {
   async enqueuePatient(
     userId: number,
     type: QueueType,
+    hospitalCode?: string,
     classification?: ManchesterClassification
   ) {
+    if (type == QueueType.TRIAGE) {
+      const success = hospitalCode
+        ? await this.managerService.checkIfCodeExists(hospitalCode)
+        : false;
+      if (!success) throw new BadRequestError("Código não encontrado");
+    }
+
     const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 

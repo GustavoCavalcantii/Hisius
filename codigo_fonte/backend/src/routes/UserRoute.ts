@@ -18,6 +18,8 @@ router.post(
   UserController.register
 );
 
+router.get("/me", AuthMiddleware, UserController.getUser);
+
 router.put(
   "/:userId",
   AuthMiddleware,

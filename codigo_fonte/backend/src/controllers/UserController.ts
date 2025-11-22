@@ -13,7 +13,7 @@ export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = plainToInstance(UserDTO, req.body);
-      const {role, ...rest} = dto;
+      const { role, ...rest } = dto;
       const user = await userService.createUser(rest);
 
       return res
@@ -33,6 +33,18 @@ export class UserController {
       res
         .status(200)
         .json(SuccessResponse(null, "Nível de acesso atualizado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const user = await userService.getById(loggedInUser.id);
+      res.status(200).json(SuccessResponse(user, "Usuário encontrado", 200));
     } catch (err) {
       next(err);
     }

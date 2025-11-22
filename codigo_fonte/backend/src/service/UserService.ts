@@ -116,6 +116,13 @@ export class UserService {
     return newUser.sanitize();
   }
 
+  async getById(userId: number) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new BadRequestError("Usuário não encontrado.");
+
+    return user.sanitize();
+  }
+
   async getUserByEmail(email: string) {
     const user = await this.userRepo.findByEmail(email);
     if (!user) throw new BadRequestError("Usuário não encontrado.");

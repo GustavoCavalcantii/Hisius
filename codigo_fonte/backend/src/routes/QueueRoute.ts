@@ -8,10 +8,16 @@ import JsonRequiredMiddleware from "../middlewares/JsonRequired";
 import { ValidateRoles } from "../middlewares/ValidateRoles";
 import { UserRole } from "../enums/User/UserRole";
 import { LoggerMiddleware } from "../middlewares/LoggerMiddleware";
+import { EnterQueueDto } from "../dtos/queue/EnterQueueDto";
 
 const router = Router();
 
-router.post("/join", AuthMiddleware, QueueController.queueJoin);
+router.post(
+  "/join",
+  AuthMiddleware,
+  ValidateRequest(EnterQueueDto),
+  QueueController.queueJoin
+);
 
 router.delete("/leave", AuthMiddleware, QueueController.queueLeave);
 

@@ -6,15 +6,20 @@ import { Patient, Queue } from "@hisius/services/src";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "apps/mobile/navigation/types";
 import Header from "../../components/header";
+import CadastroPopup from "../../popups/checkinData";
 
 export default function Home() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputsRef = useRef(
     Array.from({ length: code.length }, () => React.createRef<TextInput>())
   );
+
+  const [showCadastroPopup, setShowCadastroPopup] = useState(false);
+
   const queueInstance = new Queue();
   const patientInstance = new Patient();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   const handleProfile = () => {
     navigation.navigate("Profile");
   };
@@ -51,7 +56,26 @@ export default function Home() {
       if (success) {
         navigation.navigate("Queue");
       }
-    } catch (err) {}
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+
+      if (message === "Perfil de paciente não encontrado para este usuário.") {
+        setShowCadastroPopup(true);
+        return;
+      }
+    }
+  };
+
+  const handleCadastroSubmit = async (data: any) => {
+    try {
+      await patientInstance.updateProfile(data);
+
+      setShowCadastroPopup(false);
+
+      handleJoin();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -76,23 +100,15 @@ export default function Home() {
         ))}
       </S.CodeContainer>
 
-      {/*  
-      <S.SeparatorContainer>
-        <S.Line />
-        <S.OrText>ou</S.OrText>
-        <S.Line />
-      </S.SeparatorContainer>
-
-    
-      <S.QrButton>
-        <Ionicons name="qr-code-outline" size={18} color="#0E1D47" />
-        <S.QrText>Escanear QR Code</S.QrText>
-      </S.QrButton>
-      */}
-
       <S.ButtonContainer>
         <CustomButton title="Entrar" onPress={handleJoin} />
       </S.ButtonContainer>
+
+      <CadastroPopup
+        visible={showCadastroPopup}
+        onSubmit={handleCadastroSubmit}
+        color={{ text: "#000" }}
+      />
     </S.Container>
   );
 }

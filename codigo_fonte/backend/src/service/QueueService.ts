@@ -292,13 +292,10 @@ export class QueueService {
       (position * averageSeconds * 1000) / 60000
     );
 
-    const patientInfo: {
-      id: number;
-      classification: ManchesterClassification | null;
-      estimatedWaitMinutes: number;
-    } = {
+    const patientInfo = {
       id: patient.id,
       classification: parseClassification(meta.classification) ?? null,
+      roomCalled: meta.room ?? null,
       estimatedWaitMinutes: estimatedWaitMinutes,
     };
 
@@ -327,6 +324,7 @@ export class QueueService {
     await this.enqueuePatient(
       patient.userId,
       QueueType.TREATMENT,
+      "",
       classification
     );
   }
@@ -344,6 +342,7 @@ export class QueueService {
     const position = await this.queueRepo.getPatientPosition(type, patientId);
     await this.queueRepo.setPatientStatus(patientId, QueueStatus.IN_PROGRESS);
     await this.queueRepo.removePatientFromQueue(type, patientId);
+    await this.queueRepo.setPatientMeta(patientId, { room });
 
     const { patient, user } = await this.getPatientWithUser(patientId);
     await this.queueRepo.registerPatientCalled(type, patientId);

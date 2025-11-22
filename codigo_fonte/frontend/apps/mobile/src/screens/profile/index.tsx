@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, ScrollView } from "react-native";
-import styled from "styled-components/native";
+import { TouchableOpacity } from "react-native";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { logout, Patient } from "@hisius/services/src";
-import { GlobalText } from "../../components/globalText";
 import { color } from "@hisius/ui/theme/colors";
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { IPatient } from "packages/interfaces/src";
 import CustomPicker from "../../components/customPicker";
 import { RootStackParamList } from "apps/mobile/navigation/types";
+import * as S from "./style";
 
 export function Profile() {
   const patientInstance = new Patient();
@@ -82,17 +81,17 @@ export function Profile() {
   }, []);
 
   return (
-    <Container>
-      <Header>
-        <BackButton onPress={handleBack}>
+    <S.Container>
+      <S.Header>
+        <S.BackButton onPress={handleBack}>
           <Feather name="arrow-left" size={24} color={color.text} />
-        </BackButton>
+        </S.BackButton>
 
-        <TitleBox>
-          <Subtitle>EDITE</Subtitle>
-          <Title>SEUS DADOS</Title>
-        </TitleBox>
-      </Header>
+        <S.TitleBox>
+          <S.Subtitle>EDITE</S.Subtitle>
+          <S.Title>SEUS DADOS</S.Title>
+        </S.TitleBox>
+      </S.Header>
 
       <CustomInput
         placeholder="Nome completo"
@@ -155,62 +154,12 @@ export function Profile() {
       />
 
       <TouchableOpacity onPress={handleLogout}>
-        <LogoutText>Sair da conta</LogoutText>
+        <S.LogoutText>Sair da conta</S.LogoutText>
       </TouchableOpacity>
 
-      <ButtonContainer>
+      <S.ButtonContainer>
         <CustomButton title="Salvar" onPress={handleSave} />
-      </ButtonContainer>
-    </Container>
+      </S.ButtonContainer>
+    </S.Container>
   );
 }
-
-const ButtonContainer = styled(View)`
-  margin-top: 70px;
-`;
-
-const LogoutText = styled(GlobalText)`
-  color: ${color.error.error};
-  font-size: 16px;
-  margin-top: 20px;
-  text-align: center;
-`;
-
-const Container = styled(ScrollView)`
-  flex: 1;
-  background-color: ${color.background};
-  padding: 24px;
-`;
-
-const Header = styled(View)`
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 40px;
-`;
-
-const BackButton = styled(TouchableOpacity)`
-  margin-right: 12px;
-`;
-
-const TitleBox = styled(View)`
-  margin-top: 10px;
-`;
-
-const Title = styled(GlobalText)`
-  font-size: 22px;
-  font-weight: 700;
-`;
-
-const Subtitle = styled(GlobalText)`
-  font-size: 22px;
-  font-weight: 300;
-`;
-
-const PickerContainer = styled(View)`
-  border-width: 1px;
-  border-color: ${color.gray};
-  border-radius: 6px;
-  margin-bottom: 15px;
-  padding: 5px;
-  background-color: ${color.card};
-`;

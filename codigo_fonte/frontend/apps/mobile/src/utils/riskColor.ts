@@ -3,7 +3,7 @@ import { ManchesterTriage } from "@hisius/enums";
 
 export const getRiskColor = (risk: ManchesterTriage | null) => {
   if (risk === null) {
-    return color.triage.emergency;
+    return color.triage.nonUrgent;
   }
 
   switch (risk) {
@@ -23,6 +23,6 @@ export const getRiskColor = (risk: ManchesterTriage | null) => {
       return color.triage.nonUrgent;
 
     default:
-      return color.triage.emergency;
+      return color.triage.nonUrgent;
   }
 };

@@ -1,98 +1,95 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
+import { Alert, TextInput } from "react-native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import * as S from "./style";
 import CustomButton from "@hisius/ui/components/Button";
 import { Patient, Queue } from "@hisius/services/src";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "apps/mobile/navigation/types";
 import Header from "../../components/header";
+import { RootStackParamList } from "apps/mobile/navigation/types";
 
-export default function Home() {
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+const CODE_LENGTH = 6;
+
+export default function HomeScreen() {
+  const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
+  const [loading, setLoading] = useState(false);
   const inputsRef = useRef(
-    Array.from({ length: code.length }, () => React.createRef<TextInput>())
+    Array(CODE_LENGTH)
+      .fill(0)
+      .map(() => React.createRef<TextInput>())
   );
-  const queueInstance = new Queue();
-  const patientInstance = new Patient();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const handleProfile = () => {
-    navigation.navigate("Profile");
-  };
+  const queue = new Queue();
+  const patient = new Patient();
 
   useEffect(() => {
-    const checkInfo = async () => {
-      try {
-        const info = await patientInstance.getQueueInfo();
-        if (info) {
-          navigation.navigate("Queue");
-        }
-      } catch (err) {}
-    };
-    checkInfo();
+    patient.getQueueInfo().then((info) => {
+      if (info) navigation.navigate("Queue");
+    });
   }, []);
 
-  const handleChange = (text: string, index: number) => {
+  const handleCodeChange = (text: string, index: number) => {
+    const num = text.replace(/[^0-9]/g, "");
     const newCode = [...code];
-    newCode[index] = text;
+    newCode[index] = num;
     setCode(newCode);
 
-    if (text && index < code.length - 1) {
+    if (num && index < CODE_LENGTH - 1)
       inputsRef.current[index + 1].current?.focus();
-    }
-    if (!text && index > 0) {
-      inputsRef.current[index - 1].current?.focus();
-    }
+    if (!num && index > 0) inputsRef.current[index - 1].current?.focus();
   };
 
   const handleJoin = async () => {
-    try {
-      let success = await queueInstance.joinQueue();
+    if (code.some((d) => !d)) {
+      Alert.alert("Código Incompleto", "Preencha todos os 6 dígitos.");
+      return;
+    }
 
-      if (success) {
-        navigation.navigate("Queue");
-      }
-    } catch (err) {}
+    setLoading(true);
+    try {
+      const success = await queue.joinQueue(code.join(""));
+      if (success) navigation.navigate("Queue");
+    } catch {
+      Alert.alert("Erro", "Não foi possível entrar na fila.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <S.Container>
-      <Header softwareName="Hisius" onProfilePress={handleProfile} />
-      <View>
-        <S.Title>ESTÁ NO HOSPITAL?</S.Title>
-        <S.Subtitle>Coloque o código</S.Subtitle>
-      </View>
+      <Header
+        softwareName="Hisius"
+        onProfilePress={() => navigation.navigate("Profile")}
+      />
 
-      <S.CodeContainer>
-        {code.map((value, index) => (
-          <S.CodeInput
-            key={index}
-            ref={inputsRef.current[index]}
-            placeholder="0"
-            keyboardType="numeric"
-            maxLength={1}
-            value={value}
-            onChangeText={(text) => handleChange(text, index)}
+      <S.ContentContainer>
+        <S.HeaderContainer>
+          <S.Title>ESTÁ NO HOSPITAL?</S.Title>
+          <S.Subtitle>Digite o código de acesso</S.Subtitle>
+        </S.HeaderContainer>
+
+        <S.CodeContainer>
+          {code.map((value, i) => (
+            <S.CodeInput
+              key={i}
+              ref={inputsRef.current[i]}
+              placeholder="0"
+              keyboardType="number-pad"
+              maxLength={1}
+              value={value}
+              onChangeText={(t) => handleCodeChange(t, i)}
+            />
+          ))}
+        </S.CodeContainer>
+
+        <S.ButtonContainer>
+          <CustomButton
+            title={loading ? "Entrando..." : "Entrar na Fila"}
+            onPress={handleJoin}
+            disabled={loading || code.some((d) => !d)}
           />
-        ))}
-      </S.CodeContainer>
-
-      {/*  
-      <S.SeparatorContainer>
-        <S.Line />
-        <S.OrText>ou</S.OrText>
-        <S.Line />
-      </S.SeparatorContainer>
-
-    
-      <S.QrButton>
-        <Ionicons name="qr-code-outline" size={18} color="#0E1D47" />
-        <S.QrText>Escanear QR Code</S.QrText>
-      </S.QrButton>
-      */}
-
-      <S.ButtonContainer>
-        <CustomButton title="Entrar" onPress={handleJoin} />
-      </S.ButtonContainer>
+        </S.ButtonContainer>
+      </S.ContentContainer>
     </S.Container>
   );
 }

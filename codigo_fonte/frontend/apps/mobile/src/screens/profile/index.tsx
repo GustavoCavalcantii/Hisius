@@ -18,12 +18,14 @@ export function Profile() {
 
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
-  const [gender, setGender] = useState<"MASCULINO" | "FEMININO" | "">("");
+  const [gender, setGender] = useState<"" | "MASCULINO" | "FEMININO">("");
   const [birthDate, setBirthDate] = useState("");
   const [cnsNumber, setCnsNumber] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [motherName, setMotherName] = useState("");
+
+  const [initialData, setInitialData] = useState<Partial<IPatient>>({});
 
   const handleBack = () => {
     navigation.goBack();
@@ -31,11 +33,18 @@ export function Profile() {
 
   const handleLogout = async () => {
     await logout();
-
     navigation.reset({
       index: 0,
       routes: [{ name: "Login" }],
     });
+  };
+
+  const handleChangePassword = () => {
+    //navigation.navigate("ChangePassword");
+  };
+
+  const handleChangeEmail = () => {
+    //navigation.navigate("ChangeEmail");
   };
 
   const handleSave = async () => {
@@ -54,6 +63,7 @@ export function Profile() {
       const success = await patientInstance.updateProfile(updatedPatient);
       if (success) {
         alert("Perfil atualizado com sucesso!");
+        setInitialData(updatedPatient);
       } else {
         alert("Erro ao atualizar perfil.");
       }
@@ -63,20 +73,56 @@ export function Profile() {
     }
   };
 
+  const hasValidChanges = () => {
+    const currentData = {
+      name,
+      cpf,
+      gender,
+      birthDate,
+      cnsNumber,
+      email,
+      phone,
+      motherName,
+    };
+
+    const hasChanges = Object.keys(currentData).some((key) => {
+      const currentValue = currentData[key as keyof typeof currentData];
+      const initialValue = initialData[key as keyof typeof initialData];
+      return currentValue !== initialValue;
+    });
+
+    const hasEmptyFields = !name || !cpf || !birthDate || !email;
+
+    return hasChanges && !hasEmptyFields;
+  };
+
   useEffect(() => {
     patientInstance
       .getProfile()
       .then((data) => {
         if (!data) return;
 
-        setName(data.name ?? "");
-        setCpf(data.cpf ?? "");
-        setGender(data.gender ?? "");
-        setBirthDate(data.birthDate ?? "");
-        setCnsNumber(data.cnsNumber ?? "");
-        setEmail(data.email ?? "");
-        setPhone(data.phone ?? "");
-        setMotherName(data.motherName ?? "");
+        const patientData = {
+          name: data.name ?? "",
+          cpf: data.cpf ?? "",
+          gender: data.gender as "MASCULINO" | "FEMININO",
+          birthDate: data.birthDate ?? "",
+          cnsNumber: data.cnsNumber ?? "",
+          email: data.email ?? "",
+          phone: data.phone ?? "",
+          motherName: data.motherName ?? "",
+        };
+
+        setName(patientData.name);
+        setCpf(patientData.cpf);
+        setGender(patientData.gender || "");
+        setBirthDate(patientData.birthDate);
+        setCnsNumber(patientData.cnsNumber);
+        setEmail(patientData.email);
+        setPhone(patientData.phone);
+        setMotherName(patientData.motherName);
+
+        setInitialData(patientData);
       })
       .catch(console.error);
   }, []);
@@ -89,92 +135,165 @@ export function Profile() {
         </BackButton>
 
         <TitleBox>
-          <Subtitle>EDITE</Subtitle>
-          <Title>SEUS DADOS</Title>
+          <Subtitle>Editar informações</Subtitle>
+          <Title>Meu Perfil</Title>
         </TitleBox>
       </Header>
 
-      <CustomInput
-        placeholder="Nome completo"
-        value={name ?? ""}
-        onChangeText={setName}
-        icon={<Feather name="user" size={15} color={color.text} />}
-      />
+      <FormContainer>
+        <Section>
+          <SectionTitle>Informações Pessoais</SectionTitle>
 
-      <CustomInput
-        placeholder="Email"
-        value={email ?? ""}
-        onChangeText={setEmail}
-        icon={<Feather name="mail" size={15} color={color.text} />}
-      />
+          <InputGroup>
+            <CustomInput
+              placeholder="Nome completo"
+              value={name}
+              onChangeText={setName}
+              icon={<Feather name="user" size={16} color={color.text} />}
+            />
+          </InputGroup>
 
-      <CustomInput
-        placeholder="Data de Nascimento"
-        value={birthDate ?? ""}
-        onChangeText={setBirthDate}
-        icon={<Feather name="calendar" size={15} color={color.text} />}
-      />
+          <InputRow>
+            <InputColumn>
+              <CustomInput
+                placeholder="Data de Nascimento"
+                value={birthDate}
+                onChangeText={setBirthDate}
+                icon={<Feather name="calendar" size={16} color={color.text} />}
+              />
+            </InputColumn>
 
-      <CustomInput
-        placeholder="CPF"
-        value={cpf ?? ""}
-        onChangeText={setCpf}
-        icon={<Feather name="credit-card" size={15} color={color.text} />}
-      />
+            <InputColumn>
+              <CustomPicker
+                value={gender}
+                onValueChange={(v) =>
+                  setGender(v as "" | "MASCULINO" | "FEMININO")
+                }
+                options={[
+                  { label: "Masculino", value: "MASCULINO" },
+                  { label: "Feminino", value: "FEMININO" },
+                ]}
+                placeholder="Sexo"
+                icon={<Feather name="user" size={16} color={color.text} />}
+              />
+            </InputColumn>
+          </InputRow>
 
-      <CustomPicker
-        value={gender}
-        onValueChange={(v) => setGender(v as "" | "MASCULINO" | "FEMININO")}
-        options={[
-          { label: "Masculino", value: "MASCULINO" },
-          { label: "Feminino", value: "FEMININO" },
-        ]}
-        placeholder="Sexo"
-        icon={<Feather name="user" size={15} color={color.text} />}
-      />
+          <InputGroup>
+            <CustomInput
+              placeholder="Nome da Mãe"
+              value={motherName}
+              onChangeText={setMotherName}
+              icon={<Feather name="users" size={16} color={color.text} />}
+            />
+          </InputGroup>
+        </Section>
 
-      <CustomInput
-        placeholder="Telefone"
-        value={phone ?? ""}
-        onChangeText={setPhone}
-        icon={<Feather name="phone" size={15} color={color.text} />}
-      />
+        <Section>
+          <SectionTitle>Documentos</SectionTitle>
 
-      <CustomInput
-        placeholder="Nome da Mãe"
-        value={motherName ?? ""}
-        onChangeText={setMotherName}
-        icon={<Feather name="users" size={15} color={color.text} />}
-      />
+          <InputRow>
+            <InputColumn>
+              <CustomInput
+                placeholder="CPF"
+                value={cpf}
+                onChangeText={setCpf}
+                icon={
+                  <Feather name="credit-card" size={16} color={color.text} />
+                }
+              />
+            </InputColumn>
 
-      <CustomInput
-        placeholder="CNS"
-        value={cnsNumber ?? ""}
-        onChangeText={setCnsNumber}
-        icon={<Feather name="clipboard" size={15} color={color.text} />}
-      />
+            <InputColumn>
+              <CustomInput
+                placeholder="CNS"
+                value={cnsNumber}
+                onChangeText={setCnsNumber}
+                icon={<Feather name="clipboard" size={16} color={color.text} />}
+              />
+            </InputColumn>
+          </InputRow>
+        </Section>
 
-      <TouchableOpacity onPress={handleLogout}>
-        <LogoutText>Sair da conta</LogoutText>
-      </TouchableOpacity>
+        <Section>
+          <SectionTitle>Contato</SectionTitle>
 
-      <ButtonContainer>
-        <CustomButton title="Salvar" onPress={handleSave} />
-      </ButtonContainer>
+          <InputGroup>
+            <CustomInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              disabled
+              icon={<Feather name="mail" size={16} color={color.text} />}
+            />
+          </InputGroup>
+
+          <InputGroup>
+            <CustomInput
+              placeholder="Telefone"
+              value={phone}
+              onChangeText={setPhone}
+              icon={<Feather name="phone" size={16} color={color.text} />}
+            />
+          </InputGroup>
+        </Section>
+
+        <Section>
+          <SectionTitle>Segurança</SectionTitle>
+
+          <SecurityActions>
+            <SecurityItem onPress={handleChangeEmail}>
+              <SecurityIcon>
+                <Feather name="mail" size={20} color={color.primary} />
+              </SecurityIcon>
+              <SecurityTextContainer>
+                <SecurityTitle>Alterar Email</SecurityTitle>
+                <SecurityDescription>
+                  Modifique seu endereço de email
+                </SecurityDescription>
+              </SecurityTextContainer>
+              <Feather name="chevron-right" size={20} color={color.text} />
+            </SecurityItem>
+
+            <SecurityItem onPress={handleChangePassword}>
+              <SecurityIcon>
+                <Feather name="lock" size={20} color={color.primary} />
+              </SecurityIcon>
+              <SecurityTextContainer>
+                <SecurityTitle>Alterar Senha</SecurityTitle>
+                <SecurityDescription>
+                  Atualize sua senha de acesso
+                </SecurityDescription>
+              </SecurityTextContainer>
+              <Feather name="chevron-right" size={20} color={color.text} />
+            </SecurityItem>
+
+            <SecurityItem onPress={handleLogout}>
+              <SecurityIcon>
+                <Feather name="log-out" size={20} color={color.error.error} />
+              </SecurityIcon>
+              <SecurityTextContainer>
+                <SecurityTitle>Logout</SecurityTitle>
+                <SecurityDescription>Saia da sua conta</SecurityDescription>
+              </SecurityTextContainer>
+              <Feather name="chevron-right" size={20} color={color.text} />
+            </SecurityItem>
+          </SecurityActions>
+        </Section>
+
+        <ActionsContainer>
+          <ButtonContainer>
+            <CustomButton
+              title="Salvar Alterações"
+              onPress={handleSave}
+              disabled={!hasValidChanges()}
+            />
+          </ButtonContainer>
+        </ActionsContainer>
+      </FormContainer>
     </Container>
   );
 }
-
-const ButtonContainer = styled(View)`
-  margin-top: 70px;
-`;
-
-const LogoutText = styled(GlobalText)`
-  color: ${color.error.error};
-  font-size: 16px;
-  margin-top: 20px;
-  text-align: center;
-`;
 
 const Container = styled(ScrollView)`
   flex: 1;
@@ -186,31 +305,120 @@ const Header = styled(View)`
   flex-direction: row;
   align-items: center;
   margin-bottom: 40px;
+  padding-top: 16px;
 `;
 
 const BackButton = styled(TouchableOpacity)`
-  margin-right: 12px;
+  margin-right: 20px;
+  padding: 8px;
+  background-color: ${color.front};
+  border-radius: 12px;
 `;
 
 const TitleBox = styled(View)`
-  margin-top: 10px;
+  flex: 1;
 `;
 
 const Title = styled(GlobalText)`
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
+  color: ${color.text};
+  letter-spacing: -0.5px;
 `;
 
 const Subtitle = styled(GlobalText)`
-  font-size: 22px;
-  font-weight: 300;
+  font-size: 16px;
+  font-weight: 400;
+  color: ${color.text};
+  margin-bottom: 4px;
 `;
 
-const PickerContainer = styled(View)`
-  border-width: 1px;
-  border-color: ${color.gray};
-  border-radius: 6px;
-  margin-bottom: 15px;
-  padding: 5px;
-  background-color: ${color.card};
+const FormContainer = styled(View)`
+  gap: 32px;
+`;
+
+const Section = styled(View)`
+  gap: 16px;
+`;
+
+const SectionTitle = styled(GlobalText)`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${color.text};
+  margin-bottom: 8px;
+  padding-left: 12px;
+  border-left-width: 3px;
+  border-left-color: ${color.primary};
+`;
+
+const InputGroup = styled(View)`
+  width: 100%;
+`;
+
+const InputRow = styled(View)`
+  flex-direction: row;
+  gap: 16px;
+`;
+
+const InputColumn = styled(View)`
+  flex: 1;
+`;
+
+const ActionsContainer = styled(View)`
+  margin-top: 40px;
+  gap: 24px;
+`;
+
+const SecurityActions = styled(View)`
+  gap: 12px;
+`;
+
+const SecurityItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: 16px;
+  background-color: ${color.front};
+  border-radius: 12px;
+  border: 1px solid ${color.gray};
+`;
+
+const SecurityIcon = styled(View)`
+  margin-right: 12px;
+`;
+
+const SecurityTextContainer = styled(View)`
+  flex: 1;
+`;
+
+const SecurityTitle = styled(GlobalText)`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${color.text};
+  margin-bottom: 2px;
+`;
+
+const SecurityDescription = styled(GlobalText)`
+  font-size: 14px;
+  color: ${color.text};
+`;
+
+const LogoutButton = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background-color: ${color.front};
+  border-radius: 16px;
+  border: 1px solid ${color.gray};
+`;
+
+const LogoutText = styled(GlobalText)`
+  color: ${color.error.error};
+  font-size: 16px;
+  font-weight: 600;
+`;
+
+const ButtonContainer = styled(View)`
+  padding-horizontal: 8px;
 `;

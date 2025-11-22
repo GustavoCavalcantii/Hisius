@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   TextInput,
   Text,
   KeyboardTypeOptions,
-  TouchableOpacity,
   StyleProp,
   TextStyle,
+  ViewStyle,
+  Platform,
 } from "react-native";
 import { styles } from "./styles";
 
 interface CustomInputProps {
   value: string;
-  style?: StyleProp<TextStyle>;
+  style?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
   onChangeText: (text: string) => void;
   placeholder?: string;
   secureTextEntry?: boolean;
@@ -21,11 +23,13 @@ interface CustomInputProps {
   error?: string;
   icon?: React.ReactNode;
   onIconPress?: () => void;
+  disabled?: boolean;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
   value,
   style,
+  inputStyle,
   onChangeText,
   placeholder,
   secureTextEntry = false,
@@ -34,27 +38,88 @@ const CustomInput: React.FC<CustomInputProps> = ({
   error = "",
   icon,
   onIconPress,
+  disabled = false,
   ...props
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+
+  const showLabel = isFocused || value !== "";
+
+  const handleWebStyling = () => {
+    if (Platform.OS === "web" && inputRef.current) {
+      const element = inputRef.current as any;
+      if (element.setNativeProps) {
+        element.setNativeProps({
+          style: {
+            border: "none",
+            outline: "none",
+            boxShadow: "none",
+          },
+        });
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View
         style={[
           styles.inputContainer,
           error ? styles.inputContainerError : null,
+          isFocused ? styles.inputContainerFocused : null,
+          disabled ? styles.inputContainerDisabled : null,
         ]}
       >
         {icon && <View style={styles.iconContainer}>{icon}</View>}
-        <TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          secureTextEntry={secureTextEntry}
-          placeholderTextColor="#999"
-          selectionColor="#000"
-          {...props}
-        />
+
+        <View style={styles.inputWrapper}>
+          {showLabel && placeholder && (
+            <Text
+              style={[
+                styles.floatingLabel,
+                disabled ? styles.floatingLabelDisabled : null,
+              ]}
+            >
+              {placeholder}
+            </Text>
+          )}
+
+          <TextInput
+            ref={inputRef}
+            style={[
+              styles.input,
+              inputStyle,
+              showLabel ? styles.inputWithLabel : null,
+              disabled ? styles.inputDisabled : null,
+              Platform.OS === "web" && {
+                borderWidth: 0,
+                outlineWidth: 0,
+              },
+            ]}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={!showLabel ? placeholder : ""}
+            secureTextEntry={secureTextEntry}
+            placeholderTextColor="#999"
+            selectionColor="#007AFF"
+            keyboardType={keyboardType}
+            autoCapitalize={autoCapitalize}
+            onFocus={() => {
+              if (!disabled) {
+                setIsFocused(true);
+                handleWebStyling();
+              }
+            }}
+            onBlur={() => setIsFocused(false)}
+            underlineColorAndroid="transparent"
+            textAlignVertical="center"
+            onLayout={handleWebStyling}
+            editable={!disabled}
+            selectTextOnFocus={!disabled}
+            {...props}
+          />
+        </View>
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}

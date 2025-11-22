@@ -36,8 +36,10 @@ export class Queue {
     return response.data.data;
   }
 
-  async joinQueue(): Promise<boolean> {
-    const response = await api.post<ApiResponseGet>(`/queue/join`);
+  async joinQueue(hospitalCode: string): Promise<boolean> {
+    const response = await api.post<ApiResponseGet>(`/queue/join`, {
+      hospitalCode,
+    });
     return response.status >= 200 && response.status < 300;
   }
 

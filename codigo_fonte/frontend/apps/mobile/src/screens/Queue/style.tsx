@@ -85,6 +85,24 @@ export const createStyles = (risk: ManchesterTriage) => {
       borderBottomWidth: 1,
       borderBottomColor: `${PRIMARY_TEXT}10`,
     },
+    refreshButton: {
+      backgroundColor: color.primary,
+      padding: 12,
+      aspectRatio: "1/1",
+      borderRadius: "50%",
+      alignItems: "center",
+    },
+    refreshButtonText: {
+      color: "white",
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    lastUpdateText: {
+      fontSize: 12,
+      color: color.text,
+      textAlign: "center",
+      marginTop: 8,
+    },
     titleText: {
       fontSize: moderateScale(18),
       fontWeight: "600",

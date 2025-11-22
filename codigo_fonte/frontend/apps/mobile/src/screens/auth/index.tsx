@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import * as S from "./style";
 
-import { Auth, getToken, saveToken } from "@hisius/services";
+import { Auth, getToken, saveToken, saveUser } from "@hisius/services";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -45,7 +45,9 @@ export default function LoginRegister() {
 
       if (mode === "login") {
         const data = await AuthService.Login({ email, password });
-        saveToken(data.accessToken);
+        const { accessToken, ...rest } = data;
+        saveToken(accessToken);
+        saveUser(rest);
 
         navigation.navigate("Home");
         return;
@@ -64,7 +66,9 @@ export default function LoginRegister() {
       });
 
       const loginData = await AuthService.Login({ email, password });
-      saveToken(loginData.accessToken);
+      const { accessToken, ...rest } = loginData;
+      saveToken(accessToken);
+      saveUser(rest);
 
       navigation.navigate("Home");
     } catch (error) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
-import { logout, Patient } from "@hisius/services/src";
+import { Auth, getUser, logout, Patient } from "@hisius/services/src";
 import { color } from "@hisius/ui/theme/colors";
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -10,9 +10,11 @@ import { IPatient } from "packages/interfaces/src";
 import CustomPicker from "../../components/customPicker";
 import { RootStackParamList } from "apps/mobile/navigation/types";
 import * as S from "./style";
+import EmailChangeModal from "../../popups/changeEmail";
 
 export function Profile() {
   const patientInstance = new Patient();
+  const AuthService = new Auth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [name, setName] = useState("");
@@ -25,6 +27,22 @@ export function Profile() {
   const [motherName, setMotherName] = useState("");
 
   const [initialData, setInitialData] = useState<Partial<IPatient>>({});
+  const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
+
+  const openEmailModal = () => setIsEmailModalVisible(true);
+  const closeEmailModal = () => setIsEmailModalVisible(false);
+
+  const handleEmailSubmit = async (newEmail: string) => {
+    try {
+      console.log(newEmail);
+      await AuthService.changeEmail(newEmail);
+
+      closeEmailModal();
+    } catch (err) {
+      console.error("Erro ao alterar email:", err);
+      alert("Erro ao enviar código de verificação. Tente novamente.");
+    }
+  };
 
   const handleBack = () => {
     navigation.goBack();
@@ -38,12 +56,15 @@ export function Profile() {
     });
   };
 
-  const handleChangePassword = () => {
-    //navigation.navigate("ChangePassword");
+  const handleChangePassword = async () => {
+    try {
+      const user = JSON.parse(await getUser());
+      await AuthService.changePass(user.email);
+    } catch (err) {}
   };
 
   const handleChangeEmail = () => {
-    //navigation.navigate("ChangeEmail");
+    openEmailModal();
   };
 
   const handleSave = async () => {
@@ -290,6 +311,13 @@ export function Profile() {
           </View>
         </S.ActionsContainer>
       </S.FormContainer>
+      {/* Modal de Alteração de Email */}
+      <EmailChangeModal
+        visible={isEmailModalVisible}
+        onClose={closeEmailModal}
+        onEmailSubmit={handleEmailSubmit}
+        currentEmail={email}
+      />
     </S.Container>
   );
 }

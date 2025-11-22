@@ -30,8 +30,17 @@ export class Auth {
     return response.data.data;
   }
 
-  async leaveQueue() {
-    const response = await api.delete<ApiResponseGet>(`/queue/leave`);
-    return response.data.data != null;
+  async changeEmail(newEmail: string) {
+    const response = await api.post<ApiResponseGet>(
+      `/auth/change-email-request`,
+      { email: newEmail }
+    );
+    return response.data;
+  }
+  async changePass(email: string) {
+    const response = await api.post<ApiResponseGet>(`/auth/forgot-password`, {
+      email,
+    });
+    return response.data;
   }
 }

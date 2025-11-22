@@ -1,68 +1,111 @@
-import styled from 'styled-components/native';
+import styled from "styled-components/native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { GlobalText } from "../../components/globalText";
-import { color } from 'packages/ui/theme/colors';
+import { color } from "@hisius/ui/theme/colors";
 
-export const Container = styled.ScrollView`
+export const Container = styled(ScrollView)`
   flex: 1;
-  background-color: #f3f3f3;
+  background-color: ${color.background};
   padding: 24px;
 `;
 
-export const Header = styled.View`
+export const Header = styled(View)`
   flex-direction: row;
   align-items: center;
   margin-bottom: 40px;
+  padding-top: 16px;
 `;
 
-export const BackButton = styled.TouchableOpacity`
+export const BackButton = styled(TouchableOpacity)`
+  margin-right: 20px;
+  padding: 8px;
+  background-color: ${color.front};
+  border-radius: 12px;
+`;
+
+export const TitleBox = styled(View)`
+  flex: 1;
+`;
+
+export const Title = styled(GlobalText)`
+  font-size: 28px;
+  font-weight: 700;
+  color: ${color.text};
+  letter-spacing: -0.5px;
+`;
+
+export const Subtitle = styled(GlobalText)`
+  font-size: 16px;
+  font-weight: 400;
+  color: ${color.text};
+  margin-bottom: 4px;
+`;
+
+export const FormContainer = styled(View)`
+  gap: 32px;
+`;
+
+export const Section = styled(View)`
+  gap: 16px;
+`;
+
+export const SectionTitle = styled(GlobalText)`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${color.text};
+  margin-bottom: 8px;
+  padding-left: 12px;
+  border-left-width: 3px;
+  border-left-color: ${color.primary};
+`;
+
+export const InputGroup = styled(View)`
+  width: 100%;
+`;
+
+export const InputRow = styled(View)`
+  flex-direction: row;
+  gap: 16px;
+`;
+
+export const InputColumn = styled(View)`
+  flex: 1;
+`;
+
+export const ActionsContainer = styled(View)`
+  margin-top: 40px;
+  gap: 24px;
+`;
+
+export const SecurityActions = styled(View)`
+  gap: 12px;
+`;
+
+export const SecurityItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: 16px;
+  background-color: ${color.front};
+  border-radius: 12px;
+  border: 1px solid ${color.gray};
+`;
+
+export const SecurityIcon = styled(View)`
   margin-right: 12px;
 `;
 
-export const TitleBox = styled.View`
-  margin-top: 10px;
+export const SecurityTextContainer = styled(View)`
+  flex: 1;
 `;
 
-export const Title = styled.Text`
-  font-size: 22px;
-  font-weight: 700;
-  color: #000;
-`;
-
-export const Subtitle = styled.Text`
-  font-size: 22px;
-  font-weight: 300;
-  color: #000;
-`;
-
-export const InputWrapper = styled.View`
-  width: 100%;
-  margin-top: 16px;
-`;
-
-export const SaveButton = styled.TouchableOpacity`
-  width: 60%;
-  height: 46px;
-  background-color: #2f4a8a;
-  align-self: center;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px;
-  margin-top: 40px;
-`;
-
-export const SaveText = styled.Text`
-  color: white;
+export const SecurityTitle = styled(GlobalText)`
   font-size: 16px;
   font-weight: 600;
+  color: ${color.text};
+  margin-bottom: 2px;
 `;
 
-export const ButtonContainer = styled.View`
-  margin-top: 70px;
-`;
-
-export const LogoutText = styled(GlobalText)`
-  color: ${color.error.error};
-  font-size: 16px;
-  margin-top: 20px;
-  text-align: center;
+export const SecurityDescription = styled(GlobalText)`
+  font-size: 14px;
+  color: ${color.text};
 `;

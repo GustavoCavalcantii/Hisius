@@ -21,6 +21,7 @@ export interface IQueuedInfo {
   id: number;
   classification: ManchesterTriage;
   estimatedWaitMinutes: number;
+  roomCalled: string,
   queueType: string;
 }
 

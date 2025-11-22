@@ -1,17 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
+import { Alert, TextInput } from "react-native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import * as S from "./style";
 import CustomButton from "@hisius/ui/components/Button";
 import { Patient, Queue } from "@hisius/services/src";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import Header from "../../components/header";
 import { RootStackParamList } from "apps/mobile/navigation/types";
 import Header from "../../components/header";
 import CadastroPopup from "../../popups/checkinData";
 
-export default function Home() {
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+export default function HomeScreen() {
+  const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
+  const [loading, setLoading] = useState(false);
   const inputsRef = useRef(
-    Array.from({ length: code.length }, () => React.createRef<TextInput>())
+    Array(CODE_LENGTH)
+      .fill(0)
+      .map(() => React.createRef<TextInput>())
   );
 
   const [showCadastroPopup, setShowCadastroPopup] = useState(false);
@@ -25,31 +29,47 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const checkInfo = async () => {
-      try {
-        const info = await patientInstance.getQueueInfo();
-        if (info) {
-          navigation.navigate("Queue");
-        }
-      } catch (err) {}
-    };
-    checkInfo();
+    patient.getQueueInfo().then((info) => {
+      if (info) navigation.navigate("Queue");
+    });
   }, []);
 
-  const handleChange = (text: string, index: number) => {
+  const handleCodeChange = (text: string, index: number) => {
+    const num = text.replace(/[^0-9]/g, "");
     const newCode = [...code];
-    newCode[index] = text;
+
+    if (num.length > 1) {
+      const digits = num.split("").slice(0, CODE_LENGTH);
+      const filledCode = [
+        ...digits,
+        ...Array(CODE_LENGTH - digits.length).fill(""),
+      ];
+      setCode(filledCode);
+      inputsRef.current[
+        Math.min(digits.length, CODE_LENGTH - 1)
+      ].current?.focus();
+      return;
+    }
+
+    newCode[index] = num;
     setCode(newCode);
 
-    if (text && index < code.length - 1) {
+    if (num && index < CODE_LENGTH - 1)
       inputsRef.current[index + 1].current?.focus();
-    }
-    if (!text && index > 0) {
+  };
+
+  const handleKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0)
       inputsRef.current[index - 1].current?.focus();
-    }
   };
 
   const handleJoin = async () => {
+    if (code.some((d) => !d)) {
+      Alert.alert("Código Incompleto", "Preencha todos os 6 dígitos.");
+      return;
+    }
+
+    setLoading(true);
     try {
       let success = await queueInstance.joinQueue();
 

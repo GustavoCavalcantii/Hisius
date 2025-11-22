@@ -24,6 +24,8 @@ interface CustomInputProps {
   icon?: React.ReactNode;
   onIconPress?: () => void;
   disabled?: boolean;
+  inputType?: string;
+  inputId?: string;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -39,6 +41,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
   icon,
   onIconPress,
   disabled = false,
+  inputType,
+  inputId,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -117,6 +121,9 @@ const CustomInput: React.FC<CustomInputProps> = ({
             onLayout={handleWebStyling}
             editable={!disabled}
             selectTextOnFocus={!disabled}
+            {...(inputType && { "data-type": inputType })}
+            {...(inputId && { "data-id": inputId })}
+            {...(inputId && { testID: inputId })}
             {...props}
           />
         </View>

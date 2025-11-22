@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, View, TouchableOpacity, ScrollView } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { createStyles } from "./style";
 import { GlobalText as Text } from "../../components/globalText";
@@ -40,11 +40,9 @@ export function QueueScreen() {
 
   if (!patient) {
     return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Carregando informações...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -57,18 +55,17 @@ export function QueueScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardContent}>
-            <Text style={styles.titleText}>Chamado para Atendimento</Text>
-            <Text
-              style={[
-                styles.infoValue,
-                { textAlign: "center", marginVertical: 20 },
-              ]}
-            >
-              Sala {patient.roomCalled}
-            </Text>
-            <Text style={styles.instructionsItem}>
-              Dirija-se imediatamente à sala indicada para seu atendimento.
-            </Text>
+            <View style={styles.calledRoomSection}>
+              <Text style={styles.titleText}>Você chamado!</Text>
+              <Text style={styles.calledRoomText}>
+                {patient.roomCalled.toLowerCase().includes("sala")
+                  ? patient.roomCalled
+                  : "Sala " + patient.roomCalled}
+              </Text>
+              <Text style={[styles.instructionsItem, { textAlign: "center" }]}>
+                Dirija-se imediatamente à sala indicada.
+              </Text>
+            </View>
           </View>
         </View>
 

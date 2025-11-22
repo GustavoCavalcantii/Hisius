@@ -30,12 +30,30 @@ export default function HomeScreen() {
   const handleCodeChange = (text: string, index: number) => {
     const num = text.replace(/[^0-9]/g, "");
     const newCode = [...code];
+
+    if (num.length > 1) {
+      const digits = num.split("").slice(0, CODE_LENGTH);
+      const filledCode = [
+        ...digits,
+        ...Array(CODE_LENGTH - digits.length).fill(""),
+      ];
+      setCode(filledCode);
+      inputsRef.current[
+        Math.min(digits.length, CODE_LENGTH - 1)
+      ].current?.focus();
+      return;
+    }
+
     newCode[index] = num;
     setCode(newCode);
 
     if (num && index < CODE_LENGTH - 1)
       inputsRef.current[index + 1].current?.focus();
-    if (!num && index > 0) inputsRef.current[index - 1].current?.focus();
+  };
+
+  const handleKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0)
+      inputsRef.current[index - 1].current?.focus();
   };
 
   const handleJoin = async () => {
@@ -61,13 +79,11 @@ export default function HomeScreen() {
         softwareName="Hisius"
         onProfilePress={() => navigation.navigate("Profile")}
       />
-
       <S.ContentContainer>
         <S.HeaderContainer>
           <S.Title>ESTÁ NO HOSPITAL?</S.Title>
           <S.Subtitle>Digite o código de acesso</S.Subtitle>
         </S.HeaderContainer>
-
         <S.CodeContainer>
           {code.map((value, i) => (
             <S.CodeInput
@@ -78,10 +94,11 @@ export default function HomeScreen() {
               maxLength={1}
               value={value}
               onChangeText={(t) => handleCodeChange(t, i)}
+              onKeyPress={(e) => handleKeyPress(e, i)}
+              selectTextOnFocus={true}
             />
           ))}
         </S.CodeContainer>
-
         <S.ButtonContainer>
           <CustomButton
             title={loading ? "Entrando..." : "Entrar na Fila"}

@@ -39,7 +39,7 @@ export class QueueEventRepository {
       attributes: [
         [
           QueueEvent.sequelize!.literal(
-            `ROUND(AVG(TIMESTAMPDIFF(SECOND, enteredAt, startedAt)))`
+            `ROUND(AVG(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em)))`
           ),
           "avgWaitSeconds",
         ],

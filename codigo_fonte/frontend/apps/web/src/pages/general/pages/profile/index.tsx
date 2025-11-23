@@ -29,6 +29,7 @@ import { Auth } from "@hisius/services/src";
 import { color } from "@hisius/ui/theme/colors";
 import { useFormErrors } from "../../../../hooks/FormErrors";
 import { useAuth } from "../../../../context/authContext";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function ProfileScreen() {
   const { addNotification } = useNotification();
@@ -38,6 +39,7 @@ export function ProfileScreen() {
   const [email, setEmail] = useState("");
   const [initialData, setInitialData] = useState({ name: "", email: "" });
   const [userRole, setUserRole] = useState<number | null>(null);
+  usePageTitle("Perfil - Hisius");
 
   const AuthService = new Auth();
   const { errors, clearFieldError, handleApiErrors } = useFormErrors();

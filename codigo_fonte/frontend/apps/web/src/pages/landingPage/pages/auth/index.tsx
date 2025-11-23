@@ -25,6 +25,7 @@ import CustomButton from "@hisius/ui/components/Button";
 import { Auth } from "@hisius/services/src";
 import { useFormErrors } from "../../../../hooks/FormErrors";
 import { useAuth } from "../../../../context/authContext";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export interface LoginFormData {
   email: string;
@@ -52,6 +53,8 @@ const LoginForm: React.FC = () => {
   });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  usePageTitle("Autenticação");
 
   const {
     errors,

@@ -22,6 +22,7 @@ import { CopyButton } from "../../../../components/copyButton";
 import { copyToClipboard, truncateName } from "../../../../utils";
 import Pagination from "../../../../components/pagination";
 import CustomButton from "@hisius/ui/components/Button";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function EmployeesList() {
   const adminService = new Admin();
@@ -38,6 +39,8 @@ export function EmployeesList() {
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(12);
   const [isLoading, setIsLoading] = useState(false);
+
+  usePageTitle("Funcionários - Hisius");
 
   const fetchEmployees = async () => {
     try {
@@ -100,7 +103,9 @@ export function EmployeesList() {
 
   const handleAddEmployee = async () => {
     const code = await adminService.getEmployeeRegisterCode();
-    setCode(`http://localhost:5173/registrar?token=${encodeURIComponent(code)}`);
+    setCode(
+      `http://localhost:5173/registrar?token=${encodeURIComponent(code)}`
+    );
     setIsPopupCopyOpen(true);
   };
 

@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { Admin, Queue } from "@hisius/services";
 import { useNotification } from "../../../../components/notification/context";
 import type { LogData } from "@hisius/interfaces/src";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function Dashboard() {
   const [hospitalCode, setHospitalCode] = useState<string>("");
@@ -28,6 +29,8 @@ export function Dashboard() {
   const adminService = new Admin();
   const queueService = new Queue();
   const { addNotification } = useNotification();
+
+  usePageTitle("Administrador - Hisius");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

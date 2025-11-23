@@ -20,7 +20,7 @@ import {
 } from "./style";
 import type { ResetPasswordStep } from "./types";
 import { useFormErrors } from "../../../../hooks/FormErrors";
-
+import { usePageTitle } from "../../../../hooks/PageTitle";
 const ResetPasswordScreen: React.FC = () => {
   const [currentStep, setCurrentStep] =
     useState<ResetPasswordStep>("EMAIL_INPUT");
@@ -32,6 +32,7 @@ const ResetPasswordScreen: React.FC = () => {
   const authService = new Auth();
   const navigate = useNavigate();
   const { errors, clearFieldError, handleApiErrors } = useFormErrors();
+  usePageTitle("Esqueci minha senha");
 
   const handleRequestResetLink = async (): Promise<void> => {
     setIsLoading(true);

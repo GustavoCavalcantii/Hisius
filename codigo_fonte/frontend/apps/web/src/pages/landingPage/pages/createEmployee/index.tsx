@@ -23,6 +23,7 @@ import {
 } from "./style";
 import { Auth } from "@hisius/services/src";
 import { useFormErrors } from "../../../../hooks/FormErrors";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 interface FormData {
   name: string;
@@ -48,6 +49,7 @@ const EmployeeRegistrationScreen: React.FC = () => {
   const token = encodedToken ? decodeURIComponent(encodedToken) : null;
   const authService = new Auth();
   const { errors, clearFieldError, handleApiErrors } = useFormErrors();
+  usePageTitle("Registrar Funcionário");
 
   useEffect(() => {
     if (!token) {

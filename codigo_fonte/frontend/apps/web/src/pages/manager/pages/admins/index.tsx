@@ -18,6 +18,7 @@ import Popup from "../../../../components/popup";
 import { truncateName } from "../../../../utils";
 import { HiOutlineEnvelope } from "react-icons/hi2";
 import CustomButton from "@hisius/ui/components/Button";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function AdminsList() {
   const adminService = new Admin();
@@ -31,6 +32,8 @@ export function AdminsList() {
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(12);
   const { addNotification } = useNotification();
+
+  usePageTitle("Administradores - Hisius");
 
   const fetchAdmins = async () => {
     try {

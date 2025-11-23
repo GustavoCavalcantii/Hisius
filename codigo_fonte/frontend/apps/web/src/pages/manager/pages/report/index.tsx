@@ -19,6 +19,7 @@ import { useNotification } from "../../../../components/notification/context";
 import type { ReportInfo } from "@hisius/interfaces";
 import { formatTime } from "../../../../utils";
 import Toggle from "../../../employee/components/toggle";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function Report() {
   const colors = (): string[] => {
@@ -51,6 +52,8 @@ export function Report() {
   const [isMonthly, setIsMonthly] = useState(false);
   const [reportData, setReportData] = useState<ReportInfo>();
   const [hasData, setHasData] = useState(false);
+
+  usePageTitle("Relatórios - Hisius");
 
   const weekDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"] as const;
 

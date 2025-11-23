@@ -21,6 +21,7 @@ import {
   PatientContainer,
   PopupText,
 } from "./styles";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function Employee() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +36,8 @@ export function Employee() {
   const { addNotification } = useNotification();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const queueService = new Queue();
+
+  usePageTitle("Funcionário - Hisius");
 
   const handleReloadFlag = () => {
     setReloadFlag((prev) => !prev);

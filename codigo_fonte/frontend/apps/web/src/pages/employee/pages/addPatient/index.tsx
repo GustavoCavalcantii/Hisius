@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { IPatient } from "@hisius/interfaces/src";
 import { Queue } from "@hisius/services/src";
 import { useNotification } from "../../../../components/notification/context";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function AddPatient() {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +18,7 @@ export function AddPatient() {
   const { addNotification } = useNotification();
   const navigate = useNavigate();
   const queueService = new Queue();
-
+  usePageTitle("Cadastrar na fila - Hisius");
   useEffect(() => {
     const fetchPatientData = async () => {
       if (!id) {

@@ -18,6 +18,7 @@ import {
 } from "./style";
 import { Auth } from "@hisius/services/src";
 import { useFormErrors } from "../../../../hooks/FormErrors";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 interface FormData {
   password: string;
@@ -39,7 +40,7 @@ const PasswordSetupScreen: React.FC = () => {
   const token = encodedToken ? decodeURIComponent(encodedToken) : null;
   const authService = new Auth();
   const { errors, clearFieldError, handleApiErrors } = useFormErrors();
-
+  usePageTitle("Redefinir senha");
   useEffect(() => {
     if (!token) {
       navigate("/login");

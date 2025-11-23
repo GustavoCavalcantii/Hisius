@@ -14,6 +14,7 @@ import {
   StatusMessage,
   SuccessScreen,
 } from "./style";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 const ConfirmEmailScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +27,7 @@ const ConfirmEmailScreen: React.FC = () => {
   const token = encodedToken ? decodeURIComponent(encodedToken) : null;
 
   const authService = new Auth();
+  usePageTitle("Confirmar Email")
 
   useEffect(() => {
     if (!token) {

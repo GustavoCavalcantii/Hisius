@@ -6,11 +6,7 @@ import { useNotification } from "../../../../components/notification/context";
 import Popup from "../../../../components/popup";
 import CustomButton from "@hisius/ui/components/Button";
 import CustomInput from "@hisius/ui/components/CustomInput";
-import {
-  HiOutlineEnvelope,
-  HiOutlineLockClosed,
-  HiOutlineArrowRightOnRectangle,
-} from "react-icons/hi2";
+import { HiOutlineEnvelope, HiOutlineLockClosed } from "react-icons/hi2";
 import {
   Container,
   ProfileContainer,
@@ -50,6 +46,10 @@ export function ProfileScreen() {
 
   const loadProfileData = async () => {
     try {
+      const user = LocalStorageManager.getUser();
+      if (user && user.role !== undefined) {
+        setUserRole(user.role);
+      }
       const profileData = await AuthService.getProfile();
       setName(profileData.name || "");
       setEmail(profileData.email || "");
@@ -58,10 +58,6 @@ export function ProfileScreen() {
         email: profileData.email || "",
       });
       setNewEmail(profileData.email || "");
-      const user = LocalStorageManager.getUser();
-      if (user && user.role !== undefined) {
-        setUserRole(user.role);
-      }
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
       addNotification("Erro ao carregar dados do perfil", "error");
@@ -153,7 +149,7 @@ export function ProfileScreen() {
     } else if (userRole === 2) {
       return <EmployeeSidebar />;
     }
-    return <ManagerSidebar />;
+    return null;
   };
 
   const hasValidChanges = () =>

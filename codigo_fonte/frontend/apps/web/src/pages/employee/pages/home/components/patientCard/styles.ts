@@ -12,7 +12,7 @@ interface TextProps {
 }
 
 interface MutableProps {
-  $isSelected: boolean;
+  $isSelected?: boolean;
 }
 
 const mapColors: Record<ManchesterTriage, string> = {
@@ -27,6 +27,33 @@ const getTriageColor = (type?: ManchesterTriage): string => {
   if (!type) return color.triage.emergency;
   return mapColors[type] || color.triage.emergency;
 };
+
+export const PatientInfoGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  border-radius: 4px;
+`;
+
+export const InfoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+export const InfoLabel = styled.span`
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+`;
+
+export const InfoValue = styled.span`
+  font-size: 0.875rem;
+  color: #495057;
+  font-weight: 500;
+`;
 
 export const Container = styled.div<TextProps & MutableProps>`
   width: 100%;

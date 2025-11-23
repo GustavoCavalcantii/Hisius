@@ -6,6 +6,10 @@ import {
   SelectedCardContainer,
   TitleContainer,
   TriageBadge,
+  PatientInfoGrid,
+  InfoItem,
+  InfoLabel,
+  InfoValue,
 } from "./styles";
 import { useState } from "react";
 import { TextValue } from "../../../../../../components/textValue";
@@ -78,6 +82,18 @@ export function PatientCard(props: PatientCardProp) {
     }
   };
 
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR");
+  };
+
+  const formatDateTime = (dateTimeString: string | undefined) => {
+    if (!dateTimeString) return "";
+    const date = new Date(dateTimeString);
+    return date.toLocaleString("pt-BR");
+  };
+
   const notSelectedCard = () => {
     return (
       <Description>
@@ -98,8 +114,39 @@ export function PatientCard(props: PatientCardProp) {
   const selectedCard = () => {
     return (
       <SelectedCardContainer>
-        <TextValue title="Idade:">{props.patient.age}</TextValue>
-        <TextValue title="Sexo:">{props.patient.gender}</TextValue>
+        <PatientInfoGrid>
+          <InfoItem>
+            <InfoLabel>ID:</InfoLabel>
+            <InfoValue>{props.patient.id}</InfoValue>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>Idade:</InfoLabel>
+            <InfoValue>{props.patient.age} anos</InfoValue>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>Sexo:</InfoLabel>
+            <InfoValue>{props.patient.gender}</InfoValue>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>Data de Nascimento:</InfoLabel>
+            <InfoValue>{formatDate(props.patient.birthDate)}</InfoValue>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>Nome da Mãe:</InfoLabel>
+            <InfoValue>{props.patient.motherName}</InfoValue>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>Número CNS:</InfoLabel>
+            <InfoValue>{props.patient.cnsNumber}</InfoValue>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>Data/Hora Atendimento:</InfoLabel>
+            <InfoValue>
+              {formatDateTime(props.patient.dateHourAttendance)}
+            </InfoValue>
+          </InfoItem>
+        </PatientInfoGrid>
+
         {props.patient.classification ? (
           <>
             <TextValue title="Classificação:">

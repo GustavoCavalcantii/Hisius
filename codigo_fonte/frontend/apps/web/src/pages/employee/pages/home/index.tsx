@@ -57,7 +57,7 @@ export function Employee() {
           isTriage,
           searchTerm
         );
-        setPatients(patientsData);
+        setPatients(patientsData.patients);
       } catch (error) {
         setPatients([]);
       }

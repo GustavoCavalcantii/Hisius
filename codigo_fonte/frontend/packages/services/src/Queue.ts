@@ -1,5 +1,5 @@
 import api from "./config/axios";
-import type { ApiError, IPatient } from "@hisius/interfaces";
+import type { ApiError, IPatient, Pagination } from "@hisius/interfaces";
 
 interface ApiResponse {
   success: boolean;
@@ -17,11 +17,16 @@ interface ApiResponseGet {
   errors?: ApiError[];
 }
 
+interface QueueResponse {
+  patients: IPatient[];
+  pagination: Pagination;
+}
+
 export class Queue {
   async getPatientByQueue(
     isTriage: boolean,
     nameFilter?: string
-  ): Promise<IPatient[]> {
+  ): Promise<QueueResponse> {
     const params: Record<string, string> = {};
 
     if (nameFilter && nameFilter.trim() !== "") {
@@ -32,6 +37,8 @@ export class Queue {
       `/queue/${isTriage ? "triage" : "treatment"}/patients`,
       Object.keys(params).length > 0 ? { params } : {}
     );
+
+    console.log(response);
 
     return response.data.data;
   }

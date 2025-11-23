@@ -3,15 +3,18 @@ import { CodeContainer, Container, Text } from "./styles";
 
 interface LogProps {
   onClick?: () => void;
+  action: string;
+  module: string;
+  id: string;
 }
 
-export function Log({ onClick }: LogProps) {
+export function Log({ onClick, module, action, id }: LogProps) {
   return (
     <Container>
-      <Text>Jorge Alberto</Text>
-      <Text>Jorge Alberto</Text>
+      <Text>{module}</Text>
+      <Text>{action}</Text>
       <CodeContainer>
-        <Text>Jorge Alberto</Text>
+        <Text>{id}</Text>
         <CopyButton onClick={onClick} />
       </CodeContainer>
     </Container>

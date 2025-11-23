@@ -3,6 +3,8 @@ import type {
   ApiError,
   UserResponse,
   ReportInfo,
+  LogData,
+  Pagination,
 } from "@hisius/interfaces";
 
 interface ApiResponse {
@@ -11,6 +13,11 @@ interface ApiResponse {
   statusCode: number;
   data?: any;
   errors?: ApiError[];
+}
+
+interface LogsResponse {
+  logs: LogData[];
+  pagination: Pagination;
 }
 
 interface HospitalInfo {
@@ -52,6 +59,27 @@ export class Admin {
     const response = await api.post<ApiResponse>(`/admins/staff-code`);
 
     return response.data.data.token;
+  }
+
+  async getLogs(
+    page?: number,
+    limit?: number,
+    userId?: number,
+    action?: string,
+    module?: string
+  ): Promise<LogsResponse> {
+    const config = {
+      params: {
+        ...(page && { page }),
+        ...(limit && { limit }),
+        ...(userId && { userId }),
+        ...(action && { action }),
+        ...(module && { module }),
+      },
+    };
+
+    const response = await api.get<ApiResponse>(`/logs`, config);
+    return response.data.data;
   }
 
   async getAdmins(nameFilter?: string): Promise<UserResponse> {

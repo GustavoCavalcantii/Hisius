@@ -1,7 +1,7 @@
 import { QueueHeader } from "../../../../components/navbar";
 import { Sidebar } from "../../components/sidebar";
 import { AdminCard } from "./components/adminCard";
-import { AdminsContainer, Container } from "./styles";
+import { AdminsContainer, Container, NoAdminsMessage } from "./styles";
 import { useEffect, useState } from "react";
 import { Admin } from "@hisius/services";
 import { useNotification } from "../../../../components/notification/context";
@@ -19,6 +19,7 @@ export function AdminsList() {
       setAdmins(adminsData.users);
     } catch (error) {
       addNotification("Erro ao buscar administradores", "error");
+      setAdmins([]);
     }
   };
 
@@ -47,9 +48,13 @@ export function AdminsList() {
           placeholder="Pesquisar administradores"
         />
         <AdminsContainer>
-          {admins.map((admin) => (
-            <AdminCard key={admin.id} name={admin.name} email={admin.email} />
-          ))}
+          {admins.length > 0 ? (
+            admins.map((admin) => (
+              <AdminCard key={admin.id} name={admin.name} email={admin.email} />
+            ))
+          ) : (
+            <NoAdminsMessage>nenhum administrador encontrado</NoAdminsMessage>
+          )}
         </AdminsContainer>
       </Container>
     </>

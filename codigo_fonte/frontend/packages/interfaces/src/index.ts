@@ -21,7 +21,7 @@ export interface IQueuedInfo {
   id: number;
   classification: ManchesterTriage;
   estimatedWaitMinutes: number;
-  roomCalled: string,
+  roomCalled: string;
   queueType: string;
 }
 
@@ -48,6 +48,16 @@ export interface PeakDemand {
   QUI?: number;
   SEX?: number;
   SAB?: number;
+}
+
+export interface LogData {
+  id: number;
+  userId: number;
+  action: string;
+  module: string;
+  originIp: string;
+  userAgent: string;
+  createdAt: string;
 }
 
 export interface IEmployee {

@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
 import { QueueHeader } from "../../../../components/navbar";
 import Toggle from "../../components/toggle";
-import {
-  Container,
-  InputAndButtonContainer,
-  NextButton,
-  PatientButtonContainer,
-  PatientContainer,
-  PopupText,
-} from "./styles";
 import { PatientCard } from "./components/patientCard";
 import type { IPatient } from "@hisius/interfaces/src";
 import Pagination from "../../../../components/pagination";
@@ -21,6 +13,14 @@ import Popup from "../../../../components/popup";
 import CustomButton from "@hisius/ui/components/Button";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import { LuDoorOpen } from "react-icons/lu";
+import {
+  Container,
+  InputAndButtonContainer,
+  NextButton,
+  PatientButtonContainer,
+  PatientContainer,
+  PopupText,
+} from "./styles";
 
 export function Employee() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,7 +43,7 @@ export function Employee() {
   const generateCard = (patients: IPatient[]) => {
     return patients.map((patient) => (
       <PatientCard
-        key={patient.id}
+        key={patient.id || 0}
         patient={patient}
         onChange={handleReloadFlag}
       />

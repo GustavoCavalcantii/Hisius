@@ -16,6 +16,13 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
+export const truncateName = (name: string | undefined, limit: number) => {
+  if (!name) return;
+
+  if (name.length <= limit) return name;
+  return name.substring(0, limit) + "...";
+};
+
 export const formatTime = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);

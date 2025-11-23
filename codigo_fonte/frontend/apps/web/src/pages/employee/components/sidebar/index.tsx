@@ -12,8 +12,8 @@ export function Sidebar() {
     },
     {
       icon: <HiOutlineUser />,
-      text: "Perfil",
-      path: "/funcionario/perfil",
+      text: "Conta",
+      path: "/perfil",
       exact: true,
     },
   ];

@@ -10,6 +10,7 @@ import {
   DataContainer,
   EmployeContainer,
   TextToCopy,
+  NoEmployeesMessage,
 } from "./styles";
 import { useEffect, useState } from "react";
 import { Admin } from "@hisius/services";
@@ -17,7 +18,7 @@ import { useNotification } from "../../../../components/notification/context";
 import type { UserResponse, User } from "@hisius/interfaces";
 import Popup from "../../../../components/popup";
 import { CopyButton } from "../../../../components/copyButton";
-import { copyToClipboard } from "../../../../utils";
+import { copyToClipboard, truncateName } from "../../../../utils";
 
 export function EmployeesList() {
   const adminService = new Admin();
@@ -36,6 +37,7 @@ export function EmployeesList() {
       setEmployees(employeesData.users);
     } catch (error) {
       addNotification("Erro ao buscar funcionários", "error");
+      setEmployees([]);
     }
   };
 
@@ -101,7 +103,7 @@ export function EmployeesList() {
       <Popup
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        title={selectedEmployee?.name || "Funcionário"}
+        title={truncateName(selectedEmployee?.name, 28) || "Funcionário"}
         size="medium"
       >
         <ContactContainer>
@@ -121,13 +123,19 @@ export function EmployeesList() {
           placeholder="Pesquisar funcionários"
         />
         <EmployeContainer>
-          {employees.map((employee) => (
-            <Employee
-              key={employee.id}
-              employee={employee}
-              onClick={() => handleEmployeeClick(employee)}
-            />
-          ))}
+          {employees.length > 0 ? (
+            employees.map((employee) => (
+              <Employee
+                key={employee.id}
+                employee={employee}
+                onClick={() => handleEmployeeClick(employee)}
+              />
+            ))
+          ) : (
+            <NoEmployeesMessage>
+              nenhum funcionário encontrado
+            </NoEmployeesMessage>
+          )}
         </EmployeContainer>
         <AddButton onClick={handleAddEmployee}>
           <HiPlus />

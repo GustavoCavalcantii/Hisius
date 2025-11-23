@@ -1,7 +1,7 @@
 import api from "./config/axios";
 import type { userLogin } from "../../@types/userLogin";
 import type { userRegister } from "../../@types/userRegister";
-import { ApiError } from "@hisius/interfaces/src";
+import { ApiError, User } from "@hisius/interfaces/src";
 
 interface LoginResponse {
   id: number;
@@ -22,6 +22,11 @@ interface ApiResponseGet {
 export class Auth {
   async Login(userData: userLogin): Promise<LoginResponse> {
     const response = await api.post<ApiResponseGet>(`/auth/login`, userData);
+    return response.data.data;
+  }
+
+  async getProfile(): Promise<User> {
+    const response = await api.get<ApiResponseGet>(`/users/me`);
     return response.data.data;
   }
 

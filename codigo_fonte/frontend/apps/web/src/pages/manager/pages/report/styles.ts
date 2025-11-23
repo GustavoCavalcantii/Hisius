@@ -10,6 +10,21 @@ export const Container = styled.div`
   gap: 1rem;
 `;
 
+export const EmptyStateContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+
+`;
+
+export const EmptyStateText = styled.span`
+  font-size: 16px;
+  color: ${color.text};
+  font-weight: 500;
+`;
+
 export const HourContainer = styled.div`
   width: 100%;
   min-height: 45%;

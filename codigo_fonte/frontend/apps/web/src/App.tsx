@@ -15,6 +15,8 @@ import LoginForm from "./pages/landingPage/pages/auth";
 import { GuestRoute } from "./components/guestRoute";
 import { AuthProvider, useAuth } from "./context/authContext";
 import { ProtectedRoute } from "./components/protectedRoute";
+import LogsList from "./pages/manager/pages/logs";
+import { ProfileScreen } from "./pages/general/pages/profile";
 
 function AppRoutes() {
   const { user, isAuthenticated } = useAuth();
@@ -35,6 +37,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Employee />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/perfil"
+        element={
+          <ProtectedRoute>
+            <ProfileScreen />
           </ProtectedRoute>
         }
       />
@@ -80,6 +91,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute requiredRole={0}>
             <AdminsList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/logs"
+        element={
+          <ProtectedRoute requiredRole={0}>
+            <LogsList />
           </ProtectedRoute>
         }
       />

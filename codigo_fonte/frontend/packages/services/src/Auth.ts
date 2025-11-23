@@ -18,6 +18,11 @@ export class Auth {
     },
   });
 
+  async changeName(name: string): Promise<LoginResponse> {
+    const response = await api.put<ApiResponse>(`/users/me`, { name });
+    return response.data.data;
+  }
+
   async Login(userData: userLogin): Promise<LoginResponse> {
     const response = await api.post<ApiResponse>(`/auth/login`, userData);
     return response.data.data;

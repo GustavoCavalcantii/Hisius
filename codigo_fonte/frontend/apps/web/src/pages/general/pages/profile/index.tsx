@@ -108,9 +108,17 @@ export function ProfileScreen() {
     clearFieldError("name");
   };
 
-  const handleSave = () => {
-    addNotification("Perfil atualizado com sucesso!", "success");
-    setInitialData({ name, email });
+  const handleSave = async () => {
+    try {
+      await AuthService.changeName(name);
+      addNotification("Perfil atualizado com sucesso!", "success");
+      setInitialData({ name, email });
+    } catch (err: any) {
+      addNotification(
+        err.response.data.message || "Erro ao atualizar perfil",
+        "error"
+      );
+    }
   };
 
   const handleEmailSubmit = async () => {

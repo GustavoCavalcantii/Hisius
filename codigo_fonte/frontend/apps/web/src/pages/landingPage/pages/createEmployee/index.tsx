@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { HiOutlineLockClosed, HiOutlineCheckCircle } from "react-icons/hi";
+import {
+  HiOutlineLockClosed,
+  HiOutlineCheckCircle,
+  HiOutlineUser,
+  HiOutlineMail,
+} from "react-icons/hi";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { color } from "@hisius/ui/theme/colors";
@@ -20,12 +25,16 @@ import { Auth } from "@hisius/services/src";
 import { useFormErrors } from "../../../../hooks/FormErrors";
 
 interface FormData {
+  name: string;
+  email: string;
   password: string;
   confirmPassword: string;
 }
 
-const PasswordSetupScreen: React.FC = () => {
+const EmployeeRegistrationScreen: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
@@ -51,15 +60,11 @@ const PasswordSetupScreen: React.FC = () => {
     setError("");
 
     try {
-      await authService.resetPass(
-        token!,
-        formData.password,
-        formData.confirmPassword
-      );
+      await authService.employeeRegister(formData, token!);
       setIsSuccess(true);
       setTimeout(() => navigate("/login"), 2000);
     } catch (err: any) {
-      setError(err.response.data.message || "Erro ao redefinir senha.");
+      setError(err.response?.data?.message || "Erro ao completar cadastro.");
       if (err.response?.data) {
         handleApiErrors(err.response.data);
       }
@@ -83,9 +88,9 @@ const PasswordSetupScreen: React.FC = () => {
           <SuccessScreen>
             <HiOutlineCheckCircle size={48} color={color.error.ok} />
             <AuthHeader>
-              <ScreenTitle>Senha Redefinida!</ScreenTitle>
+              <ScreenTitle>Cadastro Concluído!</ScreenTitle>
               <ScreenDescription>
-                Sua senha foi redefinida com sucesso.
+                Sua conta foi criada com sucesso.
                 <br />
                 Redirecionando para o login...
               </ScreenDescription>
@@ -101,18 +106,34 @@ const PasswordSetupScreen: React.FC = () => {
       <AuthCard>
         <AuthForm onSubmit={(e) => e.preventDefault()} noValidate>
           <AuthHeader>
-            <ScreenTitle>Redefinir Senha</ScreenTitle>
+            <ScreenTitle>Completar Cadastro</ScreenTitle>
             <ScreenDescription>
-              Crie uma nova senha segura para sua conta
+              Complete suas informações para criar sua conta
             </ScreenDescription>
           </AuthHeader>
 
           {error && <StatusMessage variant="error">{error}</StatusMessage>}
 
           <CustomInput
+            value={formData.name}
+            onChangeText={handleInputChange("name")}
+            placeholder="Digite seu nome completo"
+            error={errors.name}
+            icon={<HiOutlineUser />}
+          />
+
+          <CustomInput
+            value={formData.email}
+            onChangeText={handleInputChange("email")}
+            placeholder="Digite seu email"
+            error={errors.email}
+            icon={<HiOutlineMail />}
+          />
+
+          <CustomInput
             value={formData.password}
             onChangeText={handleInputChange("password")}
-            placeholder="Digite sua nova senha"
+            placeholder="Crie uma senha segura"
             error={errors.password}
             icon={<HiOutlineLockClosed />}
             secureTextEntry
@@ -128,15 +149,15 @@ const PasswordSetupScreen: React.FC = () => {
           />
 
           <CustomButton
-            title="Redefinir Senha"
+            title="Completar Cadastro"
             onPress={handleSubmit}
             disabled={isLoading}
           />
 
           <ScreenFooter>
-            Lembrou sua senha?{" "}
+            Já tem uma conta?{" "}
             <ScreenLink onClick={() => navigate("/login")}>
-              Voltar para o login
+              Fazer login
             </ScreenLink>
           </ScreenFooter>
         </AuthForm>
@@ -145,4 +166,4 @@ const PasswordSetupScreen: React.FC = () => {
   );
 };
 
-export default PasswordSetupScreen;
+export default EmployeeRegistrationScreen;

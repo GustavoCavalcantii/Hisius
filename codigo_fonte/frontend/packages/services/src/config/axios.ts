@@ -13,10 +13,22 @@ const api = axios.create({
   withCredentials: true,
 });
 
+const excludedRoutes = [
+  "/auth/recover-password",
+  "/auth/login",
+  "/users",
+  "/employees/",
+  "/auth/confirm-change-email",
+];
+
 api.interceptors.request.use(
   async (config) => {
+    const isExcludedRoute = excludedRoutes.some(
+      (route) => config.url === route
+    );
+
     const token = LocalStorageManager.getAccessToken() || (await getToken());
-    if (token) {
+    if (token && !isExcludedRoute) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 

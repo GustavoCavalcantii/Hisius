@@ -12,6 +12,12 @@ interface LoginResponse {
 }
 
 export class Auth {
+  getAuthHeaders = (token: string) => ({
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   async Login(userData: userLogin): Promise<LoginResponse> {
     const response = await api.post<ApiResponse>(`/auth/login`, userData);
     return response.data.data;
@@ -22,16 +28,27 @@ export class Auth {
     return response.data.data;
   }
 
+  async employeeRegister(
+    userData: userRegister,
+    token: string
+  ): Promise<LoginResponse> {
+    const response = await api.post<ApiResponse>(
+      `/employees/`,
+      userData,
+      this.getAuthHeaders(token)
+    );
+    return response.data.data;
+  }
+
+  async adminRegister(userData: userRegister): Promise<LoginResponse> {
+    const response = await api.post<ApiResponse>(`/admins`, userData);
+    return response.data.data;
+  }
+
   async register(userData: userRegister): Promise<LoginResponse> {
     const response = await api.post<ApiResponse>(`/users`, userData);
     return response.data.data;
   }
-
-  getAuthHeaders = (token: string) => ({
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
 
   async resetEmail(token: string) {
     const response = await api.put<ApiResponse>(

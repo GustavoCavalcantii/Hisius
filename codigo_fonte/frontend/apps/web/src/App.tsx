@@ -25,6 +25,7 @@ import LogsList from "./pages/manager/pages/logs";
 
 import { ProfileScreen } from "./pages/general/pages/profile";
 import type { JSX } from "react";
+import EmployeeRegistrationScreen from "./pages/landingPage/pages/createEmployee";
 
 type PublicRoute = {
   path: string;
@@ -51,6 +52,7 @@ const routes: {
     { path: "/senha/esqueci", element: <ResetPassword /> },
     { path: "/email/confirmar", element: <ConfirmEmailScreen /> },
     { path: "/senha/redefinir", element: <PasswordSetupScreen /> },
+    { path: "/registrar", element: <EmployeeRegistrationScreen /> },
   ],
   protected: [
     {

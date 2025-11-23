@@ -22,7 +22,8 @@ const ConfirmEmailScreen: React.FC = () => {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+  const encodedToken = searchParams.get("token");
+  const token = encodedToken ? decodeURIComponent(encodedToken) : null;
 
   const authService = new Auth();
 

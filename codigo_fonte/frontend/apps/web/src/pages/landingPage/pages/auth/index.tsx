@@ -128,7 +128,7 @@ const LoginForm: React.FC = () => {
     if (!validateRegisterForm()) return;
 
     try {
-      await authService.register(registerData);
+      await authService.adminRegister(registerData);
       setSuccessMessage("Cadastro realizado com sucesso!");
       setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
@@ -196,6 +196,9 @@ const LoginForm: React.FC = () => {
               secureTextEntry
             />
             <p>
+              <Link href="/senha/esqueci">Esqueci minha senha</Link>
+            </p>
+            <p>
               Não tem uma conta? <Link onClick={toggleForm}>Cadastre-se</Link>
             </p>
             <CustomButton title="Entrar" onPress={handleLoginSubmit} />
@@ -248,7 +251,6 @@ const LoginForm: React.FC = () => {
               icon={<HiOutlineLockClosed style={iconStyle} />}
               secureTextEntry
             />
-
             <p>
               Já tem uma conta? <Link onClick={toggleForm}>Entrar</Link>
             </p>

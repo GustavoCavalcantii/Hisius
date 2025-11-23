@@ -24,11 +24,12 @@ export const refreshTokenInterceptor = async (error) => {
     "/auth/recover-password",
     "/auth/login",
     "/users",
+    "/employees/",
     "/auth/confirm-change-email",
   ];
 
-  const shouldSkipRefresh = excludedRoutes.some((route) =>
-    originalRequest.url?.includes(route)
+  const shouldSkipRefresh = excludedRoutes.some(
+    (route) => originalRequest.url === route
   );
 
   if (shouldSkipRefresh) {

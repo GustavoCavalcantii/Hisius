@@ -100,7 +100,7 @@ export function EmployeesList() {
 
   const handleAddEmployee = async () => {
     const code = await adminService.getEmployeeRegisterCode();
-    setCode(`http://localhost:5173/login/?token=${encodeURIComponent(code)}`);
+    setCode(`http://localhost:5173/registrar?token=${encodeURIComponent(code)}`);
     setIsPopupCopyOpen(true);
   };
 

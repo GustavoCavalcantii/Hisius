@@ -33,7 +33,7 @@ export const FormContainer = styled.div<{
   top: 0;
   width: 50%;
   height: 100%;
-  padding: 100px;
+  padding: 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -59,7 +59,7 @@ export const FormContainer = styled.div<{
     position: relative;
     transform: none !important;
     display: ${(props) => (props.isActive ? "flex" : "none")};
-    padding: 30px 20px;
+    padding: 50px 60px;
     left: auto !important;
     right: auto !important;
   }

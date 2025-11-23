@@ -9,6 +9,7 @@ import {
   LoginFormWrapper,
   Subtitle,
   Title,
+  Link,
   FormsWrapper,
   FormContainer,
   TogglePanel,
@@ -22,7 +23,6 @@ import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { Auth } from "@hisius/services/src";
 import LocalStorageManager from "@hisius/services/src/helpers/localStorageManager";
-import { useNavigate } from "react-router-dom";
 
 export interface LoginFormData {
   email: string;
@@ -163,7 +163,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               icon={<HiOutlineLockClosed style={iconStyle} />}
               secureTextEntry
             />
-
+            <p>
+              Não tem uma conta? <Link onClick={toggleForm}>Cadastre-se</Link>
+            </p>
             <CustomButton title="Entrar" onPress={handleLoginSubmit} />
           </LoginFormWrapper>
         </FormContainer>
@@ -207,6 +209,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               secureTextEntry
             />
 
+            <p>
+              Já tem uma conta? <Link onClick={toggleForm}>Entrar</Link>
+            </p>
             <CustomButton title="Cadastrar" onPress={handleRegisterSubmit} />
           </LoginFormWrapper>
         </FormContainer>

@@ -48,7 +48,6 @@ export function Report() {
 
   const adminService = new Admin();
   const { addNotification } = useNotification();
-  const [isMounted, setIsMounted] = useState(false);
   const [isMonthly, setIsMonthly] = useState(false);
   const [reportData, setReportData] = useState<ReportInfo>();
   const [hasData, setHasData] = useState(false);
@@ -121,7 +120,6 @@ export function Report() {
     };
 
     fetchReportData();
-    setIsMounted(true);
   }, [isMonthly]);
 
   const handleToggleChange = async (checked: boolean) => {

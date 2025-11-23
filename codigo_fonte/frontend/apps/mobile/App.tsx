@@ -6,7 +6,7 @@ import Home from "./src/screens/home";
 import { Profile } from "./src/screens/profile";
 import Splash from "./src/screens/splash";
 import Login from "./src/screens/auth";
-import { QueueScreen } from "./src/screens/queue";
+import { QueueScreen } from "./src/screens/Queue";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,7 +31,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         id={undefined}
-        initialRouteName="Login"
+        initialRouteName="Splash"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Home" component={Home} />

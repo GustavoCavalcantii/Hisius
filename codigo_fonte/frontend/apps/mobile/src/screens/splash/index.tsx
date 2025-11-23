@@ -21,7 +21,7 @@ export default function Splash() {
 
       <View style={styles.imageSpace}>
         
-        <Image source={require('../../../assets/vectorArt.png')} style={styles.image} />
+        <Image source={require('../../assets/vectorArt.png')} style={styles.image} />
       </View>
     </View>
   );

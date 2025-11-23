@@ -10,6 +10,25 @@ export const Container = styled.div`
   gap: 1rem;
 `;
 
+export const ItemsPerPageSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  select {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: white;
+  }
+`;
+
 export const NoEmployeesMessage = styled.div`
   display: flex;
   justify-content: center;

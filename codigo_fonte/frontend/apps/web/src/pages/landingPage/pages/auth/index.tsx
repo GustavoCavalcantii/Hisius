@@ -18,11 +18,14 @@ import {
   ToggleText,
   ToggleButton,
   ToggleOverlay,
+  StatusMessage,
 } from "./style";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { Auth } from "@hisius/services/src";
 import LocalStorageManager from "@hisius/services/src/helpers/localStorageManager";
+import { useFormErrors } from "../../../../hooks/FormErrors";
+import { useAuth } from "../../../../context/authContext";
 
 export interface LoginFormData {
   email: string;
@@ -36,13 +39,7 @@ export interface RegisterFormData {
   confirmPassword: string;
 }
 
-interface LoginFormProps {
-  onLogin?: (data: LoginFormData) => void;
-  onRegister?: (data: RegisterFormData) => void;
-  loading?: boolean;
-}
-
-const LoginForm: React.FC<LoginFormProps> = () => {
+const LoginForm: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loginData, setLoginData] = useState<LoginFormData>({
     email: "",
@@ -54,70 +51,93 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState<
-    Partial<LoginFormData & RegisterFormData>
-  >({});
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const {
+    errors,
+    handleApiErrors,
+    setFieldError,
+    clearFieldError,
+    clearAllErrors,
+  } = useFormErrors();
+
   const authService = new Auth();
+  const auth = useAuth();
 
   const validateLoginForm = (): boolean => {
     const newErrors: Partial<LoginFormData> = {};
+
     if (!loginData.email) newErrors.email = "Email é obrigatório";
-    else if (!/\S+@\S+\.\S+/.test(loginData.email))
-      newErrors.email = "Email inválido";
-
     if (!loginData.password) newErrors.password = "Senha é obrigatória";
-    else if (loginData.password.length < 6)
-      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
 
-    setErrors(newErrors);
+    Object.keys(newErrors).forEach((field) => {
+      setFieldError(field, newErrors[field as keyof LoginFormData]!);
+    });
+
     return Object.keys(newErrors).length === 0;
   };
 
   const validateRegisterForm = (): boolean => {
     const newErrors: Partial<RegisterFormData> = {};
+
     if (!registerData.name) newErrors.name = "Nome é obrigatório";
-
     if (!registerData.email) newErrors.email = "Email é obrigatório";
-    else if (!/\S+@\S+\.\S+/.test(registerData.email))
-      newErrors.email = "Email inválido";
-
     if (!registerData.password) newErrors.password = "Senha é obrigatória";
-    else if (registerData.password.length < 6)
-      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
-
     if (!registerData.confirmPassword)
       newErrors.confirmPassword = "Confirme sua senha";
-    else if (registerData.password !== registerData.confirmPassword)
+    if (registerData.password !== registerData.confirmPassword) {
       newErrors.confirmPassword = "Senhas não coincidem";
+    }
 
-    setErrors(newErrors);
+    Object.keys(newErrors).forEach((field) => {
+      setFieldError(field, newErrors[field as keyof RegisterFormData]!);
+    });
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handleLoginSubmit = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (!validateLoginForm()) return;
 
     try {
       const data = await authService.Login(loginData);
       const { accessToken, ...rest } = data;
 
-      LocalStorageManager.setTokens(accessToken);
-      LocalStorageManager.setUser(rest);
+      if (rest.role != 0 && rest.role != 2) {
+        setErrorMessage("Você não tem permissão para acessar");
+        return;
+      }
+
+      auth.login(rest, accessToken!);
       window.location.reload();
-    } catch (err) {}
+    } catch (err: any) {
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+        setErrorMessage(err.response.data.message || "Erro ao fazer login");
+      }
+    }
   };
 
   const handleRegisterSubmit = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (!validateRegisterForm()) return;
 
     try {
-      const data = await authService.register(registerData);
-      const { accessToken, ...rest } = data;
-
-      LocalStorageManager.setTokens(accessToken);
-      LocalStorageManager.setUser(rest);
-      window.location.reload();
-    } catch (err) {}
+      await authService.register(registerData);
+      setSuccessMessage("Cadastro realizado com sucesso!");
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (err: any) {
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+        setErrorMessage(err.response.data.message || "Erro ao cadastrar");
+      }
+    }
   };
 
   const handleInputChange =
@@ -127,14 +147,19 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       } else {
         setRegisterData((prev) => ({ ...prev, [field]: value }));
       }
-      if (errors[field as keyof typeof errors]) {
-        setErrors((prev) => ({ ...prev, [field]: undefined }));
+      if (errors[field]) {
+        clearFieldError(field);
+      }
+      if (errorMessage) {
+        setErrorMessage("");
       }
     };
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
-    setErrors({});
+    clearAllErrors();
+    setErrorMessage("");
+    setSuccessMessage("");
   };
 
   const iconStyle = { width: "20px", height: "20px" };
@@ -146,6 +171,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           <LoginFormWrapper onSubmit={(e) => e.preventDefault()}>
             <Title>Entrar</Title>
             <Subtitle>Entre na sua conta</Subtitle>
+
+            {successMessage && (
+              <StatusMessage variant="success">{successMessage}</StatusMessage>
+            )}
+
+            {errorMessage && (
+              <StatusMessage variant="error">{errorMessage}</StatusMessage>
+            )}
 
             <CustomInput
               value={loginData.email}
@@ -173,7 +206,15 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         <FormContainer position="right" isActive={!isLogin}>
           <LoginFormWrapper onSubmit={(e) => e.preventDefault()}>
             <Title>Cadastre-se</Title>
-            <Subtitle>Crie sua conta</Subtitle>
+            <Subtitle>Crie sua conta de administrador</Subtitle>
+
+            {successMessage && (
+              <StatusMessage variant="success">{successMessage}</StatusMessage>
+            )}
+
+            {errorMessage && (
+              <StatusMessage variant="error">{errorMessage}</StatusMessage>
+            )}
 
             <CustomInput
               value={registerData.name}

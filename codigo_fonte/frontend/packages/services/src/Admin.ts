@@ -1,22 +1,20 @@
 import api from "./config/axios";
 import type {
-  ApiError,
   UserResponse,
   ReportInfo,
   LogData,
   Pagination,
+  ApiResponse,
+  User,
 } from "@hisius/interfaces";
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data?: any;
-  errors?: ApiError[];
-}
 
 interface LogsResponse {
   logs: LogData[];
+  pagination: Pagination;
+}
+
+interface LogsResponse {
+  users: User[];
   pagination: Pagination;
 }
 
@@ -40,17 +38,21 @@ export class Admin {
     return response.data.data;
   }
 
-  async getEmployees(nameFilter?: string): Promise<UserResponse> {
+  async getEmployees(
+    nameFilter?: string,
+    page: number = 0,
+    limit: number = 10
+  ): Promise<UserResponse> {
     const params: Record<string, string> = {};
 
     if (nameFilter && nameFilter.trim() !== "") {
       params.nameFilter = nameFilter.trim();
     }
 
-    const response = await api.get<ApiResponse>(
-      `/employees`,
-      Object.keys(params).length > 0 ? { params } : {}
-    );
+    params.page = page.toString();
+    params.limit = limit.toString();
+
+    const response = await api.get<ApiResponse>(`/employees`, { params });
 
     return response.data.data;
   }
@@ -82,17 +84,20 @@ export class Admin {
     return response.data.data;
   }
 
-  async getAdmins(nameFilter?: string): Promise<UserResponse> {
+  async getAdmins(
+    nameFilter?: string,
+    page: number = 0,
+    limit: number = 10
+  ): Promise<UserResponse> {
     const params: Record<string, string> = {};
 
     if (nameFilter && nameFilter.trim() !== "") {
       params.nameFilter = nameFilter.trim();
     }
+    params.page = page.toString();
+    params.limit = limit.toString();
 
-    const response = await api.get<ApiResponse>(
-      `/admins`,
-      Object.keys(params).length > 0 ? { params } : {}
-    );
+    const response = await api.get<ApiResponse>(`/admins`, { params });
 
     return response.data.data;
   }

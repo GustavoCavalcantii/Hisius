@@ -25,6 +25,14 @@ export interface IQueuedInfo {
   queueType: string;
 }
 
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data?: any;
+  errors?: ApiError[];
+}
+
 export interface UserResponse {
   users: User[];
   pagination: Pagination;

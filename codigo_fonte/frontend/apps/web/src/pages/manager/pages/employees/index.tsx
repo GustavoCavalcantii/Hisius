@@ -15,14 +15,16 @@ import {
 import { useEffect, useState } from "react";
 import { Admin } from "@hisius/services";
 import { useNotification } from "../../../../components/notification/context";
-import type { UserResponse, User } from "@hisius/interfaces";
+import type { User, Pagination as IPagination } from "@hisius/interfaces";
 import Popup from "../../../../components/popup";
 import { CopyButton } from "../../../../components/copyButton";
 import { copyToClipboard, truncateName } from "../../../../utils";
+import Pagination from "../../../../components/pagination";
 
 export function EmployeesList() {
   const adminService = new Admin();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [employees, setEmployees] = useState<User[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -30,14 +32,31 @@ export function EmployeesList() {
   const [code, setCode] = useState<string>("");
   const { addNotification } = useNotification();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage] = useState(12);
+
   const fetchEmployees = async () => {
     try {
-      const employeesData: UserResponse =
-        await adminService.getEmployees(searchTerm);
+      const apiPage = currentPage - 1;
+
+      const searchName =
+        debouncedSearchTerm.length >= 3 ? debouncedSearchTerm : undefined;
+
+      const employeesData = await adminService.getEmployees(
+        searchName,
+        apiPage,
+        itemsPerPage
+      );
+
       setEmployees(employeesData.users);
+      employeesData.pagination
+        ? setTotalItems(employeesData.pagination.totalItems)
+        : setTotalItems(employeesData.users.length);
     } catch (error) {
       addNotification("Erro ao buscar funcionários", "error");
       setEmployees([]);
+      setTotalItems(0);
     }
   };
 
@@ -59,27 +78,29 @@ export function EmployeesList() {
   const handleAddEmployee = async () => {
     const code = await adminService.getEmployeeRegisterCode();
     setCode(`http://localhost:5173/login/?token=${encodeURIComponent(code)}`);
-
     setIsPopupCopyOpen(true);
   };
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchTerm.length >= 3 || searchTerm.length === 0) {
-        fetchEmployees();
-      }
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [currentPage, debouncedSearchTerm]);
 
   const handleCopy = async () => {
     const isOk = await copyToClipboard(code);
-
     if (isOk) addNotification("Texto copiado com sucesso!", "success");
   };
 
@@ -122,6 +143,7 @@ export function EmployeesList() {
           canSearch
           placeholder="Pesquisar funcionários"
         />
+
         <EmployeContainer>
           {employees.length > 0 ? (
             employees.map((employee) => (
@@ -137,6 +159,17 @@ export function EmployeesList() {
             </NoEmployeesMessage>
           )}
         </EmployeContainer>
+
+        {totalItems > 0 && (
+          <Pagination
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            maxVisibleButtons={5}
+          />
+        )}
+
         <AddButton onClick={handleAddEmployee}>
           <HiPlus />
         </AddButton>

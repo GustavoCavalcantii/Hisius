@@ -27,6 +27,8 @@ import {
 import LocalStorageManager from "@hisius/services/src/helpers/localStorageManager";
 import { Auth } from "@hisius/services/src";
 import { color } from "@hisius/ui/theme/colors";
+import { useFormErrors } from "../../../../hooks/FormErrors";
+import { useAuth } from "../../../../context/authContext";
 
 export function ProfileScreen() {
   const { addNotification } = useNotification();
@@ -35,14 +37,11 @@ export function ProfileScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [initialData, setInitialData] = useState({ name: "", email: "" });
-  const [emailError, setEmailError] = useState("");
-  const [newEmailError, setNewEmailError] = useState("");
   const [userRole, setUserRole] = useState<number | null>(null);
 
   const AuthService = new Auth();
-
-  const validateEmail = (email: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const { errors, clearFieldError, handleApiErrors } = useFormErrors();
+  const auth = useAuth();
 
   const loadProfileData = async () => {
     try {
@@ -58,9 +57,12 @@ export function ProfileScreen() {
         email: profileData.email || "",
       });
       setNewEmail(profileData.email || "");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao carregar perfil:", err);
       addNotification("Erro ao carregar dados do perfil", "error");
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      }
     }
   };
 
@@ -76,56 +78,40 @@ export function ProfileScreen() {
         "success"
       );
       setIsEmailPopupOpen(false);
-      setNewEmailError("");
-    } catch (err) {
-      console.error("Erro ao alterar email:", err);
+    } catch (err: any) {
+      console.error("Erro ao alterar senha:", err);
       addNotification(
         "Erro ao enviar código de verificação. Tente novamente.",
         "error"
       );
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      }
     }
   };
 
   const handleLogout = () => {
-    LocalStorageManager.clearAll();
+    auth.logout();
     addNotification("Logout realizado com sucesso!", "success");
     window.location.reload();
   };
 
-  const handleEmailChange = (value: string) => {
-    setEmail(value);
-    setEmailError(
-      value && !validateEmail(value) ? "Por favor, insira um email válido" : ""
-    );
-  };
-
   const handleNewEmailChange = (value: string) => {
     setNewEmail(value);
-    setNewEmailError(
-      value && !validateEmail(value) ? "Por favor, insira um email válido" : ""
-    );
+    clearFieldError("email");
+  };
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+    clearFieldError("name");
   };
 
   const handleSave = () => {
-    if (!validateEmail(email)) {
-      setEmailError("Por favor, insira um email válido");
-      return;
-    }
     addNotification("Perfil atualizado com sucesso!", "success");
     setInitialData({ name, email });
   };
 
   const handleEmailSubmit = async () => {
-    if (!newEmail.trim() || !validateEmail(newEmail)) {
-      setNewEmailError("Por favor, insira um email válido");
-      return;
-    }
-
-    if (newEmail === email) {
-      setNewEmailError("O novo email deve ser diferente do atual");
-      return;
-    }
-
     try {
       await AuthService.changeEmail(newEmail);
       addNotification(
@@ -133,13 +119,16 @@ export function ProfileScreen() {
         "success"
       );
       setIsEmailPopupOpen(false);
-      setNewEmailError("");
-    } catch (err) {
+      clearFieldError("email");
+    } catch (err: any) {
       console.error("Erro ao alterar email:", err);
       addNotification(
         "Erro ao enviar código de verificação. Tente novamente.",
         "error"
       );
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      }
     }
   };
 
@@ -152,12 +141,7 @@ export function ProfileScreen() {
     return null;
   };
 
-  const hasValidChanges = () =>
-    name !== initialData.name ||
-    (email !== initialData.email &&
-      name.trim() !== "" &&
-      email.trim() !== "" &&
-      validateEmail(email));
+  const hasValidChanges = () => name !== initialData.name;
 
   return (
     <>
@@ -173,7 +157,7 @@ export function ProfileScreen() {
           placeholder="Digite o novo email"
           value={newEmail}
           onChangeText={handleNewEmailChange}
-          error={newEmailError}
+          error={errors.email}
           style={{ marginBottom: 30 }}
         />
         <PopupText>
@@ -197,16 +181,16 @@ export function ProfileScreen() {
                 <CustomInput
                   placeholder="Nome completo"
                   value={name}
-                  onChangeText={setName}
+                  onChangeText={handleNameChange}
+                  error={errors.name}
                 />
               </InputGroup>
               <InputGroup>
                 <CustomInput
                   placeholder="Email"
                   value={email}
+                  onChangeText={() => {}}
                   disabled
-                  onChangeText={handleEmailChange}
-                  error={emailError}
                 />
               </InputGroup>
             </Section>

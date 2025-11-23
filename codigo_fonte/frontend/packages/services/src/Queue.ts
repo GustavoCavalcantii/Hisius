@@ -1,21 +1,10 @@
 import api from "./config/axios";
-import type { ApiError, IPatient, Pagination } from "@hisius/interfaces";
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data?: any;
-  errors?: ApiError[];
-}
-
-interface ApiResponseGet {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data?: IPatient;
-  errors?: ApiError[];
-}
+import type {
+  ApiError,
+  ApiResponse,
+  IPatient,
+  Pagination,
+} from "@hisius/interfaces";
 
 interface QueueResponse {
   patients: IPatient[];
@@ -44,19 +33,19 @@ export class Queue {
   }
 
   async joinQueue(hospitalCode: string): Promise<boolean> {
-    const response = await api.post<ApiResponseGet>(`/queue/join`, {
+    const response = await api.post<ApiResponse>(`/queue/join`, {
       hospitalCode,
     });
     return response.status >= 200 && response.status < 300;
   }
 
   async getPatient(id: number): Promise<IPatient> {
-    const response = await api.get<ApiResponseGet>(`/patients/${id}`);
+    const response = await api.get<ApiResponse>(`/patients/${id}`);
     return response.data.data;
   }
 
   async getNextPatient(isTriage: boolean, room: string): Promise<IPatient> {
-    const response = await api.post<ApiResponseGet>(
+    const response = await api.post<ApiResponse>(
       `/queue/${isTriage ? "triage" : "treatment"}/call-next`,
       { room }
     );
@@ -67,7 +56,7 @@ export class Queue {
     id: number,
     classification: string
   ): Promise<IPatient | ApiError[]> {
-    const response = await api.put<ApiResponseGet>(`/queue/${id}`, {
+    const response = await api.put<ApiResponse>(`/queue/${id}`, {
       classification: classification.toLowerCase(),
     });
 
@@ -83,7 +72,7 @@ export class Queue {
     id: number,
     classification: string
   ): Promise<IPatient | ApiError[]> {
-    const response = await api.put<ApiResponseGet>(`/queue/${id}/next`, {
+    const response = await api.put<ApiResponse>(`/queue/${id}/next`, {
       classification: classification.toLowerCase(),
     });
 

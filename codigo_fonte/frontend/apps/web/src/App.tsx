@@ -4,150 +4,121 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { Employee } from "./pages/employee/pages/home";
-import { AddPatient } from "./pages/employee/pages/addPatient";
-import { Dashboard } from "./pages/manager/pages/dashboard";
-import { AdminsList } from "./pages/manager/pages/admins";
-import { EmployeesList } from "./pages/manager/pages/employees";
-import { Report } from "./pages/manager/pages/report";
-import { NotificationProvider } from "./components/notification/context";
-import LoginForm from "./pages/landingPage/pages/auth";
-import { GuestRoute } from "./components/guestRoute";
 import { AuthProvider, useAuth } from "./context/authContext";
+import { NotificationProvider } from "./components/notification/context";
 import { ProtectedRoute } from "./components/protectedRoute";
-import LogsList from "./pages/manager/pages/logs";
-import { ProfileScreen } from "./pages/general/pages/profile";
+import { GuestRoute } from "./components/guestRoute";
+
+import LoginForm from "./pages/landingPage/pages/auth";
 import ResetPassword from "./pages/landingPage/pages/forgotPass";
 import PasswordSetupScreen from "./pages/landingPage/pages/resetPass";
 import ConfirmEmailScreen from "./pages/landingPage/pages/confirmEmail";
 
+import { Employee } from "./pages/employee/pages/home";
+import { AddPatient } from "./pages/employee/pages/addPatient";
+
+import { Dashboard } from "./pages/manager/pages/dashboard";
+import { AdminsList } from "./pages/manager/pages/admins";
+import { EmployeesList } from "./pages/manager/pages/employees";
+import { Report } from "./pages/manager/pages/report";
+import LogsList from "./pages/manager/pages/logs";
+
+import { ProfileScreen } from "./pages/general/pages/profile";
+import type { JSX } from "react";
+
+type PublicRoute = {
+  path: string;
+  element: JSX.Element;
+};
+
+type ProtectedRoute = {
+  path: string;
+  element: JSX.Element;
+  requiredRole?: number;
+};
+
+const ROLES = {
+  ADMIN: 0,
+  EMPLOYEE: 2,
+} as const;
+
+const routes: {
+  public: PublicRoute[];
+  protected: ProtectedRoute[];
+} = {
+  public: [
+    { path: "/login", element: <LoginForm /> },
+    { path: "/senha/esqueci", element: <ResetPassword /> },
+    { path: "/email/confirmar", element: <ConfirmEmailScreen /> },
+    { path: "/senha/redefinir", element: <PasswordSetupScreen /> },
+  ],
+  protected: [
+    {
+      path: "/funcionario",
+      element: <Employee />,
+      requiredRole: ROLES.EMPLOYEE,
+    },
+    { path: "/perfil", element: <ProfileScreen /> },
+    {
+      path: "/funcionario/filas/:id",
+      element: <AddPatient />,
+      requiredRole: ROLES.EMPLOYEE,
+    },
+
+    { path: "/admin", element: <Dashboard />, requiredRole: ROLES.ADMIN },
+    {
+      path: "/admin/funcionarios",
+      element: <EmployeesList />,
+      requiredRole: ROLES.ADMIN,
+    },
+    {
+      path: "/admin/relatorio",
+      element: <Report />,
+      requiredRole: ROLES.ADMIN,
+    },
+    {
+      path: "/admin/admins",
+      element: <AdminsList />,
+      requiredRole: ROLES.ADMIN,
+    },
+    { path: "/admin/logs", element: <LogsList />, requiredRole: ROLES.ADMIN },
+  ],
+};
+
 function AppRoutes() {
   const { user, isAuthenticated } = useAuth();
 
+  const getDefaultRoute = () => {
+    if (!isAuthenticated || !user) {
+      return "/login";
+    }
+
+    return user.role === ROLES.ADMIN ? "/admin" : "/funcionario";
+  };
+
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={
-          <GuestRoute>
-            <LoginForm />
-          </GuestRoute>
-        }
-      />
+      {routes.public.map((route) => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={<GuestRoute>{route.element}</GuestRoute>}
+        />
+      ))}
 
-      <Route
-        path="/senha/esqueci"
-        element={
-          <GuestRoute>
-            <ResetPassword />
-          </GuestRoute>
-        }
-      />
+      {routes.protected.map((route) => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={
+            <ProtectedRoute requiredRole={route.requiredRole}>
+              {route.element}
+            </ProtectedRoute>
+          }
+        />
+      ))}
 
-      <Route
-        path="/email/confirmar"
-        element={
-          <GuestRoute>
-            <ConfirmEmailScreen />
-          </GuestRoute>
-        }
-      />
-
-      <Route
-        path="/senha/redefinir"
-        element={
-          <GuestRoute>
-            <PasswordSetupScreen />
-          </GuestRoute>
-        }
-      />
-
-      <Route
-        path="/funcionario"
-        element={
-          <ProtectedRoute>
-            <Employee />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/perfil"
-        element={
-          <ProtectedRoute>
-            <ProfileScreen />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/funcionario/filas/:id"
-        element={
-          <ProtectedRoute>
-            <AddPatient />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requiredRole={0}>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/funcionarios"
-        element={
-          <ProtectedRoute requiredRole={0}>
-            <EmployeesList />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/relatorio"
-        element={
-          <ProtectedRoute requiredRole={0}>
-            <Report />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/admins"
-        element={
-          <ProtectedRoute requiredRole={0}>
-            <AdminsList />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/logs"
-        element={
-          <ProtectedRoute requiredRole={0}>
-            <LogsList />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/"
-        element={
-          isAuthenticated && user ? (
-            user.role === 0 ? (
-              <Navigate to="/admin" replace />
-            ) : (
-              <Navigate to="/funcionario" replace />
-            )
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+      <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -159,9 +130,7 @@ function App() {
     <AuthProvider>
       <NotificationProvider>
         <Router>
-          <div className="App">
-            <AppRoutes />
-          </div>
+          <AppRoutes />
         </Router>
       </NotificationProvider>
     </AuthProvider>

@@ -18,35 +18,22 @@ import {
   ScreenLink,
   ScreenFooter,
 } from "./style";
-import type { FormErrors, ResetPasswordStep } from "./types";
-import { validateEmail } from "../../../../utils";
+import type { ResetPasswordStep } from "./types";
+import { useFormErrors } from "../../../../hooks/FormErrors";
 
 const ResetPasswordScreen: React.FC = () => {
   const [currentStep, setCurrentStep] =
     useState<ResetPasswordStep>("EMAIL_INPUT");
   const [email, setEmail] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const authService = new Auth();
   const navigate = useNavigate();
-
-  const validateEmailStep = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!validateEmail(email)) {
-      newErrors.email = "Por favor, insira um email válido";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const { errors, clearFieldError, handleApiErrors } = useFormErrors();
 
   const handleRequestResetLink = async (): Promise<void> => {
-    if (!validateEmailStep()) return;
-
     setIsLoading(true);
     setErrorMessage("");
 
@@ -62,7 +49,9 @@ const ResetPasswordScreen: React.FC = () => {
         err.response.data.message ||
           "Erro ao solicitar o link de redefinição. Tente novamente."
       );
-      console.log(err);
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -70,10 +59,7 @@ const ResetPasswordScreen: React.FC = () => {
 
   const handleInputChange = (value: string): void => {
     setEmail(value);
-
-    if (errors.email) {
-      setErrors((prev) => ({ ...prev, email: undefined }));
-    }
+    clearFieldError("email");
 
     if (errorMessage) {
       setErrorMessage("");

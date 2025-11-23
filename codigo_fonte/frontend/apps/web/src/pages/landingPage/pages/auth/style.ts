@@ -64,6 +64,41 @@ export const FormContainer = styled.div<{
     right: auto !important;
   }
 `;
+export const StatusMessage = styled.div<{
+  variant: "success" | "error" | "info";
+}>`
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 16px;
+  border: 1px solid;
+  line-height: 1.5;
+
+  ${({ variant }) => {
+    switch (variant) {
+      case "success":
+        return `
+          background: ${color.error.ok}1a;
+          color: ${color.error.ok};
+          border-color: ${color.error.ok}4d;
+        `;
+      case "error":
+        return `
+          background: ${color.error.error}1a;
+          color: ${color.error.error};
+          border-color: ${color.error.error}4d;
+        `;
+      case "info":
+        return `
+          background: ${color.primary}0d;
+          color: ${color.text};
+          border-color: ${color.primary}26;
+        `;
+      default:
+        return "";
+    }
+  }}
+`;
 
 export const LoginFormWrapper = styled.form`
   width: 100%;

@@ -17,6 +17,7 @@ import {
   ScreenFooter,
 } from "./style";
 import { Auth } from "@hisius/services/src";
+import { useFormErrors } from "../../../../hooks/FormErrors";
 
 interface FormData {
   password: string;
@@ -36,6 +37,7 @@ const PasswordSetupScreen: React.FC = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const authService = new Auth();
+  const { errors, clearFieldError, handleApiErrors } = useFormErrors();
 
   useEffect(() => {
     if (!token) {
@@ -43,29 +45,7 @@ const PasswordSetupScreen: React.FC = () => {
     }
   }, [token, navigate]);
 
-  const validateForm = (): boolean => {
-    if (!formData.password) {
-      setError("Senha é obrigatória");
-      return false;
-    }
-    if (formData.password.length < 8) {
-      setError("A senha deve ter pelo menos 8 caracteres");
-      return false;
-    }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      setError("A senha deve conter letras maiúsculas, minúsculas e números");
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError("As senhas não coincidem");
-      return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (): Promise<void> => {
-    if (!validateForm()) return;
-
     setIsLoading(true);
     setError("");
 
@@ -79,6 +59,9 @@ const PasswordSetupScreen: React.FC = () => {
       setTimeout(() => navigate("/login"), 2000);
     } catch (err: any) {
       setError(err.response.data.message || "Erro ao redefinir senha.");
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +71,7 @@ const PasswordSetupScreen: React.FC = () => {
     (field: keyof FormData) =>
     (value: string): void => {
       setFormData((prev) => ({ ...prev, [field]: value }));
+      clearFieldError(field);
       if (error) setError("");
     };
 
@@ -128,7 +112,7 @@ const PasswordSetupScreen: React.FC = () => {
             value={formData.password}
             onChangeText={handleInputChange("password")}
             placeholder="Digite sua nova senha"
-            error={error && !formData.password ? error : undefined}
+            error={errors.password}
             icon={<HiOutlineLockClosed />}
             secureTextEntry
           />
@@ -137,11 +121,7 @@ const PasswordSetupScreen: React.FC = () => {
             value={formData.confirmPassword}
             onChangeText={handleInputChange("confirmPassword")}
             placeholder="Confirme sua senha"
-            error={
-              error && formData.password !== formData.confirmPassword
-                ? error
-                : undefined
-            }
+            error={errors.confirmPassword}
             icon={<HiOutlineLockClosed />}
             secureTextEntry
           />

@@ -75,6 +75,14 @@ export class UserRepository {
     return user;
   }
 
+  async updateName(newName: string, userId: number) {
+    const user = await this.findById(userId);
+    if (!user) throw new BadRequestError("Usuário não encontrado.");
+    user.name = newName;
+    await user.save();
+    return user;
+  }
+
   async updatePassword(id: number, hashedPassword: string) {
     const user = await this.findById(id);
     if (!user) throw new BadRequestError("Usuário não encontrado.");

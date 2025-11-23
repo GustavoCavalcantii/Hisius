@@ -65,10 +65,13 @@ export class ManagerService {
     return !!existing;
   }
 
-  async getAdminsPaginated(queryParams: IUserQueryParams) {
-    return await this.userService.getUsersPaginated({
-      ...queryParams,
-      role: UserRole.ADMIN,
-    });
+  async getAdminsPaginated(queryParams: IUserQueryParams, managerId: number) {
+    return await this.userService.getUsersPaginated(
+      {
+        ...queryParams,
+        role: UserRole.ADMIN,
+      },
+      managerId
+    );
   }
 }

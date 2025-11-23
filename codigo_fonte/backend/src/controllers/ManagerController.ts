@@ -26,16 +26,22 @@ export class ManagerController {
 
   static async getManagers(req: Request, res: Response, next: NextFunction) {
     try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
       const queryParams = plainToInstance(ManagerDto, req.query);
       const page = queryParams.page;
       const limit = queryParams.limit;
       const name = queryParams.nameFilter;
 
-      const result = await managerService.getAdminsPaginated({
-        page,
-        limit,
-        name,
-      } as IUserQueryParams);
+      const result = await managerService.getAdminsPaginated(
+        {
+          page,
+          limit,
+          name,
+        } as IUserQueryParams,
+        loggedInUser.id
+      );
 
       return res
         .status(200)

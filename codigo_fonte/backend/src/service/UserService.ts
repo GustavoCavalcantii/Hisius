@@ -14,7 +14,8 @@ export class UserService {
   private userRepo = new UserRepository();
 
   async getUsersPaginated(
-    queryParams: IUserQueryParams
+    queryParams: IUserQueryParams,
+    managerId?: number
   ): Promise<{ users: IUser[] | null; pagination: IPagination }> {
     const { page = 0, limit = 10, name, role } = queryParams;
 
@@ -33,7 +34,8 @@ export class UserService {
 
     const sanitizedUsers = result.users
       .map((user) => user.sanitize())
-      .filter((user): user is IUser => user !== null);
+      .filter((user): user is IUser => user !== null)
+      .filter((user) => !managerId || user.id !== managerId);
 
     return {
       users: sanitizedUsers,
@@ -114,6 +116,11 @@ export class UserService {
 
     const newUser = await this.userRepo.updatePassword(user.id, hashedPassword);
     return newUser.sanitize();
+  }
+
+  async changeName(userId: number, name: string) {
+    const user = await this.userRepo.updateName(name, userId);
+    return user.sanitize();
   }
 
   async getById(userId: number) {

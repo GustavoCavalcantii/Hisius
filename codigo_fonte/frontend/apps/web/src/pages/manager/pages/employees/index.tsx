@@ -11,15 +11,17 @@ import {
   EmployeContainer,
   TextToCopy,
   NoEmployeesMessage,
+  ButtonContainer,
 } from "./styles";
 import { useEffect, useState } from "react";
 import { Admin } from "@hisius/services";
 import { useNotification } from "../../../../components/notification/context";
-import type { User, Pagination as IPagination } from "@hisius/interfaces";
+import type { User } from "@hisius/interfaces";
 import Popup from "../../../../components/popup";
 import { CopyButton } from "../../../../components/copyButton";
 import { copyToClipboard, truncateName } from "../../../../utils";
 import Pagination from "../../../../components/pagination";
+import CustomButton from "@hisius/ui/components/Button";
 
 export function EmployeesList() {
   const adminService = new Admin();
@@ -35,6 +37,7 @@ export function EmployeesList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(12);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchEmployees = async () => {
     try {
@@ -57,6 +60,26 @@ export function EmployeesList() {
       addNotification("Erro ao buscar funcionários", "error");
       setEmployees([]);
       setTotalItems(0);
+    }
+  };
+
+  const handleMakeAdmin = async () => {
+    if (!selectedEmployee) return;
+
+    setIsLoading(true);
+    try {
+      await adminService.changeUserRole(selectedEmployee.id, 0);
+      addNotification(
+        "Funcionário promovido a administrador com sucesso!",
+        "success"
+      );
+      await fetchEmployees();
+
+      handleClosePopup();
+    } catch (error) {
+      addNotification("Erro ao promover funcionário a administrador", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -132,6 +155,14 @@ export function EmployeesList() {
           <DataContainer>
             <HiOutlineEnvelope /> {selectedEmployee?.email}
           </DataContainer>
+          <DataContainer>ID: {selectedEmployee?.id}</DataContainer>
+          <ButtonContainer>
+            <CustomButton
+              title={isLoading ? "Processando..." : "Tornar Administrador"}
+              onPress={handleMakeAdmin}
+              disabled={isLoading}
+            />
+          </ButtonContainer>
         </ContactContainer>
       </Popup>
       <Container className="containerSide">

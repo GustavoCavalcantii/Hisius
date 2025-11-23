@@ -23,7 +23,6 @@ import {
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { Auth } from "@hisius/services/src";
-import LocalStorageManager from "@hisius/services/src/helpers/localStorageManager";
 import { useFormErrors } from "../../../../hooks/FormErrors";
 import { useAuth } from "../../../../context/authContext";
 

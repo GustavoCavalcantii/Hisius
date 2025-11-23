@@ -28,6 +28,13 @@ export class Admin {
     return response.data.data;
   }
 
+  async changeUserRole(id: number, newRole: number): Promise<ApiResponse> {
+    const response = await api.put<ApiResponse>(`/users/${id}`, {
+      role: newRole,
+    });
+    return response.data;
+  }
+
   async getReport(startDate: string, endDate: string): Promise<ReportInfo> {
     const response = await api.get<ApiResponse>("reports/", {
       params: {

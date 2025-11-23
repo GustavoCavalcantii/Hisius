@@ -11,6 +11,29 @@ export const Container = styled.div`
   ${fadeInAnim}
 `;
 
+export const ButtonContainer = styled.div`
+  display: flex;
+  margin-top: 2rem;
+  justify-content: center;
+  width: 100%;
+`;
+
+export const DataContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  & svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const ContactContainer = styled.div`
+  width: fit-content;
+  margin: 2rem auto;
+`;
+
 export const AdminsContainer = styled.div`
   display: flex;
   flex-direction: column;

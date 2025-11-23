@@ -10,6 +10,14 @@ export const Container = styled.div`
   gap: 1rem;
 `;
 
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  margin-top: 2rem;
+  justify-content: center;
+  width: 100%;
+`;
+
 export const ItemsPerPageSelector = styled.div`
   display: flex;
   align-items: center;
@@ -18,13 +26,13 @@ export const ItemsPerPageSelector = styled.div`
 
   label {
     font-size: 0.9rem;
-    color: #666;
+    color: ${color.gray};
   }
 
   select {
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border: 1px solid ${color.gray};
     background-color: white;
   }
 `;

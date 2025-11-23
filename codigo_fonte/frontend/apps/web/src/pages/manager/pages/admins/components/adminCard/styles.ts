@@ -1,4 +1,5 @@
 import { color } from "@hisius/ui/theme/colors";
+import { clickAnim } from "../../../../../../assets/animations";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -18,6 +19,16 @@ export const Container = styled.div`
   transform-origin: top center;
   transition: all 0.3s ease;
   z-index: 1;
+
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.005);
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.05);
+  }
+  z-index: 1;
+
+  ${clickAnim}
 `;
 
 export const SelectContainer = styled.div`
@@ -54,6 +65,6 @@ export const NameTitle = styled.h1`
 
 export const Description = styled.p`
   font-size: 13px;
-  font-weight: 200;
+  font-weight: 300;
   transition: all 0.3s ease;
 `;

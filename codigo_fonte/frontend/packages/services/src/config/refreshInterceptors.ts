@@ -20,6 +20,21 @@ const processQueue = (error, token = null) => {
 export const refreshTokenInterceptor = async (error) => {
   const originalRequest = error.config;
 
+  const excludedRoutes = [
+    "/auth/recover-password",
+    "/auth/login",
+    "/users",
+    "/auth/confirm-change-email",
+  ];
+
+  const shouldSkipRefresh = excludedRoutes.some((route) =>
+    originalRequest.url?.includes(route)
+  );
+
+  if (shouldSkipRefresh) {
+    return Promise.reject(error);
+  }
+
   if (!originalRequest._retry) {
     if (error.response?.status === 401 || error.response?.status === 403) {
       if (isRefreshing) {

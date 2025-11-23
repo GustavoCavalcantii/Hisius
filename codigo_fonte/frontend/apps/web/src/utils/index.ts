@@ -7,6 +7,11 @@ export const capitalizeWords = (value: string | undefined) => {
     .join(" ");
 };
 
+export const validateEmail = (email: string | undefined) => {
+  if (!email) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);

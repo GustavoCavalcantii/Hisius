@@ -35,6 +35,30 @@ export class Auth {
     return response.data.data;
   }
 
+  getAuthHeaders = (token: string) => ({
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  async resetEmail(token: string) {
+    const response = await api.put<ApiResponseGet>(
+      `/auth/confirm-change-email`,
+      {},
+      this.getAuthHeaders(token)
+    );
+    return response.data;
+  }
+
+  async resetPass(token: string, password: string, confirmPassword: string) {
+    const response = await api.put<ApiResponseGet>(
+      `/auth/recover-password`,
+      { password, confirmPassword },
+      this.getAuthHeaders(token)
+    );
+    return response.data;
+  }
+
   async changeEmail(newEmail: string) {
     const response = await api.post<ApiResponseGet>(
       `/auth/change-email-request`,
@@ -42,6 +66,7 @@ export class Auth {
     );
     return response.data;
   }
+
   async changePass(email: string) {
     const response = await api.post<ApiResponseGet>(`/auth/forgot-password`, {
       email,

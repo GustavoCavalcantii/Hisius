@@ -17,6 +17,9 @@ import { AuthProvider, useAuth } from "./context/authContext";
 import { ProtectedRoute } from "./components/protectedRoute";
 import LogsList from "./pages/manager/pages/logs";
 import { ProfileScreen } from "./pages/general/pages/profile";
+import ResetPassword from "./pages/landingPage/pages/forgotPass";
+import PasswordSetupScreen from "./pages/landingPage/pages/resetPass";
+import ConfirmEmailScreen from "./pages/landingPage/pages/confirmEmail";
 
 function AppRoutes() {
   const { user, isAuthenticated } = useAuth();
@@ -28,6 +31,33 @@ function AppRoutes() {
         element={
           <GuestRoute>
             <LoginForm />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/senha/esqueci"
+        element={
+          <GuestRoute>
+            <ResetPassword />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/email/confirmar"
+        element={
+          <GuestRoute>
+            <ConfirmEmailScreen />
+          </GuestRoute>
+        }
+      />
+
+      <Route
+        path="/senha/redefinir"
+        element={
+          <GuestRoute>
+            <PasswordSetupScreen />
           </GuestRoute>
         }
       />

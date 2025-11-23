@@ -26,6 +26,8 @@ interface CustomInputProps {
   disabled?: boolean;
   inputType?: string;
   inputId?: string;
+  onSubmitEditing?: () => void;
+  returnKeyType?: "done" | "go" | "next" | "search" | "send";
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -43,6 +45,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
   disabled = false,
   inputType,
   inputId,
+  onSubmitEditing,
+  returnKeyType = "done",
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -109,6 +113,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
             selectionColor="#007AFF"
             keyboardType={keyboardType}
             autoCapitalize={autoCapitalize}
+            onSubmitEditing={onSubmitEditing}
+            returnKeyType={returnKeyType}
             onFocus={() => {
               if (!disabled) {
                 setIsFocused(true);

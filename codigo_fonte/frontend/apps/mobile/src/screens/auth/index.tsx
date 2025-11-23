@@ -58,7 +58,7 @@ export default function LoginRegister() {
         return;
       }
 
-      await AuthService.register({
+      const response = await AuthService.register({
         name,
         email,
         password,

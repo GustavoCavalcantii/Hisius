@@ -19,6 +19,7 @@ import Button from "@hisius/ui/components/Button";
 import { useNotification } from "../../../../../../components/notification/context";
 import { Queue } from "@hisius/services";
 import { capitalizeWords } from "../../../../../../utils";
+import { useTruncate } from "../../../../../../hooks/UseTruncate";
 
 interface PatientCardProp {
   key: number;
@@ -33,6 +34,8 @@ export function PatientCard(props: PatientCardProp) {
   );
   const { addNotification } = useNotification();
   const queueService = new Queue();
+
+  const { ref: nameRef, isTruncated } = useTruncate();
 
   const classificationOptions = Object.values(ManchesterTriage).map(
     (value) => ({
@@ -179,7 +182,13 @@ export function PatientCard(props: PatientCardProp) {
         onClick={handleCardClick}
       >
         <TitleContainer>
-          <NameTitle $isSelected={isSelected}>{props.patient.name}</NameTitle>
+          <NameTitle
+            ref={nameRef}
+            $isSelected={isSelected}
+            title={isTruncated ? props.patient.name : undefined}
+          >
+            {props.patient.name}
+          </NameTitle>
         </TitleContainer>
         {!isSelected ? notSelectedCard() : selectedCard()}
       </Container>

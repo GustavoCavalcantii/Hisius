@@ -139,7 +139,7 @@ export function Report() {
         <QueueHeader queueTitle="Relatórios" queueSubtitle="Semana | Mês" />
 
         <Toggle
-          labels={{ on: "Semanal", off: "Mensal" }}
+          labels={{ on: "Mensal", off: "Semanal" }}
           onToggle={handleToggleChange}
         />
 

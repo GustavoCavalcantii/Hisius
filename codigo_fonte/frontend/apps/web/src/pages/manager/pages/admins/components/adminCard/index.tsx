@@ -1,4 +1,3 @@
-import { truncateName } from "../../../../../../utils";
 import { Container, Description, NameTitle, TitleContainer } from "./styles";
 
 interface AdminCardProp {
@@ -13,7 +12,7 @@ export function AdminCard(props: AdminCardProp) {
     <>
       <Container onClick={props.onClick}>
         <TitleContainer>
-          <NameTitle>{truncateName(props.name, 25)}</NameTitle>
+          <NameTitle>{props.name}</NameTitle>
         </TitleContainer>
         <Description>ID: {props.id}</Description>
 

@@ -185,6 +185,12 @@ export const NameTitle = styled.h1<MutableProps>`
   transform: ${(props: MutableProps) =>
     props.$isSelected ? "translateX(-50%)" : "translateX(0)"};
 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+
   ${(props: MutableProps) =>
     !props.$isSelected &&
     css`

@@ -74,6 +74,7 @@ export const PopupTitle = styled.h2`
   width: 100%;
   text-align: center;
   margin: 0;
+  padding:0 3rem;
   font-size: 1.5rem;
   font-weight: 400;
   margin-bottom: 1rem;

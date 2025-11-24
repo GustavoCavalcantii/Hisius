@@ -23,6 +23,16 @@ svg {
   padding-right: 30px;
 }
 
+h1,
+h2,
+h3,
+p,
+a,
+div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 body {
   background-color: #F3F3F3;

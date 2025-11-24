@@ -15,7 +15,6 @@ import { useNotification } from "../../../../components/notification/context";
 import type { User } from "@hisius/interfaces";
 import Pagination from "../../../../components/pagination";
 import Popup from "../../../../components/popup";
-import { truncateName } from "../../../../utils";
 import { HiOutlineEnvelope } from "react-icons/hi2";
 import CustomButton from "@hisius/ui/components/Button";
 import { usePageTitle } from "../../../../hooks/PageTitle";
@@ -117,7 +116,7 @@ export function AdminsList() {
       <Popup
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        title={truncateName(selectedAdmin?.name, 28) || "Administrador"}
+        title={selectedAdmin?.name || "Administrador"}
         size="medium"
       >
         <ContactContainer>

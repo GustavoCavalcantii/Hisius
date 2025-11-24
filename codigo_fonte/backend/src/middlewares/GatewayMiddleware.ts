@@ -39,9 +39,18 @@ export function GatewayMiddleware(socket: Socket, next: any) {
 }
 
 function extractTokenFromSocket(socket: Socket): string | null {
-  return socket.handshake.headers.authorization?.replace("Bearer ", "") || null;
-}
+  const headerToken =
+    socket.handshake.headers.authorization?.replace("Bearer ", "") || null;
 
+  if (headerToken) {
+    return headerToken;
+  }
+
+  const authToken =
+    socket.handshake.auth.authorization?.replace("Bearer ", "") || null;
+
+  return authToken;
+}
 function validateToken(token: string) {
   const payload = tokenUtils.validateAccessToken(token);
 

@@ -22,6 +22,7 @@ import {
   PopupText,
 } from "./styles";
 import { usePageTitle } from "../../../../hooks/PageTitle";
+import { truncateName } from "apps/web/src/utils";
 
 export function Employee() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -155,7 +156,7 @@ export function Employee() {
       <Popup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
-        title={`Chamar ${nextPatient?.name} para a próxima fila`}
+        title={`Chamar ${truncateName(nextPatient?.name, 20)} para a próxima fila`}
         size="medium"
       >
         <PopupText>Para qual sala você deseja chamar o paciente?</PopupText>

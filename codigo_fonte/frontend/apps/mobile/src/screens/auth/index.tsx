@@ -173,6 +173,12 @@ export default function LoginRegister() {
                   inputId="password"
                   icon={<Feather name="lock" size={15} color={color.text} />}
                   onChangeText={handlePasswordChange}
+                  visibilityOff={
+                    <Feather name="eye-off" size={15} color={color.text} />
+                  }
+                  visibilityOn={
+                    <Feather name="eye" size={15} color={color.text} />
+                  }
                   secureTextEntry
                   error={errors.password}
                 />
@@ -183,6 +189,12 @@ export default function LoginRegister() {
                     value={confirmPassword}
                     inputId="confirmpassword"
                     icon={<Feather name="lock" size={15} color={color.text} />}
+                    visibilityOff={
+                      <Feather name="eye-off" size={15} color={color.text} />
+                    }
+                    visibilityOn={
+                      <Feather name="eye" size={15} color={color.text} />
+                    }
                     onChangeText={handleConfirmPasswordChange}
                     secureTextEntry
                     error={errors.confirmPassword}

@@ -3,6 +3,8 @@ import {
   HiOutlineMail,
   HiOutlineLockClosed,
   HiOutlineUser,
+  HiOutlineEye,
+  HiOutlineEyeOff,
 } from "react-icons/hi";
 import {
   LoginContainer,
@@ -195,6 +197,8 @@ const LoginForm: React.FC = () => {
               onChangeText={handleInputChange("login", "password")}
               placeholder="Senha"
               error={errors.password}
+              visibilityOff={<HiOutlineEyeOff style={iconStyle} />}
+              visibilityOn={<HiOutlineEye style={iconStyle} />}
               icon={<HiOutlineLockClosed style={iconStyle} />}
               secureTextEntry
             />
@@ -243,6 +247,8 @@ const LoginForm: React.FC = () => {
               placeholder="Senha"
               error={errors.password}
               icon={<HiOutlineLockClosed style={iconStyle} />}
+              visibilityOff={<HiOutlineEyeOff style={iconStyle} />}
+              visibilityOn={<HiOutlineEye style={iconStyle} />}
               secureTextEntry
             />
 
@@ -252,6 +258,8 @@ const LoginForm: React.FC = () => {
               placeholder="Confirmar senha"
               error={errors.confirmPassword}
               icon={<HiOutlineLockClosed style={iconStyle} />}
+              visibilityOff={<HiOutlineEyeOff style={iconStyle} />}
+              visibilityOn={<HiOutlineEye style={iconStyle} />}
               secureTextEntry
             />
             <p>

@@ -8,9 +8,9 @@ import {
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { createStyles } from "./style";
 import { GlobalText as Text } from "../../components/globalText";
-import { Patient } from "@hisius/services";
+import { getToken, getUser, Patient, useSocket } from "@hisius/services";
 import { IQueuedInfo } from "@hisius/interfaces/src";
-import { RootStackParamList } from "apps/mobile/navigation/types";
+import { RootStackParamList } from "../../../navigation/types";
 import Header from "../../components/header";
 import { Feather } from "@expo/vector-icons";
 import { color } from "@hisius/ui/theme/colors";
@@ -23,6 +23,9 @@ export function QueueScreen() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [authLoaded, setAuthLoaded] = useState(false);
 
   const lastRequestTime = useRef(0);
   const patientInstance = new Patient();
@@ -32,6 +35,46 @@ export function QueueScreen() {
   const AUTO_UPDATE_INTERVAL = 300000;
 
   const { addNotification } = useNotification();
+
+  useEffect(() => {
+    const loadAuthData = async () => {
+      try {
+        const [userData, authToken] = await Promise.all([
+          JSON.parse(await getUser()),
+          getToken(),
+        ]);
+
+        setUser(userData);
+        setToken(authToken);
+        setAuthLoaded(true);
+
+        console.log("Dados de autenticação carregados:", {
+          userId: userData?.id,
+          hasToken: !!authToken,
+        });
+      } catch (error) {
+        console.error("Erro ao carregar dados de autenticação:", error);
+        setAuthLoaded(true);
+      }
+    };
+
+    loadAuthData();
+  }, []);
+
+  const { lastNotification } = useSocket(
+    authLoaded ? user?.id || null : null,
+    authLoaded ? token : null
+  );
+
+  useEffect(() => {
+    if (lastNotification) {
+      console.log(
+        "Notificação recebida, recarregando dados...",
+        lastNotification
+      );
+      fetchPatient();
+    }
+  }, [lastNotification]);
 
   const handleProfile = () => navigation.navigate("Profile");
   const handleLeaveQueue = async () => {
@@ -137,7 +180,6 @@ export function QueueScreen() {
           </View>
         </View>
 
-        {/* Botão de ação */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.leaveButton}

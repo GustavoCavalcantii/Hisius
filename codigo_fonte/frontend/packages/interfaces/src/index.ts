@@ -1,5 +1,23 @@
 import { ManchesterTriage } from "packages/enums/src";
 
+export interface PatientCalledData {
+  message: string;
+  room: string;
+}
+
+export interface SocketEvents {
+  "paciente-chamado": (data: PatientCalledData) => void;
+  connect: () => void;
+  disconnect: () => void;
+  connect_error: (error: Error) => void;
+  [key: string]: (...args: any[]) => void;
+}
+
+export interface UseSocketReturn {
+  isConnected: boolean;
+  lastNotification: PatientCalledData | null;
+  emitEvent: <T>(event: string, data: T) => void;
+}
 export interface IPatient {
   id?: number;
   gender: "MASCULINO" | "FEMININO";

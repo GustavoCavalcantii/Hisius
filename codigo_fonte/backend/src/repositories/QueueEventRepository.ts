@@ -115,44 +115,74 @@ export class QueueEventRepository {
   async getMostFrequentWaitTimes(startDate: Date, endDate: Date) {
     const result = await QueueEvent.sequelize!.query(
       `
-        WITH wait_times AS (
-          SELECT 
-              fila AS queue,
-              ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em)) AS wait_time_seconds,
-              COUNT(*) AS frequency
-          FROM fila_eventos 
-          WHERE entrou_em BETWEEN ? AND ?
-          AND iniciou_em IS NOT NULL
-          GROUP BY fila, ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em))
-        )
-        SELECT queue, wait_time_seconds, frequency
-        FROM wait_times 
-        ORDER BY frequency DESC
-        LIMIT 5
-      `,
+    WITH wait_times AS (
+      SELECT 
+          LOWER(TRIM(fila)) AS queue,
+          ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em)) AS wait_time_seconds,
+          COUNT(*) AS frequency
+      FROM fila_eventos 
+      WHERE entrou_em BETWEEN ? AND ?
+        AND iniciou_em IS NOT NULL
+        AND entrou_em IS NOT NULL
+        AND TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em) > 0
+      GROUP BY LOWER(TRIM(fila)), ROUND(TIMESTAMPDIFF(SECOND, entrou_em, iniciou_em))
+    ),
+    ranked_times AS (
+      SELECT 
+        queue, 
+        wait_time_seconds, 
+        frequency,
+        ROW_NUMBER() OVER (
+          PARTITION BY 
+            CASE 
+              WHEN queue LIKE '%atendimento%' THEN 'atendimento'
+              WHEN queue LIKE '%triagem%' THEN 'triagem'
+            END 
+          ORDER BY frequency DESC
+        ) as row_num
+      FROM wait_times 
+      WHERE queue LIKE '%atendimento%' OR queue LIKE '%triagem%'
+    )
+    SELECT queue, wait_time_seconds, frequency
+    FROM ranked_times
+    WHERE row_num <= 5
+    ORDER BY 
+      CASE 
+        WHEN queue LIKE '%atendimento%' THEN 1
+        WHEN queue LIKE '%triagem%' THEN 2
+      END,
+      frequency DESC
+    `,
       {
         replacements: [startDate, endDate],
         type: QueryTypes.SELECT,
       }
     );
 
-    return (result as any[]).reduce(
+    console.log("Resultado filtrado:", result);
+
+    const grouped = (result as any[]).reduce(
       (acc, row) => {
-        const queueKey = row.queue.toLowerCase();
         const item = {
-          averageWaitTime:
-            row.wait_time_seconds !== null
-              ? Number(row.wait_time_seconds)
-              : null,
-          count: row.frequency !== null ? Number(row.frequency) : null,
+          averageWaitTime: Number(row.wait_time_seconds),
+          count: Number(row.frequency),
         };
-        return {
-          ...acc,
-          [queueKey]: [...(acc[queueKey] || []), item],
-        };
+
+        if (row.queue.includes("atendimento")) {
+          acc.atendimento.push(item);
+        } else if (row.queue.includes("triagem")) {
+          acc.triagem.push(item);
+        }
+
+        return acc;
       },
-      { atendimento: [], triagem: [] }
+      {
+        atendimento: [] as { averageWaitTime: number; count: number }[],
+        triagem: [] as { averageWaitTime: number; count: number }[],
+      }
     );
+
+    return grouped;
   }
 
   async getPatientJourney(patientId: string) {

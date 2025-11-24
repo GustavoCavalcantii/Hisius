@@ -21,6 +21,9 @@ import {
   ToggleButton,
   ToggleOverlay,
   StatusMessage,
+  InfoMessage,
+  ContactInfo,
+  ContactItem,
 } from "./style";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
@@ -213,59 +216,25 @@ const LoginForm: React.FC = () => {
         </FormContainer>
 
         <FormContainer position="right" isActive={!isLogin}>
-          <LoginFormWrapper onSubmit={(e) => e.preventDefault()}>
-            <Title>Cadastre-se</Title>
-            <Subtitle>Crie sua conta de administrador</Subtitle>
+          <LoginFormWrapper onSubmit={handleRegisterSubmit}>
+            <Title>Criar Conta de Administrador</Title>
 
-            {successMessage && (
-              <StatusMessage variant="success">{successMessage}</StatusMessage>
-            )}
+            <Subtitle>
+              Cadastre-se para acessar o painel administrativo
+            </Subtitle>
 
-            {errorMessage && (
-              <StatusMessage variant="error">{errorMessage}</StatusMessage>
-            )}
+            <InfoMessage>
+              <strong>Para criar sua conta:</strong>
+              <span>Entre em contato conosco</span>
+              <ContactInfo>
+                <ContactItem>email@empresa.com</ContactItem>
+                <ContactItem>(11) 99999-9999</ContactItem>
+              </ContactInfo>
+            </InfoMessage>
 
-            <CustomInput
-              value={registerData.name}
-              onChangeText={handleInputChange("register", "name")}
-              placeholder="Nome completo"
-              error={errors.name}
-              icon={<HiOutlineUser style={iconStyle} />}
-            />
-
-            <CustomInput
-              value={registerData.email}
-              onChangeText={handleInputChange("register", "email")}
-              placeholder="Email"
-              error={errors.email}
-              icon={<HiOutlineMail style={iconStyle} />}
-            />
-
-            <CustomInput
-              value={registerData.password}
-              onChangeText={handleInputChange("register", "password")}
-              placeholder="Senha"
-              error={errors.password}
-              icon={<HiOutlineLockClosed style={iconStyle} />}
-              visibilityOff={<HiOutlineEyeOff style={iconStyle} />}
-              visibilityOn={<HiOutlineEye style={iconStyle} />}
-              secureTextEntry
-            />
-
-            <CustomInput
-              value={registerData.confirmPassword}
-              onChangeText={handleInputChange("register", "confirmPassword")}
-              placeholder="Confirmar senha"
-              error={errors.confirmPassword}
-              icon={<HiOutlineLockClosed style={iconStyle} />}
-              visibilityOff={<HiOutlineEyeOff style={iconStyle} />}
-              visibilityOn={<HiOutlineEye style={iconStyle} />}
-              secureTextEntry
-            />
             <p>
-              Já tem uma conta? <Link onClick={toggleForm}>Entrar</Link>
+              Já tem uma conta? <Link onClick={toggleForm}>Entre</Link>
             </p>
-            <CustomButton title="Cadastrar" onPress={handleRegisterSubmit} />
           </LoginFormWrapper>
         </FormContainer>
 
@@ -274,7 +243,7 @@ const LoginForm: React.FC = () => {
           <TogglePanelContent isVisible={isLogin}>
             <ToggleTitle>Olá!</ToggleTitle>
             <ToggleText>
-              Preencha seus dados para seguir com a gente.
+              Faça parte!
             </ToggleText>
             <ToggleButton onClick={toggleForm}>Criar conta</ToggleButton>
           </TogglePanelContent>

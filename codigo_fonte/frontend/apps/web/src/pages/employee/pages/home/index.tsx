@@ -120,7 +120,7 @@ export function Employee() {
         addNotification("Nenhum paciente na fila", "warning");
         return;
       }
-
+      
       if (isTriage) navigate(`/funcionario/filas/${next.id}`);
       addNotification("Paciente chamado com sucesso", "success");
       setIsPopupOpen(false);

@@ -114,6 +114,36 @@ export const Title = styled.h1`
   margin-bottom: 8px;
 `;
 
+export const InfoMessage = styled.div`
+  background: ${color.front};
+  border: 1px solid ${color.gray};
+  border-radius: 8px;
+  padding: 12px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  span {
+    font-size: 14px;
+  }
+`;
+
+export const ContactInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+`;
+
+export const ContactItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 4px 0;
+`;
+
 export const Subtitle = styled.p`
   text-align: center;
   color: ${color.text}80;

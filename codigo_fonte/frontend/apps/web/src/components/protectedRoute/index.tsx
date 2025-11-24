@@ -1,6 +1,5 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
-import LocalStorageManager from "@hisius/services/src/helpers/localStorageManager";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,16 +10,23 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
 }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div>Carregando...</div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
   if (requiredRole !== undefined && user.role !== requiredRole) {
-    logout();
-    LocalStorageManager.clearAll();
-    return <Navigate to="/login" replace />;
+    const defaultRoute = user.role === 0 ? "/admin" : "/funcionario";
+    return <Navigate to={defaultRoute} replace />;
   }
 
   return <>{children}</>;

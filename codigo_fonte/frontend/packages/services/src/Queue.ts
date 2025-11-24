@@ -12,6 +12,24 @@ interface QueueResponse {
 }
 
 export class Queue {
+  async getPatientInRoomByQueue(
+    isTriage: boolean,
+    nameFilter?: string
+  ): Promise<QueueResponse> {
+    const params: Record<string, string> = {};
+
+    if (nameFilter && nameFilter.trim() !== "") {
+      params.nameFilter = nameFilter.trim();
+    }
+
+    const response = await api.get<ApiResponse>(
+      `/queue/${isTriage ? "triage" : "treatment"}/room`,
+      Object.keys(params).length > 0 ? { params } : {}
+    );
+
+    return response.data.data;
+  }
+
   async getPatientByQueue(
     isTriage: boolean,
     nameFilter?: string
@@ -27,8 +45,6 @@ export class Queue {
       Object.keys(params).length > 0 ? { params } : {}
     );
 
-    console.log(response);
-
     return response.data.data;
   }
 
@@ -41,6 +57,11 @@ export class Queue {
 
   async getPatient(id: number): Promise<IPatient> {
     const response = await api.get<ApiResponse>(`/patients/${id}`);
+    return response.data.data;
+  }
+
+  async finishTreatment(userId: number): Promise<ApiResponse> {
+    const response = await api.delete<ApiResponse>(`/queue/${userId}/finish`);
     return response.data.data;
   }
 

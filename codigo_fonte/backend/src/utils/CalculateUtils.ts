@@ -16,22 +16,22 @@ export function calculateScore(
   age: number,
   classification?: ManchesterClassification
 ) {
-  let score = 0;
 
-  const classificationPriority: Record<ManchesterClassification, number> = {
-    [ManchesterClassification.RED]: 1000,
-    [ManchesterClassification.ORANGE]: 800,
-    [ManchesterClassification.YELLOW]: 500,
-    [ManchesterClassification.GREEN]: 200,
-    [ManchesterClassification.BLUE]: 0,
+  const baseScores = {
+    [ManchesterClassification.RED]: 400,
+    [ManchesterClassification.ORANGE]: 300,
+    [ManchesterClassification.YELLOW]: 200,
+    [ManchesterClassification.GREEN]: 100,
+    [ManchesterClassification.BLUE]: 50,
   };
 
-  score += classification ? classificationPriority[classification] : 0;
+  let score = classification ? baseScores[classification] : 50;
 
-  if (age > 65 || age < 1) score += 200;
+  if (age > 65 || age < 1) score += score * 0.15;
 
-  const waitTime = Date.now() - joinedAt.getTime();
-  score += waitTime / 1000;
+  const waitTimeHours = (Date.now() - joinedAt.getTime()) / (1000 * 60 * 60);
+  const timeBonus = Math.min(score * 0.5, waitTimeHours * (score * 0.1));
+  score += timeBonus;
 
-  return score;
+  return Math.round(score);
 }

@@ -50,7 +50,9 @@ export class QueueRepository {
   ) {
     const redis = this.getRedisClient();
     const queueKey = `queue:${queueType}`;
-    await redis.zadd(queueKey, score, patientId.toString());
+
+    const invertedScore = -score;
+    await redis.zadd(queueKey, invertedScore, patientId.toString());
   }
 
   async removePatientFromHistory(queueType: QueueType, patientId: number) {
@@ -131,6 +133,7 @@ export class QueueRepository {
   async getNextPatientId(queueType: QueueType): Promise<string | null> {
     const redis = this.getRedisClient();
     const queueKey = `queue:${queueType}`;
+    
     const ids = await redis.zrange(queueKey, 0, 0);
     return ids.length > 0 ? ids[0] : null;
   }

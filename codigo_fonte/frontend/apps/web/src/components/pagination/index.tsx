@@ -60,6 +60,15 @@ export default function Pagination({
 
   return (
     <Container>
+      {/* Botão anterior */}
+      <PageButton
+        onClick={() => changePage(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        ‹
+      </PageButton>
+
+      {/* Números das páginas */}
       {pageNumbers.map((number, index) => (
         <PageButton
           key={index}
@@ -71,6 +80,14 @@ export default function Pagination({
           {number}
         </PageButton>
       ))}
+
+      {/* Botão próximo */}
+      <PageButton
+        onClick={() => changePage(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        ›
+      </PageButton>
     </Container>
   );
 }

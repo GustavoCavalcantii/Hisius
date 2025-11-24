@@ -10,18 +10,24 @@ import {
   DataContainer,
   EmployeContainer,
   TextToCopy,
+  NoEmployeesMessage,
+  ButtonContainer,
 } from "./styles";
 import { useEffect, useState } from "react";
 import { Admin } from "@hisius/services";
 import { useNotification } from "../../../../components/notification/context";
-import type { UserResponse, User } from "@hisius/interfaces";
+import type { User } from "@hisius/interfaces";
 import Popup from "../../../../components/popup";
 import { CopyButton } from "../../../../components/copyButton";
-import { copyToClipboard } from "../../../../utils";
+import { copyToClipboard, truncateName } from "../../../../utils";
+import Pagination from "../../../../components/pagination";
+import CustomButton from "@hisius/ui/components/Button";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function EmployeesList() {
   const adminService = new Admin();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [employees, setEmployees] = useState<User[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -29,13 +35,54 @@ export function EmployeesList() {
   const [code, setCode] = useState<string>("");
   const { addNotification } = useNotification();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage] = useState(12);
+  const [isLoading, setIsLoading] = useState(false);
+
+  usePageTitle("Funcionários - Hisius");
+
   const fetchEmployees = async () => {
     try {
-      const employeesData: UserResponse =
-        await adminService.getEmployees(searchTerm);
+      const apiPage = currentPage - 1;
+
+      const searchName =
+        debouncedSearchTerm.length >= 3 ? debouncedSearchTerm : undefined;
+
+      const employeesData = await adminService.getEmployees(
+        searchName,
+        apiPage,
+        itemsPerPage
+      );
+
       setEmployees(employeesData.users);
+      employeesData.pagination
+        ? setTotalItems(employeesData.pagination.totalItems)
+        : setTotalItems(employeesData.users.length);
     } catch (error) {
       addNotification("Erro ao buscar funcionários", "error");
+      setEmployees([]);
+      setTotalItems(0);
+    }
+  };
+
+  const handleMakeAdmin = async () => {
+    if (!selectedEmployee) return;
+
+    setIsLoading(true);
+    try {
+      await adminService.changeUserRole(selectedEmployee.id, 0);
+      addNotification(
+        "Funcionário promovido a administrador com sucesso!",
+        "success"
+      );
+      await fetchEmployees();
+
+      handleClosePopup();
+    } catch (error) {
+      addNotification("Erro ao promover funcionário a administrador", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,28 +103,32 @@ export function EmployeesList() {
 
   const handleAddEmployee = async () => {
     const code = await adminService.getEmployeeRegisterCode();
-    setCode(`http://localhost:5173/login/?token=${encodeURIComponent(code)}`);
-
+    setCode(
+      `http://localhost:5173/registrar?token=${encodeURIComponent(code)}`
+    );
     setIsPopupCopyOpen(true);
   };
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchTerm.length >= 3 || searchTerm.length === 0) {
-        fetchEmployees();
-      }
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [currentPage, debouncedSearchTerm]);
 
   const handleCopy = async () => {
     const isOk = await copyToClipboard(code);
-
     if (isOk) addNotification("Texto copiado com sucesso!", "success");
   };
 
@@ -101,7 +152,7 @@ export function EmployeesList() {
       <Popup
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        title={selectedEmployee?.name || "Funcionário"}
+        title={truncateName(selectedEmployee?.name, 28) || "Funcionário"}
         size="medium"
       >
         <ContactContainer>
@@ -109,6 +160,14 @@ export function EmployeesList() {
           <DataContainer>
             <HiOutlineEnvelope /> {selectedEmployee?.email}
           </DataContainer>
+          <DataContainer>ID: {selectedEmployee?.id}</DataContainer>
+          <ButtonContainer>
+            <CustomButton
+              title={isLoading ? "Processando..." : "Tornar Administrador"}
+              onPress={handleMakeAdmin}
+              disabled={isLoading}
+            />
+          </ButtonContainer>
         </ContactContainer>
       </Popup>
       <Container className="containerSide">
@@ -120,15 +179,33 @@ export function EmployeesList() {
           canSearch
           placeholder="Pesquisar funcionários"
         />
+
         <EmployeContainer>
-          {employees.map((employee) => (
-            <Employee
-              key={employee.id}
-              employee={employee}
-              onClick={() => handleEmployeeClick(employee)}
-            />
-          ))}
+          {employees.length > 0 ? (
+            employees.map((employee) => (
+              <Employee
+                key={employee.id}
+                employee={employee}
+                onClick={() => handleEmployeeClick(employee)}
+              />
+            ))
+          ) : (
+            <NoEmployeesMessage>
+              nenhum funcionário encontrado
+            </NoEmployeesMessage>
+          )}
         </EmployeContainer>
+
+        {totalItems > 0 && (
+          <Pagination
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+            maxVisibleButtons={5}
+          />
+        )}
+
         <AddButton onClick={handleAddEmployee}>
           <HiPlus />
         </AddButton>

@@ -7,6 +7,11 @@ export const capitalizeWords = (value: string | undefined) => {
     .join(" ");
 };
 
+export const validateEmail = (email: string | undefined) => {
+  if (!email) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
@@ -15,6 +20,13 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     return false;
   }
 }
+
+export const truncateName = (name: string | undefined, limit: number) => {
+  if (!name) return;
+
+  if (name.length <= limit) return name;
+  return name.substring(0, limit) + "...";
+};
 
 export const formatTime = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);

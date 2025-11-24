@@ -1,20 +1,21 @@
 import api from "./config/axios";
 import type {
-  ApiError,
   UserResponse,
-  IEmployee,
-  IPatient,
-  Pagination,
   ReportInfo,
+  LogData,
+  Pagination,
+  ApiResponse,
   User,
 } from "@hisius/interfaces";
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data?: any;
-  errors?: ApiError[];
+interface LogsResponse {
+  logs: LogData[];
+  pagination: Pagination;
+}
+
+interface LogsResponse {
+  users: User[];
+  pagination: Pagination;
 }
 
 interface HospitalInfo {
@@ -27,6 +28,13 @@ export class Admin {
     return response.data.data;
   }
 
+  async changeUserRole(id: number, newRole: number): Promise<ApiResponse> {
+    const response = await api.put<ApiResponse>(`/users/${id}`, {
+      role: newRole,
+    });
+    return response.data;
+  }
+
   async getReport(startDate: string, endDate: string): Promise<ReportInfo> {
     const response = await api.get<ApiResponse>("reports/", {
       params: {
@@ -37,17 +45,21 @@ export class Admin {
     return response.data.data;
   }
 
-  async getEmployees(nameFilter?: string): Promise<UserResponse> {
+  async getEmployees(
+    nameFilter?: string,
+    page: number = 0,
+    limit: number = 10
+  ): Promise<UserResponse> {
     const params: Record<string, string> = {};
 
     if (nameFilter && nameFilter.trim() !== "") {
       params.nameFilter = nameFilter.trim();
     }
 
-    const response = await api.get<ApiResponse>(
-      `/employees`,
-      Object.keys(params).length > 0 ? { params } : {}
-    );
+    params.page = page.toString();
+    params.limit = limit.toString();
+
+    const response = await api.get<ApiResponse>(`/employees`, { params });
 
     return response.data.data;
   }
@@ -58,17 +70,41 @@ export class Admin {
     return response.data.data.token;
   }
 
-  async getAdmins(nameFilter?: string): Promise<UserResponse> {
+  async getLogs(
+    page?: number,
+    limit?: number,
+    userId?: number,
+    action?: string,
+    module?: string
+  ): Promise<LogsResponse> {
+    const config = {
+      params: {
+        ...(page && { page }),
+        ...(limit && { limit }),
+        ...(userId && { userId }),
+        ...(action && { action }),
+        ...(module && { module }),
+      },
+    };
+
+    const response = await api.get<ApiResponse>(`/logs`, config);
+    return response.data.data;
+  }
+
+  async getAdmins(
+    nameFilter?: string,
+    page: number = 0,
+    limit: number = 10
+  ): Promise<UserResponse> {
     const params: Record<string, string> = {};
 
     if (nameFilter && nameFilter.trim() !== "") {
       params.nameFilter = nameFilter.trim();
     }
+    params.page = page.toString();
+    params.limit = limit.toString();
 
-    const response = await api.get<ApiResponse>(
-      `/admins`,
-      Object.keys(params).length > 0 ? { params } : {}
-    );
+    const response = await api.get<ApiResponse>(`/admins`, { params });
 
     return response.data.data;
   }

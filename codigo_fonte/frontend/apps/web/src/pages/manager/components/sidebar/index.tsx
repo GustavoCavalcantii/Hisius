@@ -1,4 +1,4 @@
-import { HiOutlineHome } from "react-icons/hi2";
+import { HiOutlineClock, HiOutlineHome } from "react-icons/hi2";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { HiOutlineUser } from "react-icons/hi2";
 import { TbGraph } from "react-icons/tb";
@@ -26,6 +26,12 @@ export function Sidebar() {
       exact: true,
     },
     {
+      icon: <HiOutlineClock />,
+      text: "Atividades",
+      path: "/admin/logs",
+      exact: true,
+    },
+    {
       icon: <HiOutlineInformationCircle />,
       text: "Administradores",
       path: "/admin/admins",
@@ -34,7 +40,7 @@ export function Sidebar() {
     {
       icon: <HiOutlineUser />,
       text: "Conta",
-      path: "/admin/perfil",
+      path: "/perfil",
       exact: true,
     },
   ];

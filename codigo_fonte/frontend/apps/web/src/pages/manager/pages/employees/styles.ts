@@ -9,6 +9,46 @@ export const Container = styled.div`
   flex-direction: column;
   gap: 1rem;
 `;
+
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  margin-top: 2rem;
+  justify-content: center;
+  width: 100%;
+`;
+
+export const ItemsPerPageSelector = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.9rem;
+    color: ${color.gray};
+  }
+
+  select {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid ${color.gray};
+    background-color: white;
+  }
+`;
+
+export const NoEmployeesMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: ${color.text};
+  font-size: 16px;
+  width: 100%;
+  text-align: center;
+  grid-column: 1 / -1;
+`;
+
 export const EmployeContainer = styled.div`
   display: grid;
   gap: 1rem;
@@ -88,6 +128,7 @@ export const AddButton = styled.button`
   & svg {
     width: 100%;
     height: 100%;
+    color: ${color.front};
     aspect-ratio: 1/1;
   }
 `;

@@ -1,12 +1,36 @@
 import { ManchesterTriage } from "packages/enums/src";
 
 export interface IPatient {
-  id: number;
-  gender: string;
+  id?: number;
+  gender: "MASCULINO" | "FEMININO";
   name: string;
-  age: number;
+  cpf: string;
+  birthDate: string;
+  cnsNumber: string;
+  email: string;
+  phone: string;
+  motherName: string;
+  dateHourAttendance?: string;
+  age?: number;
+  attendanceId?: number;
   classification?: ManchesterTriage;
-  position: number;
+  position?: number;
+}
+
+export interface IQueuedInfo {
+  id: number;
+  classification: ManchesterTriage;
+  estimatedWaitMinutes: number;
+  roomCalled: string;
+  queueType: string;
+}
+
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data?: any;
+  errors?: ApiError[];
 }
 
 export interface UserResponse {
@@ -32,6 +56,16 @@ export interface PeakDemand {
   QUI?: number;
   SEX?: number;
   SAB?: number;
+}
+
+export interface LogData {
+  id: number;
+  userId: number;
+  action: string;
+  module: string;
+  originIp: string;
+  userAgent: string;
+  createdAt: string;
 }
 
 export interface IEmployee {

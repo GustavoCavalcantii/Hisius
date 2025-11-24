@@ -1,27 +1,21 @@
 import api from "./config/axios";
-import type { ApiError, IPatient } from "@hisius/interfaces";
+import type {
+  ApiError,
+  ApiResponse,
+  IPatient,
+  Pagination,
+} from "@hisius/interfaces";
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data?: any;
-  errors?: ApiError[];
-}
-
-interface ApiResponseGet {
-  success: boolean;
-  message: string;
-  statusCode: number;
-  data?: IPatient;
-  errors?: ApiError[];
+interface QueueResponse {
+  patients: IPatient[];
+  pagination: Pagination;
 }
 
 export class Queue {
   async getPatientByQueue(
     isTriage: boolean,
     nameFilter?: string
-  ): Promise<IPatient[]> {
+  ): Promise<QueueResponse> {
     const params: Record<string, string> = {};
 
     if (nameFilter && nameFilter.trim() !== "") {
@@ -33,16 +27,25 @@ export class Queue {
       Object.keys(params).length > 0 ? { params } : {}
     );
 
+    console.log(response);
+
     return response.data.data;
   }
 
+  async joinQueue(hospitalCode: string): Promise<boolean> {
+    const response = await api.post<ApiResponse>(`/queue/join`, {
+      hospitalCode,
+    });
+    return response.status >= 200 && response.status < 300;
+  }
+
   async getPatient(id: number): Promise<IPatient> {
-    const response = await api.get<ApiResponseGet>(`/patients/${id}`);
+    const response = await api.get<ApiResponse>(`/patients/${id}`);
     return response.data.data;
   }
 
   async getNextPatient(isTriage: boolean, room: string): Promise<IPatient> {
-    const response = await api.post<ApiResponseGet>(
+    const response = await api.post<ApiResponse>(
       `/queue/${isTriage ? "triage" : "treatment"}/call-next`,
       { room }
     );
@@ -53,7 +56,7 @@ export class Queue {
     id: number,
     classification: string
   ): Promise<IPatient | ApiError[]> {
-    const response = await api.put<ApiResponseGet>(`/queue/${id}`, {
+    const response = await api.put<ApiResponse>(`/queue/${id}`, {
       classification: classification.toLowerCase(),
     });
 
@@ -69,7 +72,7 @@ export class Queue {
     id: number,
     classification: string
   ): Promise<IPatient | ApiError[]> {
-    const response = await api.put<ApiResponseGet>(`/queue/${id}/next`, {
+    const response = await api.put<ApiResponse>(`/queue/${id}/next`, {
       classification: classification.toLowerCase(),
     });
 

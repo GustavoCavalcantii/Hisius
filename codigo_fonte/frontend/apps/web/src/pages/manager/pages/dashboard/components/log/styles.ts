@@ -27,6 +27,6 @@ export const CodeContainer = styled.div`
 
 export const Text = styled.span`
   font-size: 13px;
-  font-weight: 200;
+  font-weight: 300;
   height: 100%;
 `;

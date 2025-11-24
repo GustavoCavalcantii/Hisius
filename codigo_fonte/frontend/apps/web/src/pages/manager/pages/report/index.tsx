@@ -9,6 +9,8 @@ import {
   GraphTitle,
   HourContainer,
   PeakContainer,
+  EmptyStateContainer,
+  EmptyStateText,
 } from "./styles";
 import DonutChart from "./DonutChart";
 import { useEffect, useState } from "react";
@@ -17,6 +19,7 @@ import { useNotification } from "../../../../components/notification/context";
 import type { ReportInfo } from "@hisius/interfaces";
 import { formatTime } from "../../../../utils";
 import Toggle from "../../../employee/components/toggle";
+import { usePageTitle } from "../../../../hooks/PageTitle";
 
 export function Report() {
   const colors = (): string[] => {
@@ -45,15 +48,37 @@ export function Report() {
 
   const adminService = new Admin();
   const { addNotification } = useNotification();
-  const [isMounted, setIsMounted] = useState(false);
   const [isMonthly, setIsMonthly] = useState(false);
   const [reportData, setReportData] = useState<ReportInfo>();
+  const [hasData, setHasData] = useState(false);
+
+  usePageTitle("Relatórios - Hisius");
 
   const weekDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"] as const;
 
   const mappedPeakDemand = weekDays.map(
     (day) => reportData?.peakDemand[day] ?? 0
   );
+
+  const checkDataAvailability = (data: ReportInfo | undefined): boolean => {
+    if (!data) return false;
+
+    const hasAvgTimeTreatment =
+      data.avgTimeTreatmentInSec &&
+      data.avgTimeTreatmentInSec.length > 0 &&
+      data.avgTimeTreatmentInSec.some((item) => item.count > 0);
+
+    const hasAvgTimeTriage =
+      data.avgTimeTriageInSec &&
+      data.avgTimeTriageInSec.length > 0 &&
+      data.avgTimeTriageInSec.some((item) => item.count > 0);
+
+    const hasPeakDemand =
+      data.peakDemand &&
+      Object.values(data.peakDemand).some((value) => value > 0);
+
+    return hasAvgTimeTreatment || hasAvgTimeTriage || hasPeakDemand;
+  };
 
   useEffect(() => {
     const fetchReportData = async () => {
@@ -87,19 +112,25 @@ export function Report() {
 
         const hospitalInfo = await adminService.getReport(startDate, endDate);
         setReportData(hospitalInfo);
-
+        setHasData(checkDataAvailability(hospitalInfo));
       } catch (error) {
         addNotification("Erro ao buscar informações", "error");
+        setHasData(false);
       }
     };
 
     fetchReportData();
-    setIsMounted(true);
   }, [isMonthly]);
 
   const handleToggleChange = async (checked: boolean) => {
     setIsMonthly(checked);
   };
+
+  const EmptyState = () => (
+    <EmptyStateContainer>
+      <EmptyStateText>Dados insuficientes</EmptyStateText>
+    </EmptyStateContainer>
+  );
 
   return (
     <>
@@ -111,55 +142,88 @@ export function Report() {
           labels={{ on: "Semanal", off: "Mensal" }}
           onToggle={handleToggleChange}
         />
-        <HourContainer>
-          <GraphHourContainer>
-            <GraphTitle>Tempo médio de espera (atendimento):</GraphTitle>
-            <GraphContainer>
-              <DonutChart
-                labels={
-                  reportData?.avgTimeTreatmentInSec.map((item) =>
-                    formatTime(item.averageWaitTime)
-                  ) || []
-                }
-                data={
-                  reportData?.avgTimeTreatmentInSec.map((item) => item.count) ||
-                  []
-                }
-                color={color.primary}
-                height="100%"
-              />
-            </GraphContainer>
-          </GraphHourContainer>
 
-          <GraphHourContainer>
-            <GraphTitle>Tempo médio de espera (triagem):</GraphTitle>
-            <GraphContainer>
-              <DonutChart
-                labels={
-                  reportData?.avgTimeTriageInSec.map((item) =>
-                    formatTime(item.averageWaitTime)
-                  ) || []
-                }
-                data={
-                  reportData?.avgTimeTriageInSec.map((item) => item.count) || []
-                }
-                color={color.primary}
-                width="300px"
-                height="100%"
-              />
-            </GraphContainer>
-          </GraphHourContainer>
-        </HourContainer>
+        {!hasData ? (
+          <EmptyState />
+        ) : (
+          <>
+            <HourContainer>
+              <GraphHourContainer>
+                <GraphTitle>Tempo médio de espera (atendimento):</GraphTitle>
+                <GraphContainer>
+                  {reportData?.avgTimeTreatmentInSec &&
+                  reportData.avgTimeTreatmentInSec.length > 0 &&
+                  reportData.avgTimeTreatmentInSec.some(
+                    (item) => item.count > 0
+                  ) ? (
+                    <DonutChart
+                      labels={
+                        reportData.avgTimeTreatmentInSec.map((item) =>
+                          formatTime(item.averageWaitTime)
+                        ) || []
+                      }
+                      data={
+                        reportData.avgTimeTreatmentInSec.map(
+                          (item) => item.count
+                        ) || []
+                      }
+                      color={color.primary}
+                      height="100%"
+                    />
+                  ) : (
+                    <EmptyState />
+                  )}
+                </GraphContainer>
+              </GraphHourContainer>
 
-        <PeakContainer>
-          <GraphTitle>Pico de demanda:</GraphTitle>
-          <SimpleBarChart
-            labels={weekDays.slice()}
-            data={mappedPeakDemand}
-            colors={colors()}
-            height={300}
-          />
-        </PeakContainer>
+              <GraphHourContainer>
+                <GraphTitle>Tempo médio de espera (triagem):</GraphTitle>
+                <GraphContainer>
+                  {reportData?.avgTimeTriageInSec &&
+                  reportData.avgTimeTriageInSec.length > 0 &&
+                  reportData.avgTimeTriageInSec.some(
+                    (item) => item.count > 0
+                  ) ? (
+                    <DonutChart
+                      labels={
+                        reportData.avgTimeTriageInSec.map((item) =>
+                          formatTime(item.averageWaitTime)
+                        ) || []
+                      }
+                      data={
+                        reportData.avgTimeTriageInSec.map(
+                          (item) => item.count
+                        ) || []
+                      }
+                      color={color.primary}
+                      width="300px"
+                      height="100%"
+                    />
+                  ) : (
+                    <EmptyState />
+                  )}
+                </GraphContainer>
+              </GraphHourContainer>
+            </HourContainer>
+
+            <PeakContainer>
+              <GraphTitle>Pico de demanda:</GraphTitle>
+              {reportData?.peakDemand &&
+              Object.values(reportData.peakDemand).some(
+                (value) => value > 0
+              ) ? (
+                <SimpleBarChart
+                  labels={weekDays.slice()}
+                  data={mappedPeakDemand}
+                  colors={colors()}
+                  height={300}
+                />
+              ) : (
+                <EmptyState />
+              )}
+            </PeakContainer>
+          </>
+        )}
       </Container>
     </>
   );

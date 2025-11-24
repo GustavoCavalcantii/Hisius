@@ -21,11 +21,11 @@ import { Dashboard } from "./pages/manager/pages/dashboard";
 import { AdminsList } from "./pages/manager/pages/admins";
 import { EmployeesList } from "./pages/manager/pages/employees";
 import { Report } from "./pages/manager/pages/report";
-import LogsList from "./pages/manager/pages/logs";
 
 import { ProfileScreen } from "./pages/general/pages/profile";
 import type { JSX } from "react";
 import EmployeeRegistrationScreen from "./pages/landingPage/pages/createEmployee";
+import LogsList from "./pages/manager/pages/LogPage";
 
 type PublicRoute = {
   path: string;

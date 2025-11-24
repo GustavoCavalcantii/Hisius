@@ -6,12 +6,16 @@ import CustomButton from "@hisius/ui/components/Button";
 import { Patient, Queue } from "@hisius/services/src";
 import Header from "../../components/header";
 import { RootStackParamList } from "apps/mobile/navigation/types";
+import CadastroPopup from "../../popups/checkinData";
+import { useFormErrors } from "../../hooks/FormErrors";
+import { useNotification } from "../../components/notification/context";
 
 const CODE_LENGTH = 6;
 
 export default function HomeScreen() {
   const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
+  const [showCadastroPopup, setShowCadastroPopup] = useState(false);
   const inputsRef = useRef(
     Array(CODE_LENGTH)
       .fill(0)
@@ -20,6 +24,8 @@ export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const queue = new Queue();
   const patient = new Patient();
+  const { addNotification } = useNotification();
+  const { errors, clearAllErrors, handleApiErrors } = useFormErrors();
 
   useEffect(() => {
     patient.getQueueInfo().then((info) => {
@@ -56,18 +62,48 @@ export default function HomeScreen() {
       inputsRef.current[index - 1].current?.focus();
   };
 
+  const handleCadastroSubmit = async (patientData: any) => {
+    try {
+      console.log("Dados do paciente:", patientData);
+      await patient.createProfile(patientData);
+      setShowCadastroPopup(false);
+      addNotification("Dados cadastrados com sucesso!", "success");
+    } catch (error: any) {
+      console.error("Erro no cadastro:", error);
+      if (error.response?.data) {
+        handleApiErrors(error.response.data);
+      } else {
+        addNotification("Não foi possível completar o cadastro.", "error");
+      }
+    }
+  };
+
   const handleJoin = async () => {
     if (code.some((d) => !d)) {
-      Alert.alert("Código Incompleto", "Preencha todos os 6 dígitos.");
+      addNotification("Preencha todos os 6 dígitos.", "warning");
       return;
     }
 
     setLoading(true);
+    clearAllErrors();
     try {
       const success = await queue.joinQueue(code.join(""));
       if (success) navigation.navigate("Queue");
-    } catch {
-      Alert.alert("Erro", "Não foi possível entrar na fila.");
+    } catch (error: any) {
+      if (
+        error.response?.data?.message?.includes(
+          "Perfil de paciente não encontrado para este usuário."
+        )
+      ) {
+        setShowCadastroPopup(true);
+        return;
+      }
+
+      if (error.response?.data) {
+        handleApiErrors(error.response.data);
+      } else {
+        addNotification("Não foi possível entrar na fila.", "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -107,6 +143,13 @@ export default function HomeScreen() {
           />
         </S.ButtonContainer>
       </S.ContentContainer>
+
+      <CadastroPopup
+        visible={showCadastroPopup}
+        onSubmit={handleCadastroSubmit}
+        color={{ text: "#000" }}
+        errors={errors}
+      />
     </S.Container>
   );
 }

@@ -14,6 +14,7 @@ import { RootStackParamList } from "apps/mobile/navigation/types";
 import Header from "../../components/header";
 import { Feather } from "@expo/vector-icons";
 import { color } from "@hisius/ui/theme/colors";
+import { useNotification } from "../../components/notification/context";
 
 export function QueueScreen() {
   const [patient, setPatient] = useState<IQueuedInfo | null>(null);
@@ -29,6 +30,8 @@ export function QueueScreen() {
 
   const MIN_REQUEST_DELAY = 5000;
   const AUTO_UPDATE_INTERVAL = 300000;
+
+  const { addNotification } = useNotification();
 
   const handleProfile = () => navigation.navigate("Profile");
   const handleLeaveQueue = async () => {
@@ -53,10 +56,8 @@ export function QueueScreen() {
       setEstimatedWaitingTime(info.estimatedWaitMinutes ?? 0);
       setLastUpdate(new Date());
     } catch (err) {
-      console.error(
-        "Erro ao buscar paciente:",
-        err?.response?.data?.message || err?.message || "Erro desconhecido"
-      );
+      addNotification("Erro ao buscar informações", "error");
+      navigation.navigate("Home");
     } finally {
       setIsLoading(false);
       setRefreshing(false);

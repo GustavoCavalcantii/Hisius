@@ -7,6 +7,7 @@ import { Profile } from "./src/screens/profile";
 import Splash from "./src/screens/splash";
 import Login from "./src/screens/auth";
 import { QueueScreen } from "./src/screens/queue";
+import { NotificationProvider } from "./src/components/notification/context";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,17 +30,19 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        id={undefined}
-        initialRouteName="Login"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="Queue" component={QueueScreen} />
-      </Stack.Navigator>
+      <NotificationProvider>
+        <Stack.Navigator
+          id={undefined}
+          initialRouteName="Login"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="Splash" component={Splash} />
+          <Stack.Screen name="Queue" component={QueueScreen} />
+        </Stack.Navigator>
+      </NotificationProvider>
     </NavigationContainer>
   );
 }

@@ -26,6 +26,7 @@ interface CustomInputProps {
   disabled?: boolean;
   inputType?: string;
   inputId?: string;
+  maxLength?: number;
   onSubmitEditing?: () => void;
   returnKeyType?: "done" | "go" | "next" | "search" | "send";
 }
@@ -46,6 +47,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   inputType,
   inputId,
   onSubmitEditing,
+  maxLength,
   returnKeyType = "done",
   ...props
 }) => {
@@ -115,6 +117,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             autoCapitalize={autoCapitalize}
             onSubmitEditing={onSubmitEditing}
             returnKeyType={returnKeyType}
+            maxLength={maxLength}
             onFocus={() => {
               if (!disabled) {
                 setIsFocused(true);

@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "@hisius/interfaces/src";
+import LocalStorageManager from "./localStorageManager";
 
 export const saveToken = async (token: string) => {
   await AsyncStorage.setItem("token", token);
@@ -19,4 +20,6 @@ export const saveUser = async (user: User) => {
 
 export const logout = async () => {
   await AsyncStorage.removeItem("token");
+  await AsyncStorage.removeItem("user");
+  await LocalStorageManager.clearAll();
 };

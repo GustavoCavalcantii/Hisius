@@ -15,6 +15,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "apps/mobile/navigation/types";
 import { Feather } from "@expo/vector-icons";
 import { color } from "@hisius/ui/theme/colors";
+import { useFormErrors } from "../../hooks/FormErrors";
 
 export default function LoginRegister() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -29,6 +30,9 @@ export default function LoginRegister() {
 
   const [loading, setLoading] = useState(false);
 
+  const { errors, clearFieldError, clearAllErrors, handleApiErrors } =
+    useFormErrors();
+
   useEffect(() => {
     const checkToken = async () => {
       const token = await getToken();
@@ -41,6 +45,8 @@ export default function LoginRegister() {
 
   const handleSubmit = async () => {
     try {
+      clearAllErrors();
+
       setLoading(true);
 
       if (mode === "login") {
@@ -50,11 +56,6 @@ export default function LoginRegister() {
         saveUser(rest);
 
         navigation.navigate("Home");
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        Alert.alert("Erro", "As senhas não coincidem");
         return;
       }
 
@@ -71,10 +72,43 @@ export default function LoginRegister() {
       saveUser(rest);
 
       navigation.navigate("Home");
-    } catch (error) {
-      Alert.alert("Erro", "Falha ao processar a ação.");
+    } catch (error: any) {
+      if (error.response?.data) {
+        handleApiErrors(error.response.data);
+      } else {
+        Alert.alert("Erro", "Falha ao processar a ação.");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (errors.email) clearFieldError("email");
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (errors.password) clearFieldError("password");
+  };
+
+  const handleConfirmPasswordChange = (text: string) => {
+    setConfirmPassword(text);
+    if (errors.confirmPassword) clearFieldError("confirmPassword");
+  };
+
+  const handleNameChange = (text: string) => {
+    setName(text);
+    if (errors.name) clearFieldError("name");
+  };
+
+  const handleModeChange = (newMode: "login" | "register") => {
+    setMode(newMode);
+    clearAllErrors();
+    if (newMode === "login") {
+      setConfirmPassword("");
+      setName("");
     }
   };
 
@@ -90,12 +124,11 @@ export default function LoginRegister() {
         <S.Container>
           <S.Title>HISIUS</S.Title>
 
-          {/* Tabs */}
           <View style={{ flex: 1, width: "100%" }}>
             <S.TabContainer>
               <S.TabButton
                 active={mode === "login"}
-                onPress={() => setMode("login")}
+                onPress={() => handleModeChange("login")}
               >
                 <S.TabText>Entrar</S.TabText>
                 {mode === "login" && <S.ActiveBar />}
@@ -103,7 +136,7 @@ export default function LoginRegister() {
 
               <S.TabButton
                 active={mode === "register"}
-                onPress={() => setMode("register")}
+                onPress={() => handleModeChange("register")}
               >
                 <S.TabText>Registrar</S.TabText>
                 {mode === "register" && <S.ActiveBar />}
@@ -118,7 +151,8 @@ export default function LoginRegister() {
                     value={name}
                     inputId="name"
                     icon={<Feather name="user" size={15} color={color.text} />}
-                    onChangeText={setName}
+                    onChangeText={handleNameChange}
+                    error={errors.name}
                   />
                 )}
 
@@ -126,10 +160,11 @@ export default function LoginRegister() {
                   placeholder="E-mail"
                   value={email}
                   inputId="email"
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                   icon={<Feather name="mail" size={15} color={color.text} />}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  error={errors.email}
                 />
 
                 <CustomInput
@@ -137,8 +172,9 @@ export default function LoginRegister() {
                   value={password}
                   inputId="password"
                   icon={<Feather name="lock" size={15} color={color.text} />}
-                  onChangeText={setPassword}
+                  onChangeText={handlePasswordChange}
                   secureTextEntry
+                  error={errors.password}
                 />
 
                 {mode === "register" && (
@@ -147,8 +183,9 @@ export default function LoginRegister() {
                     value={confirmPassword}
                     inputId="confirmpassword"
                     icon={<Feather name="lock" size={15} color={color.text} />}
-                    onChangeText={setConfirmPassword}
+                    onChangeText={handleConfirmPasswordChange}
                     secureTextEntry
+                    error={errors.confirmPassword}
                   />
                 )}
               </S.InputContainer>

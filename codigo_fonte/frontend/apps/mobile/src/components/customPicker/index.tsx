@@ -36,7 +36,7 @@ const CustomPicker: React.FC<CustomPickerProps> = ({
     options.find((opt) => opt.value === value)?.label || placeholder;
 
   return (
-    <View style={styles.container}>
+    <View>
       <TouchableOpacity
         style={[
           styles.inputContainer,

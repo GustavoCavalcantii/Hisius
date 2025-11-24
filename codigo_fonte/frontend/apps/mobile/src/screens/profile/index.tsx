@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View } from "react-native";
+import { View, Alert } from "react-native";
 import CustomInput from "@hisius/ui/components/CustomInput";
 import CustomButton from "@hisius/ui/components/Button";
 import { Auth, getUser, logout, Patient } from "@hisius/services/src";
@@ -11,6 +11,8 @@ import CustomPicker from "../../components/customPicker";
 import { RootStackParamList } from "apps/mobile/navigation/types";
 import * as S from "./style";
 import EmailChangeModal from "../../popups/changeEmail";
+import { useFormErrors } from "../../hooks/FormErrors";
+import { useNotification } from "../../components/notification/context";
 
 export function Profile() {
   const patientInstance = new Patient();
@@ -28,19 +30,64 @@ export function Profile() {
 
   const [initialData, setInitialData] = useState<Partial<IPatient>>({});
   const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { addNotification } = useNotification();
+
+  const { errors, clearFieldError, clearAllErrors, handleApiErrors } =
+    useFormErrors();
 
   const openEmailModal = () => setIsEmailModalVisible(true);
   const closeEmailModal = () => setIsEmailModalVisible(false);
 
+  const formatDateFromISO = (isoDate: string): string => {
+    if (!isoDate) return "";
+    if (isoDate.includes("/")) return isoDate;
+
+    const parts = isoDate.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return isoDate;
+  };
+
+  const formatDateToISO = (dateString: string): string => {
+    const numbers = dateString.replace(/\D/g, "");
+
+    if (numbers.length <= 2) {
+      return numbers;
+    } else if (numbers.length <= 4) {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    } else {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    }
+  };
+
+  const convertToISO = (dateString: string): string => {
+    const parts = dateString.split("/");
+    if (parts.length === 3 && parts[2].length === 4) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateString;
+  };
+
   const handleEmailSubmit = async (newEmail: string) => {
     try {
-      console.log(newEmail);
+      setLoading(true);
       await AuthService.changeEmail(newEmail);
-
+      addNotification("Link de confirmação enviado!");
       closeEmailModal();
-    } catch (err) {
-      console.error("Erro ao alterar email:", err);
-      alert("Erro ao enviar código de verificação. Tente novamente.");
+    } catch (err: any) {
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      } else {
+        addNotification(
+          "Erro ao enviar código de verificação. Tente novamente.",
+          "error"
+        );
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,7 +107,16 @@ export function Profile() {
     try {
       const user = JSON.parse(await getUser());
       await AuthService.changePass(user.email);
-    } catch (err) {}
+      addNotification(
+        "Instruções para alteração de senha enviadas para seu e-mail."
+      );
+    } catch (err: any) {
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      } else {
+        addNotification("Falha ao solicitar alteração de senha.", "error");
+      }
+    }
   };
 
   const handleChangeEmail = () => {
@@ -68,29 +124,83 @@ export function Profile() {
   };
 
   const handleSave = async () => {
-    const updatedPatient: IPatient = {
-      name,
-      cpf,
-      gender: gender as "MASCULINO" | "FEMININO",
-      birthDate,
-      cnsNumber,
-      email,
-      phone,
-      motherName,
-    };
-
     try {
+      setLoading(true);
+      clearAllErrors();
+
+      const isoBirthDate = convertToISO(birthDate);
+
+      const updatedPatient: IPatient = {
+        name,
+        cpf,
+        gender: gender as "MASCULINO" | "FEMININO",
+        birthDate: isoBirthDate,
+        cnsNumber,
+        email,
+        phone,
+        motherName,
+      };
+
       const success = await patientInstance.updateProfile(updatedPatient);
       if (success) {
-        alert("Perfil atualizado com sucesso!");
-        setInitialData(updatedPatient);
+        addNotification("Perfil atualizado com sucesso!");
+        setInitialData({
+          ...updatedPatient,
+          birthDate: birthDate,
+        });
       } else {
-        alert("Erro ao atualizar perfil.");
+        addNotification("Erro ao atualizar perfil.", "error");
       }
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao atualizar perfil.");
+    } catch (err: any) {
+      if (err.response?.data) {
+        handleApiErrors(err.response.data);
+      } else {
+        addNotification("Erro ao atualizar perfil.", "error");
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleBirthDateChange = (text: string) => {
+    const formattedDate = formatDateToISO(text);
+    setBirthDate(formattedDate);
+    if (errors.birthDate) clearFieldError("birthDate");
+  };
+
+  const handleNameChange = (text: string) => {
+    setName(text);
+    if (errors.name) clearFieldError("name");
+  };
+
+  const handleCpfChange = (text: string) => {
+    setCpf(text);
+    if (errors.cpf) clearFieldError("cpf");
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (errors.email) clearFieldError("email");
+  };
+
+  const handlePhoneChange = (text: string) => {
+    setPhone(text);
+    if (errors.phone) clearFieldError("phone");
+  };
+
+  const handleCnsNumberChange = (text: string) => {
+    setCnsNumber(text);
+    if (errors.cnsNumber) clearFieldError("cnsNumber");
+  };
+
+  const handleMotherNameChange = (text: string) => {
+    setMotherName(text);
+    if (errors.motherName) clearFieldError("motherName");
+  };
+
+  const handleGenderChange = (value: "" | "MASCULINO" | "FEMININO") => {
+    setGender(value);
+    if (errors.gender) clearFieldError("gender");
   };
 
   const hasValidChanges = () => {
@@ -126,7 +236,7 @@ export function Profile() {
           name: data.name ?? "",
           cpf: data.cpf ?? "",
           gender: data.gender as "MASCULINO" | "FEMININO",
-          birthDate: data.birthDate ?? "",
+          birthDate: formatDateFromISO(data.birthDate ?? ""),
           cnsNumber: data.cnsNumber ?? "",
           email: data.email ?? "",
           phone: data.phone ?? "",
@@ -144,7 +254,10 @@ export function Profile() {
 
         setInitialData(patientData);
       })
-      .catch(console.error);
+      .catch(() => {
+        navigation.goBack();
+        addNotification("Erro ao buscar informações do perfil!", "error");
+      });
   }, []);
 
   return (
@@ -168,8 +281,9 @@ export function Profile() {
             <CustomInput
               placeholder="Nome completo"
               value={name}
-              onChangeText={setName}
+              onChangeText={handleNameChange}
               icon={<Feather name="user" size={16} color={color.text} />}
+              error={errors.name}
             />
           </S.InputGroup>
 
@@ -178,23 +292,25 @@ export function Profile() {
               <CustomInput
                 placeholder="Data de Nascimento"
                 value={birthDate}
-                onChangeText={setBirthDate}
+                onChangeText={handleBirthDateChange}
                 icon={<Feather name="calendar" size={16} color={color.text} />}
+                error={errors.birthDate}
+                keyboardType="numeric"
+                maxLength={10}
               />
             </S.InputColumn>
 
             <S.InputColumn>
               <CustomPicker
                 value={gender}
-                onValueChange={(v) =>
-                  setGender(v as "" | "MASCULINO" | "FEMININO")
-                }
+                onValueChange={handleGenderChange}
                 options={[
                   { label: "Masculino", value: "MASCULINO" },
                   { label: "Feminino", value: "FEMININO" },
                 ]}
                 placeholder="Sexo"
                 icon={<Feather name="user" size={16} color={color.text} />}
+                error={errors.gender}
               />
             </S.InputColumn>
           </S.InputRow>
@@ -203,8 +319,9 @@ export function Profile() {
             <CustomInput
               placeholder="Nome da Mãe"
               value={motherName}
-              onChangeText={setMotherName}
+              onChangeText={handleMotherNameChange}
               icon={<Feather name="users" size={16} color={color.text} />}
+              error={errors.motherName}
             />
           </S.InputGroup>
         </S.Section>
@@ -217,10 +334,11 @@ export function Profile() {
               <CustomInput
                 placeholder="CPF"
                 value={cpf}
-                onChangeText={setCpf}
+                onChangeText={handleCpfChange}
                 icon={
                   <Feather name="credit-card" size={16} color={color.text} />
                 }
+                error={errors.cpf}
               />
             </S.InputColumn>
 
@@ -228,8 +346,9 @@ export function Profile() {
               <CustomInput
                 placeholder="CNS"
                 value={cnsNumber}
-                onChangeText={setCnsNumber}
+                onChangeText={handleCnsNumberChange}
                 icon={<Feather name="clipboard" size={16} color={color.text} />}
+                error={errors.cnsNumber}
               />
             </S.InputColumn>
           </S.InputRow>
@@ -242,9 +361,10 @@ export function Profile() {
             <CustomInput
               placeholder="Email"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleEmailChange}
               disabled
               icon={<Feather name="mail" size={16} color={color.text} />}
+              error={errors.email}
             />
           </S.InputGroup>
 
@@ -252,8 +372,9 @@ export function Profile() {
             <CustomInput
               placeholder="Telefone"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={handlePhoneChange}
               icon={<Feather name="phone" size={16} color={color.text} />}
+              error={errors.phone}
             />
           </S.InputGroup>
         </S.Section>
@@ -306,12 +427,12 @@ export function Profile() {
             <CustomButton
               title="Salvar Alterações"
               onPress={handleSave}
-              disabled={!hasValidChanges()}
+              disabled={!hasValidChanges() || loading}
             />
           </View>
         </S.ActionsContainer>
       </S.FormContainer>
-      {/* Modal de Alteração de Email */}
+
       <EmailChangeModal
         visible={isEmailModalVisible}
         onClose={closeEmailModal}

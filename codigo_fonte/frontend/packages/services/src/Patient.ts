@@ -12,6 +12,11 @@ export class Patient {
     return response.data.data;
   }
 
+  async createProfile(patient: IPatient): Promise<boolean> {
+    const response = await api.post<ApiResponse>(`/patients`, patient);
+    return response.data != null;
+  }
+
   async updateProfile(patient: IPatient): Promise<boolean> {
     const response = await api.put<ApiResponse>(`/patients/me`, patient);
     return response.data != null;

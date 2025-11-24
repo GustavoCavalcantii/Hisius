@@ -8,14 +8,20 @@ export class QueueEventService {
   private queueEventRepo = new QueueEventRepository();
 
   async create(queue: QueueType, data: ICreateQueueEventInput) {
-    this.queueEventRepo.create(queue, data);
+    const queueEvent = await this.queueEventRepo.create(queue, data);
+
+    if (!queueEvent)
+      throw new BadRequestError("Não foi possível criar o relatório");
+
+    return queueEvent.sanitize();
   }
 
   async update(queueId: string, exitDate: Date) {
     const event = await this.queueEventRepo.findByQueueId(queueId);
     if (!event) throw new BadRequestError("Paciente não encontrado na fila");
     event.startedAt = exitDate;
-    return await event.save();
+    await event.save();
+    return event.sanitize();
   }
 
   async getQueueAvgTime(queue: QueueType) {

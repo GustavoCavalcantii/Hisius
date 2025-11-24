@@ -4,8 +4,10 @@ import { PatientService } from "../service/PatientService";
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../utils/responses/SuccessResponse";
 import { BadRequestError } from "../utils/errors/BadRequestError";
+import { UserService } from "../service/UserService";
 
 const patientService = new PatientService();
+const userService = new UserService();
 
 export class PatientController {
   static async getMyProfile(req: Request, res: Response, next: NextFunction) {
@@ -33,8 +35,15 @@ export class PatientController {
       const loggedInUser = req.user;
       if (!loggedInUser) throw new BadRequestError("Usuário não autenticado.");
 
-      const dto = plainToInstance(PatientDto, req.body);
+      const patientDto = plainToInstance(PatientDto, req.body);
+      const { name, ...dto } = patientDto;
+
+      if (name) {
+        await userService.changeName(loggedInUser.id, name);
+      }
+
       await patientService.updatePatientByUserId(loggedInUser.id, dto);
+
       return res.json(
         SuccessResponse(null, "Perfil atualizado com sucesso!", 200)
       );
@@ -64,22 +73,7 @@ export class PatientController {
     try {
       const { id } = req.params;
       const patient = await patientService.getPatientById(Number(id));
-      return res.json(
-        SuccessResponse(patient, "Paciente encontrado pelo administrador", 200)
-      );
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  static async updatePatient(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { id } = req.params;
-      const dto = plainToInstance(PatientDto, req.body);
-      await patientService.updatePatient(Number(id), dto);
-      return res.json(
-        SuccessResponse(null, "Registro atualizado pelo administrador!", 200)
-      );
+      return res.json(SuccessResponse(patient, "Paciente encontrado.", 200));
     } catch (err) {
       next(err);
     }

@@ -9,20 +9,6 @@ import { NotFoundError } from "../utils/errors/NotFoundError";
 export class LogService {
   private logRepo = new LogRepository();
 
-  private sanitizeLog(log: any): ILog | null {
-    if (!log) return null;
-
-    return {
-      id: log.id,
-      userId: log.userId,
-      action: log.action,
-      module: log.module,
-      originIp: log.originIp,
-      userAgent: log.userAgent,
-      createdAt: log.createdAt,
-    };
-  }
-
   async getLogsPaginated(
     queryParams: ILogFilter
   ): Promise<{ logs: ILog[] | null; pagination: IPagination }> {
@@ -43,7 +29,7 @@ export class LogService {
     const hasPrev = page > 0;
 
     const sanitizedLogs = result.logs
-      .map((log) => this.sanitizeLog(log))
+      .map((log) => log.sanitize())
       .filter((log): log is ILog => log !== null);
 
     return {
@@ -65,7 +51,7 @@ export class LogService {
     const log = await this.logRepo.findById(id);
     if (!log) throw new NotFoundError("Registro não encontrado");
 
-    const sanitizedLog = this.sanitizeLog(log);
+    const sanitizedLog = log.sanitize();
     if (!sanitizedLog) throw new NotFoundError("Registro não encontrado");
 
     return sanitizedLog;
@@ -75,7 +61,7 @@ export class LogService {
     const logs = await this.logRepo.findByUserId(userId);
 
     const sanitizedLogs = logs
-      .map((log) => this.sanitizeLog(log))
+      .map((log) => log.sanitize())
       .filter((log): log is ILog => log !== null);
 
     return sanitizedLogs;
@@ -84,7 +70,7 @@ export class LogService {
   async createLog(input: ILogCreate): Promise<ILog> {
     const log = await this.logRepo.create(input);
 
-    const sanitizedLog = this.sanitizeLog(log);
+    const sanitizedLog = log.sanitize();
     if (!sanitizedLog) throw new BadRequestError("Erro ao criar registro");
 
     return sanitizedLog;
@@ -97,7 +83,7 @@ export class LogService {
     originIp?: string,
     userAgent?: string
   ): Promise<ILog> {
-    return this.createLog({
+    return await this.createLog({
       userId,
       action,
       module,

@@ -15,7 +15,7 @@ export async function RegisterEmployeeMiddleware(
   if (!token) return next(new BadRequestError("Token ausente"));
 
   try {
-    const payload = tokenUtils.validateResetPassToken(token);
+    const payload = tokenUtils.validateEmployeeToken(token);
 
     if (payload.type !== TokenType.GENERATE_ACCOUNT) {
       throw new BadRequestError("Token inválido");

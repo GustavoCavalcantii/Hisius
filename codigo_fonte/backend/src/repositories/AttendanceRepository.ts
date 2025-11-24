@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import Attendance from "../database/models/Attendance";
 import { ICreateAttendanceInput } from "../interfaces/attendance/ICreateAttendanceInput";
 import User from "../database/models/User";
@@ -35,13 +35,17 @@ export class AttendanceRepository {
     return attendance;
   }
 
-  async updateById(id: number, data: IUpdateAttendanceInput, options?: any) {
+  async updateById(
+    id: number,
+    data: IUpdateAttendanceInput,
+    options?: any
+  ): Promise<Attendance | null> {
     await this.findById(id);
     const [affectedCount] = await Attendance.update(data, {
       where: { id },
       ...options,
     });
-    return this.findById(id, options);
+    return await this.findById(id, options);
   }
 
   async deleteById(id: number, options?: any) {
@@ -80,13 +84,13 @@ export class AttendanceRepository {
       }
     }
 
-    const { count, rows } = await await Attendance.findAndCountAll({
+    const { count, rows } = await Attendance.findAndCountAll({
       where: whereClause,
       limit,
       offset,
       order: [
         ["entryDate", "DESC"],
-        ["createdAt", "DESC"],
+        [Sequelize.literal("`data_criacao`"), "DESC"],
       ],
       include: [
         {
@@ -103,21 +107,8 @@ export class AttendanceRepository {
       ],
     });
 
-    const transformedAttendances = rows.map((item) => {
-      const attendance = item.toJSON();
-
-      return {
-        ...attendance,
-        patient: {
-          ...attendance.patient,
-          name: attendance.patient.user.name,
-          user: undefined,
-        },
-      };
-    });
-
     return {
-      attendances: transformedAttendances,
+      attendances: rows,
       total: count,
     };
   }

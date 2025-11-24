@@ -13,7 +13,7 @@ export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = plainToInstance(UserDTO, req.body);
-      const {role, ...rest} = dto;
+      const { role, ...rest } = dto;
       const user = await userService.createUser(rest);
 
       return res
@@ -24,15 +24,50 @@ export class UserController {
     }
   }
 
+  static async updateName(req: Request, res: Response, next: NextFunction) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const dto = plainToInstance(UserDTO, req.body);
+
+      await userService.changeName(loggedInUser.id, dto.name);
+      res.status(200).json(SuccessResponse(null, "Nome atualizado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async updateRole(req: Request, res: Response, next: NextFunction) {
     try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
       const paramDto = plainToInstance(UserParamsDto, req.params);
       const dto = plainToInstance(UserDTO, req.body);
+
+      if (loggedInUser.id === paramDto.userId) {
+        throw new BadRequestError(
+          "Não é permitido alterar o próprio nível de acesso"
+        );
+      }
 
       await userService.updateRole(dto.role, paramDto.userId);
       res
         .status(200)
         .json(SuccessResponse(null, "Nível de acesso atualizado", 200));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const loggedInUser = req.user;
+      if (!loggedInUser) throw new BadRequestError("Acesso negado");
+
+      const user = await userService.getById(loggedInUser.id);
+      res.status(200).json(SuccessResponse(user, "Usuário encontrado", 200));
     } catch (err) {
       next(err);
     }

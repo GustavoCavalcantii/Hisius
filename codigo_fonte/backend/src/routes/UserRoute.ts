@@ -19,6 +19,16 @@ router.post(
 );
 
 router.put(
+  "/me",
+  AuthMiddleware,
+  JsonRequiredMiddleware,
+  ValidateRequest(UserDTO, ["updateName"]),
+  UserController.updateName
+);
+
+router.get("/me", AuthMiddleware, UserController.getUser);
+
+router.put(
   "/:userId",
   AuthMiddleware,
   ValidateRoles(UserRole.ADMIN),

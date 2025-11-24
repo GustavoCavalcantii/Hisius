@@ -7,16 +7,23 @@ import { plainToInstance } from "class-transformer";
 import { QueueDto } from "../dtos/queue/QueueDto";
 import { QueueParamsDto } from "../dtos/queue/QueueParamsDto";
 import { NotFoundError } from "../utils/errors/NotFoundError";
+import { EnterQueueDto } from "../dtos/queue/EnterQueueDto";
 
 const queueService = new QueueService();
 
 export class QueueController {
   static async queueJoin(req: Request, res: Response, next: NextFunction) {
     try {
+      const bodyDto = plainToInstance(EnterQueueDto, req.body);
+
       const loggedInUser = req.user;
       if (!loggedInUser) throw new BadRequestError("Acesso negado");
 
-      await queueService.enqueuePatient(loggedInUser.id, QueueType.TRIAGE);
+      await queueService.enqueuePatient(
+        loggedInUser.id,
+        QueueType.TRIAGE,
+        bodyDto.hospitalCode
+      );
 
       return res
         .status(200)

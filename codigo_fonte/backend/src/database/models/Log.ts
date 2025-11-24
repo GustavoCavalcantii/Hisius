@@ -1,4 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
+import { ILog } from "../../interfaces/log/ILog";
 
 export class Log extends Model {
   declare id: number;
@@ -9,6 +10,18 @@ export class Log extends Model {
   declare userAgent: string | null;
 
   declare createdAt: Date;
+
+  sanitize(): ILog {
+    return {
+      id: this.id,
+      userId: this.userId,
+      action: this.action,
+      module: this.module,
+      originIp: this.originIp,
+      userAgent: this.userAgent,
+      createdAt: this.createdAt,
+    };
+  }
 
   static initialize(sequelize: Sequelize): void {
     Log.init(

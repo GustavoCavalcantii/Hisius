@@ -5,12 +5,24 @@ import {
   IsDateString,
   IsPhoneNumber,
   Matches,
+  Length,
   MaxLength,
   MinLength,
 } from "class-validator";
 import { Gender } from "../../enums/User/Gender";
 
 export class PatientDto {
+  @IsString({
+    message: "O nome deve ser um texto",
+    groups: ["update"],
+  })
+  @Length(2, 100, {
+    message: "O nome deve ter entre 2 e 100 caracteres",
+    groups: ["update"],
+  })
+  @IsOptional({ groups: ["update"] })
+  name?: string;
+
   @IsString({
     message: "O CPF deve ser uma string",
     groups: ["create", "update"],

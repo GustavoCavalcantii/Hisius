@@ -1,4 +1,5 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
+import { IQueueEvent } from "../../interfaces/queue/IQueueEvent";
 
 export class QueueEvent extends Model {
   declare id: string;
@@ -10,6 +11,18 @@ export class QueueEvent extends Model {
   declare queueId: string;
   declare createdAt: Date;
   declare updatedAt: Date;
+
+  sanitize(): IQueueEvent {
+    return {
+      id: this.id,
+      patientId: this.patientId,
+      queue: this.queue,
+      enteredAt: this.enteredAt,
+      startedAt: this.startedAt,
+      finishedAt: this.finishedAt,
+      queueId: this.queueId,
+    };
+  }
 
   static initialize(sequelize: Sequelize): void {
     QueueEvent.init(

@@ -17,11 +17,11 @@ export class UserDTO {
    */
   @IsString({
     message: "O nome deve ser um texto",
-    groups: ["create", "update"],
+    groups: ["create", "update", "updateName"],
   })
   @Length(2, 100, {
     message: "O nome deve ter entre 2 e 100 caracteres",
-    groups: ["create", "update"],
+    groups: ["create", "update", "updateName"],
   })
   name!: string;
 

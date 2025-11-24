@@ -22,6 +22,8 @@ import { AttendanceService } from "./AttendanceService";
 import { ICreateAttendanceInput } from "../interfaces/attendance/ICreateAttendanceInput";
 import { AttendanceStatus } from "../enums/Attendance/AttendanceStatus";
 import { Destination } from "../enums/Attendance/Destination";
+import { ManagerService } from "../service/ManagerService";
+import QueueEventRepository from "../repositories/QueueEventRepository";
 
 export class QueueService {
   private patientService = new PatientService();
@@ -29,6 +31,8 @@ export class QueueService {
   private queueRepo = new QueueRepository();
   private reportService = new ReportService();
   private attendanceService = new AttendanceService();
+  private managerService = new ManagerService();
+  private queueEventRepo = new QueueEventRepository();
 
   private async getPatientWithUser(
     patientId: number
@@ -80,8 +84,16 @@ export class QueueService {
   async enqueuePatient(
     userId: number,
     type: QueueType,
+    hospitalCode?: string,
     classification?: ManchesterClassification
   ) {
+    if (type == QueueType.TRIAGE) {
+      const success = hospitalCode
+        ? await this.managerService.checkIfCodeExists(hospitalCode)
+        : false;
+      if (!success) throw new BadRequestError("Código não encontrado");
+    }
+
     const patient = await this.patientService.getPatientByUserId(userId);
     if (!patient) throw new BadRequestError("Paciente não encontrado");
 
@@ -264,31 +276,26 @@ export class QueueService {
       patient.id
     );
 
-    const lastTimestamps = (
-      await this.queueRepo.getLastTimestamps(meta.type as QueueType, 10)
-    ).map((t: any) => Number(t));
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
 
-    let averageTime = 10 * 60 * 1000;
-    if (lastTimestamps.length >= 2) {
-      const diffs = [];
-      for (let i = 1; i < lastTimestamps.length; i++) {
-        const diff = lastTimestamps[i] - lastTimestamps[i - 1];
-        if (diff > 0) diffs.push(diff);
-      }
-      if (diffs.length > 0) {
-        averageTime = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-      }
-    }
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
 
-    const estimatedWaitMinutes = Math.round((position * averageTime) / 60000);
+    const averageSeconds = await this.queueEventRepo.getAverageWaitTimeByQueue(
+      meta.type as QueueType,
+      start,
+      end
+    );
 
-    const patientInfo: {
-      id: number;
-      classification: ManchesterClassification | null;
-      estimatedWaitMinutes: number;
-    } = {
+    const estimatedWaitMinutes = Math.round(
+      (position * averageSeconds * 1000) / 60000
+    );
+
+    const patientInfo = {
       id: patient.id,
       classification: parseClassification(meta.classification) ?? null,
+      roomCalled: meta.room ?? null,
       estimatedWaitMinutes: estimatedWaitMinutes,
     };
 
@@ -317,6 +324,7 @@ export class QueueService {
     await this.enqueuePatient(
       patient.userId,
       QueueType.TREATMENT,
+      "",
       classification
     );
   }
@@ -334,6 +342,7 @@ export class QueueService {
     const position = await this.queueRepo.getPatientPosition(type, patientId);
     await this.queueRepo.setPatientStatus(patientId, QueueStatus.IN_PROGRESS);
     await this.queueRepo.removePatientFromQueue(type, patientId);
+    await this.queueRepo.setPatientMeta(patientId, { room });
 
     const { patient, user } = await this.getPatientWithUser(patientId);
     await this.queueRepo.registerPatientCalled(type, patientId);

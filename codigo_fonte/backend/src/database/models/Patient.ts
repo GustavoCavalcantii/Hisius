@@ -1,6 +1,8 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import { Gender } from "../../enums/User/Gender";
 import User from "./User";
+import { IPatient } from "../../interfaces/patient/IPatient";
+import { calculateAge } from "../../utils/CalculateUtils";
 
 export class Patient extends Model {
   declare id: number;
@@ -13,9 +15,25 @@ export class Patient extends Model {
   declare cnsNumber: string;
   declare icePhone: string;
   declare motherName: string;
+  declare user?: User;
 
   declare data_criacao: Date;
   declare data_atualizacao: Date;
+
+  sanitize(): IPatient {
+    return {
+      id: this.id,
+      userId: this.userId,
+      cpf: this.cpf,
+      gender: this.gender,
+      phone: this.phone,
+      birthDate: this.birthDate,
+      cnsNumber: this.cnsNumber,
+      icePhone: this.icePhone,
+      motherName: this.motherName,
+      age: calculateAge(this.birthDate),
+    };
+  }
 
   static initialize(sequelize: Sequelize): void {
     Patient.init(

@@ -85,6 +85,9 @@ npm run dev
 
     - Credenciais do banco de dados
     - Porta do servidor
+    - Credenciais do SMTP
+    - Código do JWT
+    - URL do Redis
 
 
 - No frontend, configure **.env** com URLs da API
@@ -105,3 +108,4 @@ Código Fonte sob licença APACHE 2.0
 
 Elementos Visuais sob Creative Commons By
 ```
+

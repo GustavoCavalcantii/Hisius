@@ -9,24 +9,22 @@ O projeto consiste em uma plataforma que melhora a transparência na comunicaç�
 - Relatórios de demanda
 
 ## 🚀 Tecnologias
-- [GitHub](https://github.com/)
-
+- [TypeScript](https://www.typescriptlang.org/)
+  
 ### Backend (API)
-
 - [Node.js](https://nodejs.org/)
 - [Express](https://expressjs.com/)
-- [TypeScript](https://www.typescriptlang.org/)
 - [Sequelize](https://sequelize.org/)
 - [MySQL](https://www.mysql.com/)
 
 ### Frontend
 #### Web
 - [Vite](https://vitejs.dev/)
+- [React]([https://pt-br.legacy.reactjs.org/) 
 
 #### Mobile
 - [React Native](https://reactnative.dev/) 
 - [Expo](https://expo.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
 
 ## 📂 Estrutura do Projeto
 ```bash
@@ -88,6 +86,8 @@ npm run dev
     - Credenciais do SMTP
     - Código do JWT
     - URL do Redis
+      
+- No backend, posicione o arquivo de configuração do Firebase em config/firebase.
 
 
 - No frontend, configure **.env** com URLs da API
@@ -108,4 +108,5 @@ Código Fonte sob licença APACHE 2.0
 
 Elementos Visuais sob Creative Commons By
 ```
+
 

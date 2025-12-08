@@ -87,6 +87,8 @@ export class QueueService {
     hospitalCode?: string,
     classification?: ManchesterClassification
   ) {
+    await this.removePatientsOverOneDay();
+
     if (type == QueueType.TRIAGE) {
       const success = hospitalCode
         ? await this.managerService.checkIfCodeExists(hospitalCode)
@@ -326,6 +328,42 @@ export class QueueService {
       QueueType.TREATMENT,
       "",
       classification
+    );
+  }
+
+  async removePatientsOverOneDay(): Promise<number> {
+    const patientIds = await this.queueRepo.getAllPatientsWithQueueData();
+    const now = Date.now();
+    const removalPromises = [];
+
+    for (const patientId of patientIds) {
+      removalPromises.push(
+        (async () => {
+          const meta = await this.queueRepo.getPatientMeta(patientId);
+          if (
+            meta?.joinedAt &&
+            now - new Date(meta.joinedAt).getTime() > 86400000
+          ) {
+            await this.queueRepo.removePatientFromQueue(
+              meta.type as QueueType,
+              patientId
+            );
+            await this.queueRepo.deletePatientMeta(patientId);
+            if (meta.queueId) {
+              await this.reportService.updateExit(meta.queueId, new Date());
+            }
+            return 1;
+          }
+          return 0;
+        })()
+      );
+    }
+
+    const results = await Promise.allSettled(removalPromises);
+    return results.reduce(
+      (count, result) =>
+        result.status === "fulfilled" ? count + result.value : count,
+      0
     );
   }
 

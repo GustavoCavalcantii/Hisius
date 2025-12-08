@@ -18,7 +18,9 @@ export function AddPatient() {
   const { addNotification } = useNotification();
   const navigate = useNavigate();
   const queueService = new Queue();
+
   usePageTitle("Cadastrar na fila - Hisius");
+
   useEffect(() => {
     const fetchPatientData = async () => {
       if (!id) {
@@ -78,13 +80,23 @@ export function AddPatient() {
           canBack
         />
         <ContentContainer>
-          <AddCard
-            name={patientData?.name || "Nome não informado"}
-            age={patientData?.age || 0}
-            gender={patientData?.gender || "Sexo não informado"}
-            selectedClassification={selectedClassification}
-            onClassificationChange={handleClassificationChange}
-          />
+          {patientData && (
+            <AddCard
+              name={patientData.name || "Nome não informado"}
+              patient={
+                {
+                  id: patientData.id,
+                  age: patientData.age || 0,
+                  gender: patientData.gender || "Sexo não informado",
+                  birthDate: patientData.birthDate || "",
+                  motherName: patientData.motherName || "Não informado",
+                  cnsNumber: patientData.cnsNumber || "Não informado",
+                } as IPatient
+              }
+              selectedClassification={selectedClassification}
+              onClassificationChange={handleClassificationChange}
+            />
+          )}
           <ButtonContainer>
             <CustomButton
               title={"Confirmar"}

@@ -19,7 +19,7 @@ import { useNotification } from "../../../../components/notification/context";
 import type { User } from "@hisius/interfaces";
 import Popup from "../../../../components/popup";
 import { CopyButton } from "../../../../components/copyButton";
-import { copyToClipboard, truncateName } from "../../../../utils";
+import { copyToClipboard } from "../../../../utils";
 import Pagination from "../../../../components/pagination";
 import CustomButton from "@hisius/ui/components/Button";
 import { usePageTitle } from "../../../../hooks/PageTitle";
@@ -152,7 +152,7 @@ export function EmployeesList() {
       <Popup
         isOpen={isPopupOpen}
         onClose={handleClosePopup}
-        title={truncateName(selectedEmployee?.name, 28) || "Funcionário"}
+        title={selectedEmployee?.name || "Funcionário"}
         size="medium"
       >
         <ContactContainer>

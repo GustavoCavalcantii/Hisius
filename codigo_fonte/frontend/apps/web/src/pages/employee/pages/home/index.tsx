@@ -22,7 +22,6 @@ import {
   PopupText,
 } from "./styles";
 import { usePageTitle } from "../../../../hooks/PageTitle";
-import { truncateName } from "apps/web/src/utils";
 
 export function Employee() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -121,7 +120,7 @@ export function Employee() {
         addNotification("Nenhum paciente na fila", "warning");
         return;
       }
-
+      
       if (isTriage) navigate(`/funcionario/filas/${next.id}`);
       addNotification("Paciente chamado com sucesso", "success");
       setIsPopupOpen(false);
@@ -156,7 +155,7 @@ export function Employee() {
       <Popup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
-        title={`Chamar ${truncateName(nextPatient?.name, 20)} para a próxima fila`}
+        title={`Chamar ${nextPatient?.name} para a próxima fila`}
         size="medium"
       >
         <PopupText>Para qual sala você deseja chamar o paciente?</PopupText>

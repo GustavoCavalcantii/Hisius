@@ -26,6 +26,7 @@ import { ProfileScreen } from "./pages/general/pages/profile";
 import type { JSX } from "react";
 import EmployeeRegistrationScreen from "./pages/landingPage/pages/createEmployee";
 import LogsList from "./pages/manager/pages/LogPage";
+import { InRoom } from "./pages/employee/pages/inRoom";
 
 type PublicRoute = {
   path: string;
@@ -55,19 +56,17 @@ const routes: {
     { path: "/registrar", element: <EmployeeRegistrationScreen /> },
   ],
   protected: [
-    {
-      path: "/funcionario",
-      element: <Employee />,
-      requiredRole: ROLES.EMPLOYEE,
-    },
     { path: "/perfil", element: <ProfileScreen /> },
     {
       path: "/funcionario/filas/:id",
       element: <AddPatient />,
+    },
+    {
+      path: "/funcionario/salas",
+      element: <InRoom />,
       requiredRole: ROLES.EMPLOYEE,
     },
 
-    { path: "/admin", element: <Dashboard />, requiredRole: ROLES.ADMIN },
     {
       path: "/admin/funcionarios",
       element: <EmployeesList />,
@@ -84,6 +83,12 @@ const routes: {
       requiredRole: ROLES.ADMIN,
     },
     { path: "/admin/logs", element: <LogsList />, requiredRole: ROLES.ADMIN },
+    { path: "/admin", element: <Dashboard />, requiredRole: ROLES.ADMIN },
+    {
+      path: "/funcionario",
+      element: <Employee />,
+      requiredRole: ROLES.EMPLOYEE,
+    },
   ],
 };
 

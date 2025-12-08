@@ -8,7 +8,9 @@ import {
   TextStyle,
   ViewStyle,
   Platform,
+  TouchableOpacity,
 } from "react-native";
+
 import { styles } from "./styles";
 
 interface CustomInputProps {
@@ -22,6 +24,8 @@ interface CustomInputProps {
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   error?: string;
   icon?: React.ReactNode;
+  visibilityOff?: React.ReactNode;
+  visibilityOn?: React.ReactNode;
   onIconPress?: () => void;
   disabled?: boolean;
   inputType?: string;
@@ -49,10 +53,13 @@ const CustomInput: React.FC<CustomInputProps> = ({
   onSubmitEditing,
   maxLength,
   returnKeyType = "done",
+  visibilityOff,
+  visibilityOn,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const showLabel = isFocused || value !== "";
 
@@ -69,6 +76,21 @@ const CustomInput: React.FC<CustomInputProps> = ({
         });
       }
     }
+  };
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const renderPasswordIcon = () => {
+    return (
+      <TouchableOpacity
+        onPress={togglePasswordVisibility}
+        style={styles.iconContainer}
+        disabled={disabled}
+      >
+        {isPasswordVisible ? visibilityOn : visibilityOff}
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -110,7 +132,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             value={value}
             onChangeText={onChangeText}
             placeholder={!showLabel ? placeholder : ""}
-            secureTextEntry={secureTextEntry}
+            secureTextEntry={secureTextEntry && !isPasswordVisible}
             placeholderTextColor="#999"
             selectionColor="#007AFF"
             keyboardType={keyboardType}
@@ -136,6 +158,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             {...props}
           />
         </View>
+        {secureTextEntry && renderPasswordIcon()}
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}

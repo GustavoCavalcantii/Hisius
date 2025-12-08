@@ -13,88 +13,64 @@ import {
 } from "./styles";
 import { useState } from "react";
 import { TextValue } from "../../../../../../components/textValue";
-import { ManchesterTriage } from "@hisius/enums/src";
-import { Select } from "../../../../../../components/select";
 import Button from "@hisius/ui/components/Button";
-import { useNotification } from "../../../../../../components/notification/context";
-import { Queue } from "@hisius/services";
 import { capitalizeWords } from "../../../../../../utils";
-import { useTruncate } from "../../../../../../hooks/UseTruncate";
+import { useNavigate } from "react-router-dom";
+import { Queue } from "@hisius/services/src";
+import { useNotification } from "../../../../../../components/notification/context";
 
 interface PatientCardProp {
   key: number;
   patient: IPatient;
+  id?: number;
+  isTriage: boolean;
   onChange: () => void;
 }
 
 export function PatientCard(props: PatientCardProp) {
   const [isSelected, setIsSelected] = useState(false);
-  const [selectedClassification, setSelectedClassification] = useState<string>(
-    props.patient.classification || ""
-  );
-  const { addNotification } = useNotification();
+  const navigate = useNavigate();
   const queueService = new Queue();
-
-  const { ref: nameRef, isTruncated } = useTruncate();
-
-  const classificationOptions = Object.values(ManchesterTriage).map(
-    (value) => ({
-      value: value,
-      label: value,
-    })
-  );
+  const { addNotification } = useNotification();
 
   const handleCardClick = () => {
     setIsSelected(!isSelected);
   };
 
-  const handleSelectClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-  };
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedClassification(event.target.value);
-  };
-
   const handleButtonClick = async () => {
-    try {
-      await queueService.updateClassification(
-        Number(props.patient.id),
-        selectedClassification
-      );
-      props.onChange?.();
-      addNotification("Classificação alterada com sucesso", "success");
-      setIsSelected(false);
-    } catch (err: any) {
-      const errors = err.response?.data?.errors || [];
-      const messages = errors
-        .map((error: any) => error?.message || error)
-        .filter(Boolean);
+    if (props.isTriage) navigate(`/funcionario/filas/${props.id}`);
+    else {
+      try {
+        await queueService.finishTreatment(props.id!);
+        addNotification("Atendimento finalizado com sucesso", "success");
+      } catch (err: any) {
+        const errors = err.response?.data?.errors || [];
+        const messages = errors
+          .map((error: any) => error?.message || error)
+          .filter(Boolean);
 
-      if (messages.length === 0) {
-        messages.push(
-          err.response?.data?.message ||
-            err.message ||
-            "Erro ao mudar classificação do paciente"
-        );
+        if (messages.length === 0) {
+          messages.push(
+            err.response?.data?.message ||
+              err.message ||
+              "Erro ao chamar finalizar cadastro"
+          );
+        }
+
+        messages.forEach((message: string) => {
+          addNotification(message, "error");
+        });
       }
-
-      messages.forEach((message: string) => {
-        addNotification(message, "error");
-      });
     }
+
+    props.onChange?.();
+    setIsSelected(false);
   };
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
-  };
-
-  const formatDateTime = (dateTimeString: string | undefined) => {
-    if (!dateTimeString) return "";
-    const date = new Date(dateTimeString);
-    return date.toLocaleString("pt-BR");
   };
 
   const notSelectedCard = () => {
@@ -142,12 +118,6 @@ export function PatientCard(props: PatientCardProp) {
             <InfoLabel>Número CNS:</InfoLabel>
             <InfoValue>{props.patient.cnsNumber}</InfoValue>
           </InfoItem>
-          <InfoItem>
-            <InfoLabel>Data/Hora Atendimento:</InfoLabel>
-            <InfoValue>
-              {formatDateTime(props.patient.dateHourAttendance)}
-            </InfoValue>
-          </InfoItem>
         </PatientInfoGrid>
 
         {props.patient.classification ? (
@@ -157,19 +127,14 @@ export function PatientCard(props: PatientCardProp) {
                 {capitalizeWords(props.patient.classification.toString())}
               </TriageBadge>
             </TextValue>
-
-            <Select
-              label="Classificação"
-              options={classificationOptions}
-              onClick={handleSelectClick}
-              onChange={handleSelectChange}
-              value={selectedClassification}
-            />
-            <Button title="Alterar classificação" onPress={handleButtonClick} />
           </>
         ) : (
           ""
         )}
+        <Button
+          title={props.isTriage ? "Ver informações" : "Finalizar atendimento"}
+          onPress={handleButtonClick}
+        />
       </SelectedCardContainer>
     );
   };
@@ -182,13 +147,7 @@ export function PatientCard(props: PatientCardProp) {
         onClick={handleCardClick}
       >
         <TitleContainer>
-          <NameTitle
-            ref={nameRef}
-            $isSelected={isSelected}
-            title={isTruncated ? props.patient.name : undefined}
-          >
-            {props.patient.name}
-          </NameTitle>
+          <NameTitle $isSelected={isSelected}>{props.patient.name}</NameTitle>
         </TitleContainer>
         {!isSelected ? notSelectedCard() : selectedCard()}
       </Container>

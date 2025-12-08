@@ -12,13 +12,14 @@ export const Container = styled.div`
 `;
 
 export const TitleInfo = styled.div`
-  font-size: 16px;
+  font-size: clamp(13px, 2vw, 25px);
   font-weight: 200;
 `;
 
 export const SubtitleInfo = styled.div`
-  font-size: 24px;
+  font-size: clamp(15px, 7vw, 25px);
   font-weight: 300;
+  color: ${color.primary};
 `;
 
 export const TextContainer = styled.div`
@@ -49,7 +50,7 @@ export const QueueContainer = styled.div`
   display: flex;
   gap: 1rem;
 
-  @media (max-width: 552px) {
+  @media (max-width: 754px) {
     display: flex;
     flex-direction: column;
   }
@@ -58,6 +59,7 @@ export const QueueContainer = styled.div`
 export const InfoCardContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr auto;
+  gap: 1rem;
   width: 100%;
   justify-content: space-between;
 
@@ -81,6 +83,7 @@ export const InfoContainer = styled.div`
   justify-content: space-around;
   align-items: center;
   padding: 1.5rem;
+
   background: ${color.front};
   border: 0.7px solid rgba(13, 19, 41, 0.12);
   border-radius: 5px;

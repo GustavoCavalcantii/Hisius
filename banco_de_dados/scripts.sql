@@ -1,8 +1,8 @@
-create database hisius;
-use hisius;
+create database hisius_db;
+use hisius_db;
 
 -- Tabela Usuario
-CREATE TABLE Usuario (
+CREATE TABLE usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
@@ -33,7 +33,7 @@ CREATE TABLE gerente (
 );
 
 -- Tabela Paciente
-CREATE TABLE Paciente (
+CREATE TABLE paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL UNIQUE,
     cpf VARCHAR(14) UNIQUE NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE Paciente (
     data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_usuario_paciente
-        FOREIGN KEY (usuario_id) REFERENCES Usuario(id)
+        FOREIGN KEY (usuario_id) REFERENCES usuario(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     
@@ -66,7 +66,7 @@ CREATE TABLE fila_eventos (
     iniciou_em DATETIME NULL,
     
     CONSTRAINT fk_fila_paciente 
-        FOREIGN KEY (paciente_id) REFERENCES Paciente(id),
+        FOREIGN KEY (paciente_id) REFERENCES paciente(id),
     
     INDEX idx_fila_eventos_paciente (paciente_id),
     INDEX idx_fila_eventos_fila (fila),
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     data_atualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_usuario
-        FOREIGN KEY (usuario_id) REFERENCES Usuario(id)
+        FOREIGN KEY (usuario_id) REFERENCES usuario(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 );
 
 -- Tabela Atendimento 
-CREATE TABLE Atendimento (
+CREATE TABLE atendimento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,  -- Profissional que registrou
     paciente_id INT NOT NULL,
@@ -138,8 +138,8 @@ CREATE TABLE Atendimento (
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(id),
-    FOREIGN KEY (paciente_id) REFERENCES Paciente(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id),
     
     INDEX idx_paciente_data (paciente_id, data_atendimento),
     INDEX idx_destino (destino),
@@ -147,7 +147,7 @@ CREATE TABLE Atendimento (
 );
 
 -- Tabela Registro (Log)
-CREATE TABLE Registro (
+CREATE TABLE registro (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     acao VARCHAR(100) NOT NULL, 
@@ -157,7 +157,7 @@ CREATE TABLE Registro (
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_registro_usuario 
-        FOREIGN KEY (usuario_id) REFERENCES Usuario(id),
+        FOREIGN KEY (usuario_id) REFERENCES usuario(id),
     
     INDEX idx_registro_data (data_criacao),
     INDEX idx_registro_acao (acao),

@@ -3,7 +3,7 @@ import http from "http";
 import logger from "./config/Logger";
 import { ApiEnviroment } from "./enums/Api/ApiEnviroment";
 import app from "./routes";
-import { generateASCII } from "./utils/nameGenerator";
+import { generateASCII } from "./utils/NameGenerator";
 import packageJson from "../package.json";
 import { initDB, disconnectDB } from "./database/Connection";
 import { initializeModels } from "./database/models/index";

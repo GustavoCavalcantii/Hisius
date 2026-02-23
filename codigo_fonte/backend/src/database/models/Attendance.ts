@@ -164,7 +164,7 @@ export class Attendance extends Model {
       },
       {
         sequelize,
-        tableName: "Atendimento",
+        tableName: "atendimento",
         timestamps: true,
         createdAt: "data_criacao",
         updatedAt: "data_atualizacao",

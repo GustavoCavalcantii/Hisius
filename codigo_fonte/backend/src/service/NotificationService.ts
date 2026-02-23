@@ -1,12 +1,13 @@
 import { NotificationGateway } from "../gateways/NotificationGateway";
 import admin from "firebase-admin";
-import serviceAccount from "../config/firebase/serviceAccountKey.json";
+//mport serviceAccount from "../config/firebase/serviceAccountKey.json";
 import Logger from "../config/Logger";
 import { IQueueHistoryResponse } from "../interfaces/queue/IQueueHistoryResponse";
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-});
+//admin.initializeApp({
+//  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+//});
+
 export class NotificationService {
   static async notifyAddInPanel(patients: IQueueHistoryResponse[]) {
     NotificationGateway.emitToAdmins("paciente-chamado", patients);
